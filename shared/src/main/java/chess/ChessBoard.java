@@ -49,6 +49,40 @@ public class ChessBoard {
 
     }
 
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        String currentBoardString = "";
+        for (int i = 0; i < 8; i++){
+
+            for (int j = 0; j < 8; j++){
+
+                // Here we're going to get the piece at each location. Then we're going to
+                // grab the visual representation of the variable and attach it to the string.
+
+                throw new RuntimeException("You didn't yet make the string function work properly yet.");
+
+                CREATE A BIG ERROR HERE ON PURPOSE SO I CHECK HERE AGAIN LATER
+
+
+            }
+
+            currentBoardString = currentBoardString + "|\n";
+
+        }
+
+        return super.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     /**
      * Sets the board to the default starting board
      * (How the game of chess normally starts)
