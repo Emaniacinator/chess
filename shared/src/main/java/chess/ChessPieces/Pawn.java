@@ -2,6 +2,7 @@ package chess.ChessPieces;
 
 import chess.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class Pawn extends ChessPiece {
@@ -32,8 +33,47 @@ public class Pawn extends ChessPiece {
 
 
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) { // Does this include capturing pieces? If so, this is wrong.
+
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+
+        if (pieceColor == ChessGame.TeamColor.BLACK && myPosition.getColumn() == 0){
+
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.ROOK));
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.KNIGHT));
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.BISHOP));
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.QUEEN));
+
+        } else if (pieceColor == ChessGame.TeamColor.WHITE && myPosition.getColumn() == 7) {
+
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.ROOK));
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.KNIGHT));
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.BISHOP));
+            possibleMoves.add(new ChessMove(myPosition, myPosition, PieceType.QUEEN));
+
+        } else {
+
+            ChessPosition oneSpaceMove = new ChessPosition(myPosition.getRow(), myPosition.getColumn() + 1);
+            if (board.getPiece(oneSpaceMove) == null) {
+
+                possibleMoves.add(new ChessMove(myPosition, oneSpaceMove, null));
+
+                if (hasMoved == false) {
+
+                    ChessPosition twoSpaceMove = new ChessPosition(myPosition.getRow(), myPosition.getColumn() + 2);
+                    if (board.getPiece(twoSpaceMove) == null) {
+
+                        possibleMoves.add(new ChessMove(myPosition, twoSpaceMove, null));
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return possibleMoves;
     }
 
 
