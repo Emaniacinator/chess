@@ -1,5 +1,7 @@
 package chess;
 
+import java.util.Objects;
+
 /**
  * A chessboard that can hold and rearrange chess pieces.
  * <p>
@@ -14,6 +16,7 @@ public class ChessBoard {
         
     }
 
+
     /**
      * Adds a chess piece to the chessboard
      *
@@ -25,6 +28,7 @@ public class ChessBoard {
         currentBoard[position.getRow()][position.getColumn()] = piece;
 
     }
+
 
     /**
      * Gets a chess piece on the chessboard
@@ -49,14 +53,18 @@ public class ChessBoard {
 
     }
 
+
     @Override
     public int hashCode() {
         return super.hashCode();
     }
 
+
     @Override
     public String toString() {
+
         String currentBoardString = "";
+
         for (int i = 0; i < 8; i++){
 
             for (int j = 0; j < 8; j++){
@@ -64,10 +72,15 @@ public class ChessBoard {
                 // Here we're going to get the piece at each location. Then we're going to
                 // grab the visual representation of the variable and attach it to the string.
 
-                throw new RuntimeException("You didn't yet make the string function work properly yet.");
+                ChessPosition positionToCheck = new ChessPosition(i+ 1, j + 1);
 
-                CREATE A BIG ERROR HERE ON PURPOSE SO I CHECK HERE AGAIN LATER
+                if (getPiece(positionToCheck) != null){
+                    currentBoardString += "|" + getPiece(positionToCheck).toString();
+                }
 
+                else{
+                    currentBoardString += "| ";
+                }
 
             }
 
@@ -75,13 +88,26 @@ public class ChessBoard {
 
         }
 
-        return super.toString();
+        return currentBoardString;
+
     }
+
 
     @Override
     public boolean equals(Object obj) {
-        return super.equals(obj);
+
+        if (obj.getClass() == this.getClass()){
+
+            ChessBoard other = (ChessBoard) obj;
+
+            return Objects.equals(other.toString(), this.toString());
+
+        }
+
+        return false;
+
     }
+
 
     /**
      * Sets the board to the default starting board
@@ -96,50 +122,50 @@ public class ChessBoard {
             // This next bit is mad because I'm passing in the PAWN enum when it actually wants a complete
             // chess piece class. I'll need to pass in the actual pieces here in a moment.
 
-            ChessPiece blackPawn = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
-            ChessPiece whitePawn = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+            chess.ChessPieces.Pawn blackPawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN, false);
+            chess.ChessPieces.Pawn whitePawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN, false);
 
-            addPiece(new ChessPosition (2, i), blackPawn); // How does the position value work? I think this is how, but I'm not sure
-            addPiece(new ChessPosition (7, i), whitePawn);
+            addPiece(new ChessPosition (7, i), blackPawn); // How does the position value work? I think this is how, but I'm not sure
+            addPiece(new ChessPosition (2, i), whitePawn);
 
             switch (i){
 
                 case 1: // In both of these cases, we want to create and place the rooks.
                 case 8:
-                    ChessPiece blackRook = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
-                    ChessPiece whiteRook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
-                    addPiece(new ChessPosition (1, i), blackRook);
-                    addPiece(new ChessPosition (8, i), whiteRook);
+                    chess.ChessPieces.Rook blackRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK, false);
+                    chess.ChessPieces.Rook whiteRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK, false);
+                    addPiece(new ChessPosition (8, i), blackRook);
+                    addPiece(new ChessPosition (1, i), whiteRook);
                     break;
 
                 case 2: // In both of these cases, we want to create and place the knights
                 case 7:
-                    ChessPiece blackKnight = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-                    ChessPiece whiteKnight = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-                    addPiece(new ChessPosition(1, i), blackKnight);
-                    addPiece(new ChessPosition(8, i), whiteKnight);
+                    chess.ChessPieces.Knight blackKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+                    chess.ChessPieces.Knight whiteKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+                    addPiece(new ChessPosition(8, i), blackKnight);
+                    addPiece(new ChessPosition(1, i), whiteKnight);
                     break;
 
                 case 3: // In both of these cases, we want to create and place the bishops
                 case 6:
-                    ChessPiece blackBishop = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-                    ChessPiece whiteBishop = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-                    addPiece(new ChessPosition(1, i), blackBishop);
-                    addPiece(new ChessPosition(8, i), whiteBishop);
+                    chess.ChessPieces.Bishop blackBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+                    chess.ChessPieces.Bishop whiteBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+                    addPiece(new ChessPosition(8, i), blackBishop);
+                    addPiece(new ChessPosition(1, i), whiteBishop);
                     break;
 
                 case 4: // In this case, we want to create and place the queens
-                    ChessPiece blackQueen = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
-                    ChessPiece whiteQueen = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
-                    addPiece(new ChessPosition(1, i), blackQueen);
-                    addPiece(new ChessPosition(8, i), whiteQueen);
+                    chess.ChessPieces.Queen blackQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+                    chess.ChessPieces.Queen whiteQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+                    addPiece(new ChessPosition(8, i), blackQueen);
+                    addPiece(new ChessPosition(1, i), whiteQueen);
                     break;
 
                 case 5: // In this case, we want to create and place the kings
-                    ChessPiece blackKing = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
-                    ChessPiece whiteKing = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
-                    addPiece(new ChessPosition(1, i), blackKing);
-                    addPiece(new ChessPosition(8, i), whiteKing);
+                    chess.ChessPieces.King blackKing = new chess.ChessPieces.King(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING, false);
+                    chess.ChessPieces.King whiteKing = new chess.ChessPieces.King(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING, false);
+                    addPiece(new ChessPosition(8, i), blackKing);
+                    addPiece(new ChessPosition(1, i), whiteKing);
                     break;
 
             }
