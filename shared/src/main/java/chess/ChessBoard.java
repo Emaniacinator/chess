@@ -122,50 +122,73 @@ public class ChessBoard {
             // This next bit is mad because I'm passing in the PAWN enum when it actually wants a complete
             // chess piece class. I'll need to pass in the actual pieces here in a moment.
 
-            chess.ChessPieces.Pawn blackPawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN, false);
-            chess.ChessPieces.Pawn whitePawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN, false);
+            ChessPosition currentBlackPawnPosition = new ChessPosition (7, i);
+            ChessPosition currentWhitePawnPosition = new ChessPosition (2, i);
 
-            addPiece(new ChessPosition (7, i), blackPawn); // How does the position value work? I think this is how, but I'm not sure
-            addPiece(new ChessPosition (2, i), whitePawn);
+            chess.ChessPieces.Pawn blackPawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN, currentBlackPawnPosition, false);
+            chess.ChessPieces.Pawn whitePawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN, currentWhitePawnPosition, false);
+
+            addPiece(currentBlackPawnPosition, blackPawn); // How does the position value work? I think this is how, but I'm not sure
+            addPiece(currentWhitePawnPosition, whitePawn);
 
             switch (i){
 
                 case 1: // In both of these cases, we want to create and place the rooks.
                 case 8:
-                    chess.ChessPieces.Rook blackRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK, false);
-                    chess.ChessPieces.Rook whiteRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK, false);
-                    addPiece(new ChessPosition (8, i), blackRook);
-                    addPiece(new ChessPosition (1, i), whiteRook);
+                    ChessPosition currentBlackRookPosition = new ChessPosition (8, i);
+                    ChessPosition currentWhiteRookPosition = new ChessPosition (1, i);
+
+                    chess.ChessPieces.Rook blackRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK, currentBlackRookPosition, false);
+                    chess.ChessPieces.Rook whiteRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK, currentWhiteRookPosition, false);
+
+                    addPiece(currentBlackRookPosition, blackRook);
+                    addPiece(currentWhiteRookPosition, whiteRook);
                     break;
 
                 case 2: // In both of these cases, we want to create and place the knights
                 case 7:
-                    chess.ChessPieces.Knight blackKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
-                    chess.ChessPieces.Knight whiteKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
-                    addPiece(new ChessPosition(8, i), blackKnight);
-                    addPiece(new ChessPosition(1, i), whiteKnight);
+                    ChessPosition currentBlackKnightPosition = new ChessPosition (8, i);
+                    ChessPosition currentWhiteKnightPosition = new ChessPosition (1, i);
+
+                    chess.ChessPieces.Knight blackKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT, currentBlackKnightPosition);
+                    chess.ChessPieces.Knight whiteKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT, currentBlackKnightPosition);
+
+                    addPiece(currentBlackKnightPosition, blackKnight);
+                    addPiece(currentWhiteKnightPosition, whiteKnight);
                     break;
 
                 case 3: // In both of these cases, we want to create and place the bishops
                 case 6:
-                    chess.ChessPieces.Bishop blackBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
-                    chess.ChessPieces.Bishop whiteBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
-                    addPiece(new ChessPosition(8, i), blackBishop);
-                    addPiece(new ChessPosition(1, i), whiteBishop);
+                    ChessPosition currentBlackBishopPosition = new ChessPosition (8, i);
+                    ChessPosition currentWhiteBishopPosition = new ChessPosition (1, i);
+
+                    chess.ChessPieces.Bishop blackBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP, currentBlackBishopPosition);
+                    chess.ChessPieces.Bishop whiteBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP, currentWhiteBishopPosition);
+
+                    addPiece(currentBlackBishopPosition, blackBishop);
+                    addPiece(currentWhiteBishopPosition, whiteBishop);
                     break;
 
                 case 4: // In this case, we want to create and place the queens
-                    chess.ChessPieces.Queen blackQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
-                    chess.ChessPieces.Queen whiteQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
-                    addPiece(new ChessPosition(8, i), blackQueen);
-                    addPiece(new ChessPosition(1, i), whiteQueen);
+                    ChessPosition currentBlackQueenPosition = new ChessPosition (8, i);
+                    ChessPosition currentWhiteQueenPosition = new ChessPosition (1, i);
+
+                    chess.ChessPieces.Queen blackQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN, currentBlackQueenPosition);
+                    chess.ChessPieces.Queen whiteQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN, currentWhiteQueenPosition);
+
+                    addPiece(currentBlackQueenPosition, blackQueen);
+                    addPiece(currentWhiteQueenPosition, whiteQueen);
                     break;
 
                 case 5: // In this case, we want to create and place the kings
-                    chess.ChessPieces.King blackKing = new chess.ChessPieces.King(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING, false);
-                    chess.ChessPieces.King whiteKing = new chess.ChessPieces.King(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING, false);
-                    addPiece(new ChessPosition(8, i), blackKing);
-                    addPiece(new ChessPosition(1, i), whiteKing);
+                    ChessPosition currentBlackKingPosition = new ChessPosition (8, i);
+                    ChessPosition currentWhiteKingPosition = new ChessPosition (1, i);
+
+                    chess.ChessPieces.King blackKing = new chess.ChessPieces.King(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING, currentBlackKingPosition, false);
+                    chess.ChessPieces.King whiteKing = new chess.ChessPieces.King(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING, currentWhiteKingPosition, false);
+
+                    addPiece(currentBlackKingPosition, blackKing);
+                    addPiece(currentWhiteKingPosition, whiteKing);
                     break;
 
             }

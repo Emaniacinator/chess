@@ -20,6 +20,7 @@ public class ChessPiece {
 
     }
 
+
     /**
      * The various different chess piece options
      */
@@ -32,6 +33,7 @@ public class ChessPiece {
         PAWN
     }
 
+
     /**
      * @return Which team this chess piece belongs to
      */
@@ -41,6 +43,7 @@ public class ChessPiece {
 
     }
 
+
     /**
      * @return which type of chess piece this piece is
      */
@@ -49,6 +52,7 @@ public class ChessPiece {
         return type;
 
     }
+
 
     /**
      * Calculates all the positions a chess piece can move to
@@ -60,6 +64,7 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         throw new RuntimeException("Not implemented");
     }
+
 
     @Override
     public String toString() {

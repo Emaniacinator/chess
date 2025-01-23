@@ -2,13 +2,25 @@ package chess.ChessPieces;
 
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 public class Knight extends ChessPiece {
 
-    public Knight(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type){
+    private ChessPosition currentPosition;
+
+    public Knight(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, ChessPosition currentPosition) {
         super(pieceColor, type);
+        this.currentPosition = currentPosition;
 
     }
+
+
+    public ChessPosition getCurrentPosition() {
+
+        return currentPosition;
+
+    }
+
 
     @Override
     public String toString(){
