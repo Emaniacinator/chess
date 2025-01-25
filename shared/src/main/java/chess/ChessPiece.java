@@ -190,4 +190,72 @@ public class ChessPiece {
 
     }
 
+
+    @Override
+    public int hashCode() {
+
+        int typeHasher;
+        int hasMovedHasher;
+        int pieceColorHasher;
+
+        switch(this.type){
+
+            case KING:
+                typeHasher = 1;
+                break;
+
+            case QUEEN:
+                typeHasher = 2;
+                break;
+
+            case BISHOP:
+                typeHasher = 3;
+                break;
+
+            case KNIGHT:
+                typeHasher = 4;
+                break;
+
+            case ROOK:
+                typeHasher = 5;
+                break;
+
+            case PAWN:
+                typeHasher = 6;
+                break;
+
+            default:
+                typeHasher = 0;
+                break;
+
+        }
+
+        if (hasMoved == true){
+
+            hasMovedHasher = 3;
+
+        }
+
+        else{
+
+            hasMovedHasher = 7;
+
+        }
+
+        if (pieceColor == ChessGame.TeamColor.WHITE){
+
+            pieceColorHasher = 5;
+
+        }
+
+        else{
+
+            pieceColorHasher = 9;
+
+        }
+
+        return typeHasher * hasMovedHasher * pieceColorHasher;
+
+    }
+
 }

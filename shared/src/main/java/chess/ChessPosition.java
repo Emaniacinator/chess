@@ -99,4 +99,11 @@ public class ChessPosition {
 
     }
 
+    @Override
+    public int hashCode() {
+
+        return this.toString().hashCode() * (this.getRow() + 1) * this.getColumn();
+
+    }
+
 }

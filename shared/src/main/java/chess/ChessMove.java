@@ -79,4 +79,20 @@ public class ChessMove {
         return move.toString().equals(this.toString());
 
     }
+
+    @Override
+    public int hashCode() {
+
+        int promotionPieceHasher = 13;
+
+        if (this.getPromotionPiece() != null) {
+
+            promotionPieceHasher += this.getPromotionPiece().hashCode();
+
+        }
+
+        return startPosition.hashCode() * endPosition.hashCode() * promotionPieceHasher;
+
+    }
+
 }
