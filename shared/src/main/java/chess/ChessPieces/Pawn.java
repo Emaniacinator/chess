@@ -32,6 +32,7 @@ public class Pawn extends ChessPiece {
     }
 
 
+    // En Passant capturing not yet implemented
     // It's worth noting that this might let the object exceed the edges of the chess board as currently implemented.
     // Limits may need to be created to prevent this from happening.
     @Override
