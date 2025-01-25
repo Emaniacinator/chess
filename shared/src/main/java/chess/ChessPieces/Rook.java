@@ -1,8 +1,9 @@
 package chess.ChessPieces;
 
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class Rook extends ChessPiece {
 
@@ -48,5 +49,89 @@ public class Rook extends ChessPiece {
 
     }
 
+
+    @Override
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
+
+        int currentCol = myPosition.getColumn();
+        int currentRow = myPosition.getRow();
+
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
+
+        for (int i = currentCol + 1; i < 7; i++){
+
+            ChessPosition checkedPosition = new ChessPosition(currentRow, i);
+
+            if (board.getPiece(checkedPosition) == null){
+
+                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
+
+            }
+
+            else{
+
+                break;
+
+            }
+
+        }
+
+        for (int i = currentCol - 1; i > 0; i--){
+
+            ChessPosition checkedPosition = new ChessPosition(currentRow, i);
+
+            if (board.getPiece(checkedPosition) == null){
+
+                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
+
+            }
+
+            else{
+
+                break;
+
+            }
+
+        }
+
+        for (int j = currentRow + 1; j < 7; j++){
+
+            ChessPosition checkedPosition = new ChessPosition(j, currentCol);
+
+            if (board.getPiece(checkedPosition) == null){
+
+                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
+
+            }
+
+            else{
+
+                break;
+
+            }
+
+        }
+
+        for (int j = currentRow - 1; j > 0; j--){
+
+            ChessPosition checkedPosition = new ChessPosition(j, currentCol);
+
+            if (board.getPiece(checkedPosition) == null){
+
+                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
+
+            }
+
+            else{
+
+                break;
+
+            }
+
+        }
+
+        return possibleMoves;
+
+    }
 }
 

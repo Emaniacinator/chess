@@ -43,10 +43,10 @@ public class Knight extends ChessPiece {
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
-        Collection<ChessMove> possibleMoves = new ArrayList();
+        Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
-        int currentCol = currentPosition.getColumn();
-        int currentRow = currentPosition.getRow();
+        int currentCol = myPosition.getColumn();
+        int currentRow = myPosition.getRow();
 
         if (currentRow < 6){
 
