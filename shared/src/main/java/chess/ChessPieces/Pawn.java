@@ -62,7 +62,7 @@ public class Pawn extends ChessPiece {
 
                     ChessPosition whitePromotionCaptureLeft = new ChessPosition(currentRow + 1, currentCol - 1);
 
-                    if (board.getPiece(whitePromotionCaptureLeft) != null && board.getPiece(whitePromotionCaptureLeft).getTeamColor() != pieceColor){}{
+                    if (board.getPiece(whitePromotionCaptureLeft) != null && board.getPiece(whitePromotionCaptureLeft).getTeamColor() != pieceColor){
 
                         possibleMoves.add(new ChessMove(myPosition, whitePromotionCaptureLeft, PieceType.ROOK));
                         possibleMoves.add(new ChessMove(myPosition, whitePromotionCaptureLeft, PieceType.KNIGHT));
@@ -85,6 +85,7 @@ public class Pawn extends ChessPiece {
                         possibleMoves.add(new ChessMove(myPosition, whitePromotionCaptureRight, PieceType.QUEEN));
 
                     }
+
                 }
 
             }
@@ -109,15 +110,27 @@ public class Pawn extends ChessPiece {
 
             }
 
-            if (currentCol - 1 > 1){
+            if (currentCol - 1 > 1 && currentRow + 1 != 8){
 
-                
+                ChessPosition whiteCaptureLeft = new ChessPosition(currentRow + 1, currentCol - 1);
+
+                if (board.getPiece(whiteCaptureLeft) != null && board.getPiece(whiteCaptureLeft).getTeamColor() != pieceColor){
+
+                    possibleMoves.add(new ChessMove(myPosition, whiteCaptureLeft, null));
+
+                }
 
             }
 
-            if (currentCol + 1 < 8){
+            if (currentCol + 1 < 8 && currentRow + 1 != 8){
 
+                ChessPosition whiteCaptureRight = new ChessPosition(currentRow + 1, currentCol + 1);
 
+                if (board.getPiece(whiteCaptureRight) != null && board.getPiece(whiteCaptureRight).getTeamColor() != pieceColor){
+
+                    possibleMoves.add(new ChessMove(myPosition, whiteCaptureRight, null));
+
+                }
 
             }
 
