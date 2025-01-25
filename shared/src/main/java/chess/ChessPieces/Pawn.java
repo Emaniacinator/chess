@@ -32,6 +32,8 @@ public class Pawn extends ChessPiece {
     }
 
 
+    // It's worth noting that this might let the object exceed the edges of the chess board as currently implemented.
+    // Limits may need to be created to prevent this from happening.
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) { // Does this include capturing pieces? If so, this is wrong.
 
