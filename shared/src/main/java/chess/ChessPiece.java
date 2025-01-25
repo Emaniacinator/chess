@@ -174,4 +174,20 @@ public class ChessPiece {
 
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o.getClass() != this.getClass()) {
+
+            return false;
+
+        }
+
+        ChessPiece typeCastObject = (ChessPiece) o;
+
+        return typeCastObject.hasMoved == this.hasMoved && typeCastObject.getPieceType().equals(this.getPieceType()) && typeCastObject.getTeamColor().equals(this.getTeamColor());
+
+    }
+
 }

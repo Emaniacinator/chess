@@ -50,4 +50,33 @@ public class ChessMove {
         return promotionPiece;
 
     }
+
+    @Override
+    public String toString() {
+
+        if (this.getPromotionPiece() == null){
+
+            return "Starting Position: " + startPosition.toString() + "\nEnding Position: " + endPosition.toString();
+
+        }
+
+        return "Promoted the piece to " + promotionPiece.toString();
+
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (o.getClass() != ChessMove.class) {
+
+            return false;
+
+        }
+
+        ChessMove move = (ChessMove) o;
+
+        return move.toString().equals(this.toString());
+
+    }
 }

@@ -37,4 +37,66 @@ public class ChessPosition {
         return col - 1;
 
     }
+
+    @Override
+    public String toString() {
+
+        char columnPosition = ' ';
+        int rowPosition = this.getRow() + 1;
+
+        switch(this.getColumn()){
+
+            case 0:
+                columnPosition = 'A';
+                break;
+
+            case 1:
+                columnPosition = 'B';
+                break;
+
+            case 2:
+                columnPosition = 'C';
+                break;
+
+            case 3:
+                columnPosition = 'D';
+                break;
+
+            case 4:
+                columnPosition = 'E';
+                break;
+
+            case 5:
+                columnPosition = 'F';
+                break;
+
+            case 6:
+                columnPosition = 'G';
+                break;
+
+            case 7:
+                columnPosition = 'H';
+                break;
+
+        }
+
+        return columnPosition + ", " + rowPosition;
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj.getClass() != ChessPosition.class) {
+
+            return false;
+
+        }
+
+        ChessPosition other = (ChessPosition) obj;
+
+        return this.getRow() == other.getRow() && this.getColumn() == other.getColumn();
+
+    }
+
 }

@@ -56,14 +56,14 @@ public class King extends ChessPiece {
 
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
-        int currentCol = myPosition.getColumn();
-        int currentRow = myPosition.getRow();
+        int currentCol = myPosition.getColumn() + 1;
+        int currentRow = myPosition.getRow() + 1;
 
-        if (currentCol < 7){
+        if (currentCol < 8){
 
-            ChessPosition right = new ChessPosition(currentCol + 1, currentRow);
+            ChessPosition right = new ChessPosition(currentRow, currentCol + 1);
 
-            if(board.getPiece(right) == null){
+            if(board.getPiece(right) == null || board.getPiece(right).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, right, null));
 
@@ -71,11 +71,11 @@ public class King extends ChessPiece {
 
         }
 
-        if (currentCol > 0) {
+        if (currentCol > 1) {
 
-            ChessPosition left = new ChessPosition(currentCol - 1, currentRow);
+            ChessPosition left = new ChessPosition(currentRow, currentCol - 1);
 
-            if(board.getPiece(left) == null){
+            if(board.getPiece(left) == null || board.getPiece(left).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, left, null));
 
@@ -83,11 +83,11 @@ public class King extends ChessPiece {
 
         }
 
-        if (currentRow > 0) {
+        if (currentRow > 1) {
 
-            ChessPosition down = new ChessPosition(currentCol, currentRow - 1);
+            ChessPosition down = new ChessPosition(currentRow - 1, currentCol);
 
-            if(board.getPiece(down) == null){
+            if(board.getPiece(down) == null || board.getPiece(down).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, down, null));
 
@@ -95,11 +95,11 @@ public class King extends ChessPiece {
 
         }
 
-        if (currentRow < 7) {
+        if (currentRow < 8) {
 
-            ChessPosition up = new ChessPosition(currentCol, currentRow + 1);
+            ChessPosition up = new ChessPosition(currentRow + 1, currentCol);
 
-            if(board.getPiece(up) == null){
+            if(board.getPiece(up) == null || board.getPiece(up).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, up, null));
 
@@ -107,11 +107,11 @@ public class King extends ChessPiece {
 
         }
 
-        if (currentCol < 7 && currentRow < 7) {
+        if (currentCol < 8 && currentRow < 8) {
 
-            ChessPosition diagonalRightUp = new ChessPosition(currentCol + 1, currentRow + 1);
+            ChessPosition diagonalRightUp = new ChessPosition(currentRow + 1, currentCol + 1);
 
-            if(board.getPiece(diagonalRightUp) == null){
+            if(board.getPiece(diagonalRightUp) == null || board.getPiece(diagonalRightUp).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, diagonalRightUp, null));
 
@@ -119,11 +119,11 @@ public class King extends ChessPiece {
 
         }
 
-        if (currentCol < 7 && currentRow > 0) {
+        if (currentCol < 8 && currentRow > 1) {
 
-            ChessPosition diagonalRightDown = new ChessPosition(currentCol + 1, currentRow - 1);
+            ChessPosition diagonalRightDown = new ChessPosition(currentRow - 1, currentCol + 1);
 
-            if(board.getPiece(diagonalRightDown) == null){
+            if(board.getPiece(diagonalRightDown) == null || board.getPiece(diagonalRightDown).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, diagonalRightDown, null));
 
@@ -131,11 +131,11 @@ public class King extends ChessPiece {
 
         }
 
-        if (currentCol > 0 && currentRow < 7) {
+        if (currentCol > 1 && currentRow < 8) {
 
-            ChessPosition diagonalLeftUp = new ChessPosition(currentCol - 1, currentRow + 1);
+            ChessPosition diagonalLeftUp = new ChessPosition(currentRow + 1, currentCol - 1);
 
-            if(board.getPiece(diagonalLeftUp) == null){
+            if(board.getPiece(diagonalLeftUp) == null || board.getPiece(diagonalLeftUp).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, diagonalLeftUp, null));
 
@@ -143,11 +143,11 @@ public class King extends ChessPiece {
 
         }
 
-        if (currentCol > 0 && currentRow > 0) {
+        if (currentCol > 1 && currentRow > 1) {
 
-            ChessPosition diagonalLeftDown = new ChessPosition(currentCol - 1, currentRow - 1);
+            ChessPosition diagonalLeftDown = new ChessPosition(currentRow - 1, currentCol - 1);
 
-            if(board.getPiece(diagonalLeftDown) == null){
+            if(board.getPiece(diagonalLeftDown) == null || board.getPiece(diagonalLeftDown).getTeamColor() != pieceColor){
 
                 possibleMoves.add(new ChessMove(myPosition, diagonalLeftDown, null));
 
@@ -158,4 +158,21 @@ public class King extends ChessPiece {
         return possibleMoves;
 
     }
+
+
+    // This implementation might cause a few problems due to weird classes conflicting.
+    @Override
+    public boolean equals (Object o){
+
+        if (o.getClass() == this.getClass()){
+
+            King other = (King) o;
+            return super.equals(o) && other.getCurrentPosition().equals(currentPosition);
+
+        }
+
+        return false;
+
+    }
+
 }

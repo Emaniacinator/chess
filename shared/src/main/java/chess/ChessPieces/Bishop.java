@@ -47,17 +47,23 @@ public class Bishop extends ChessPiece {
 
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
-        int currentCol = myPosition.getColumn();
-        int currentRow = myPosition.getRow();
+        int currentCol = myPosition.getColumn() + 1;
+        int currentRow = myPosition.getRow() + 1;
 
-        for (int i = currentCol + 1, j = currentRow + 1; i < 7 && j < 7 ; i++, j++){
+        for (int i = currentCol + 1, j = currentRow + 1; i < 8 && j < 8 ; i++, j++){ // Something with i is wrong here
 
-            ChessPosition checkedSpot = new ChessPosition(i, j);
+            ChessPosition checkedSpot = new ChessPosition(j, i);
 
-            if(board.getPiece(checkedSpot) == null){
+            if(board.getPiece(checkedSpot) == null || board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()){
 
                 ChessMove newMove = new ChessMove(myPosition, checkedSpot, null);
                 possibleMoves.add(newMove);
+
+                if (board.getPiece(checkedSpot) != null && board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()) {
+
+                    break;
+
+                }
 
             }
 
@@ -69,14 +75,20 @@ public class Bishop extends ChessPiece {
 
         }
 
-        for (int i = currentCol + 1, j = currentRow - 1; i < 7 && j > 0 ; i++, j--){
+        for (int i = currentCol + 1, j = currentRow - 1; i < 8 && j > 1 ; i++, j--){ // Something with i is wrong here
 
-            ChessPosition checkedSpot = new ChessPosition(i, j);
+            ChessPosition checkedSpot = new ChessPosition(j, i);
 
-            if(board.getPiece(checkedSpot) == null){
+            if(board.getPiece(checkedSpot) == null || board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()){
 
                 ChessMove newMove = new ChessMove(myPosition, checkedSpot, null);
                 possibleMoves.add(newMove);
+
+                if (board.getPiece(checkedSpot) != null && board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()) {
+
+                    break;
+
+                }
 
             }
 
@@ -88,14 +100,20 @@ public class Bishop extends ChessPiece {
 
         }
 
-        for (int i = currentCol - 1, j = currentRow + 1; i > 0 && j < 7 ; i--, j++){
+        for (int i = currentCol - 1, j = currentRow + 1; i > 1 && j < 8 ; i--, j++){
 
-            ChessPosition checkedSpot = new ChessPosition(i, j);
+            ChessPosition checkedSpot = new ChessPosition(j, i);
 
-            if(board.getPiece(checkedSpot) == null){
+            if(board.getPiece(checkedSpot) == null || board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()){
 
                 ChessMove newMove = new ChessMove(myPosition, checkedSpot, null);
                 possibleMoves.add(newMove);
+
+                if (board.getPiece(checkedSpot) != null && board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()) {
+
+                    break;
+
+                }
 
             }
 
@@ -107,14 +125,20 @@ public class Bishop extends ChessPiece {
 
         }
 
-        for (int i = currentCol - 1, j = currentRow - 1; i > 0 && j > 0 ; i--, j--){
+        for (int i = currentCol - 1, j = currentRow - 1; i > 1 && j > 1 ; i--, j--){
 
-            ChessPosition checkedSpot = new ChessPosition(i, j);
+            ChessPosition checkedSpot = new ChessPosition(j, i);
 
-            if(board.getPiece(checkedSpot) == null){
+            if(board.getPiece(checkedSpot) == null || board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()){
 
                 ChessMove newMove = new ChessMove(myPosition, checkedSpot, null);
                 possibleMoves.add(newMove);
+
+                if (board.getPiece(checkedSpot) != null && board.getPiece(checkedSpot).getTeamColor() != this.getTeamColor()) {
+
+                    break;
+
+                }
 
             }
 
