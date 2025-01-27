@@ -33,10 +33,9 @@ public class Pawn extends ChessPiece {
 
 
     // En Passant capturing not yet implemented
-    // It's worth noting that this might let the object exceed the edges of the chess board as currently implemented.
-    // Limits may need to be created to prevent this from happening.
+    // Note that white starts at the bottom and black starts at the top
     @Override
-    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) { // Note that white starts at the bottom and black starts at the top
+    public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
 
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
         int currentRow = currentPosition.getRow() + 1;
@@ -77,7 +76,7 @@ public class Pawn extends ChessPiece {
 
                     ChessPosition whitePromotionCaptureRight = new ChessPosition(currentRow + 1, currentCol + 1);
 
-                    if (board.getPiece(whitePromotionCaptureRight) != null && board.getPiece(whitePromotionCaptureRight).getTeamColor() != pieceColor) {
+                    if(board.getPiece(whitePromotionCaptureRight) != null && board.getPiece(whitePromotionCaptureRight).getTeamColor() != pieceColor){
 
                         possibleMoves.add(new ChessMove(myPosition, whitePromotionCaptureRight, PieceType.ROOK));
                         possibleMoves.add(new ChessMove(myPosition, whitePromotionCaptureRight, PieceType.KNIGHT));
@@ -171,7 +170,7 @@ public class Pawn extends ChessPiece {
 
                     ChessPosition blackPromotionCaptureRight = new ChessPosition(currentRow - 1, currentCol + 1);
 
-                    if (board.getPiece(blackPromotionCaptureRight) != null && board.getPiece(blackPromotionCaptureRight).getTeamColor() != pieceColor) {
+                    if(board.getPiece(blackPromotionCaptureRight) != null && board.getPiece(blackPromotionCaptureRight).getTeamColor() != pieceColor){
 
                         possibleMoves.add(new ChessMove(myPosition, blackPromotionCaptureRight, PieceType.ROOK));
                         possibleMoves.add(new ChessMove(myPosition, blackPromotionCaptureRight, PieceType.KNIGHT));

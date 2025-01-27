@@ -186,7 +186,10 @@ public class ChessPiece {
 
         ChessPiece typeCastObject = (ChessPiece) o;
 
-        return typeCastObject.hasMoved == this.hasMoved && typeCastObject.getPieceType().equals(this.getPieceType()) && typeCastObject.getTeamColor().equals(this.getTeamColor());
+        boolean typeCheck = typeCastObject.getPieceType().equals(this.getPieceType());
+        boolean colorCheck = typeCastObject.getTeamColor().equals(this.getTeamColor());
+
+        return typeCastObject.hasMoved == this.hasMoved && typeCheck && colorCheck;
 
     }
 
