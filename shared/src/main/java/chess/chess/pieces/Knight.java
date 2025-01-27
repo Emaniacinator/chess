@@ -1,4 +1,4 @@
-package chess.ChessPieces;
+package chess.chess.pieces;
 
 import chess.*;
 

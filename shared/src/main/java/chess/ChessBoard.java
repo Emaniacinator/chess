@@ -1,5 +1,7 @@
 package chess;
 
+import chess.chess.pieces.*;
+
 import java.util.Objects;
 
 /**
@@ -125,8 +127,8 @@ public class ChessBoard {
             ChessPosition currentBlackPawnPosition = new ChessPosition (7, i);
             ChessPosition currentWhitePawnPosition = new ChessPosition (2, i);
 
-            chess.ChessPieces.Pawn blackPawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN, currentBlackPawnPosition, false);
-            chess.ChessPieces.Pawn whitePawn = new chess.ChessPieces.Pawn(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN, currentWhitePawnPosition, false);
+            Pawn blackPawn = new Pawn(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN, currentBlackPawnPosition, false);
+            Pawn whitePawn = new Pawn(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN, currentWhitePawnPosition, false);
 
             addPiece(currentBlackPawnPosition, blackPawn); // How does the position value work? I think this is how, but I'm not sure
             addPiece(currentWhitePawnPosition, whitePawn);
@@ -138,8 +140,8 @@ public class ChessBoard {
                     ChessPosition currentBlackRookPosition = new ChessPosition (8, i);
                     ChessPosition currentWhiteRookPosition = new ChessPosition (1, i);
 
-                    chess.ChessPieces.Rook blackRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK, currentBlackRookPosition, false);
-                    chess.ChessPieces.Rook whiteRook = new chess.ChessPieces.Rook(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK, currentWhiteRookPosition, false);
+                    Rook blackRook = new Rook(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK, currentBlackRookPosition, false);
+                    Rook whiteRook = new Rook(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK, currentWhiteRookPosition, false);
 
                     addPiece(currentBlackRookPosition, blackRook);
                     addPiece(currentWhiteRookPosition, whiteRook);
@@ -150,8 +152,8 @@ public class ChessBoard {
                     ChessPosition currentBlackKnightPosition = new ChessPosition (8, i);
                     ChessPosition currentWhiteKnightPosition = new ChessPosition (1, i);
 
-                    chess.ChessPieces.Knight blackKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT, currentBlackKnightPosition);
-                    chess.ChessPieces.Knight whiteKnight = new chess.ChessPieces.Knight(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT, currentBlackKnightPosition);
+                    Knight blackKnight = new Knight(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT, currentBlackKnightPosition);
+                    Knight whiteKnight = new Knight(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT, currentBlackKnightPosition);
 
                     addPiece(currentBlackKnightPosition, blackKnight);
                     addPiece(currentWhiteKnightPosition, whiteKnight);
@@ -162,8 +164,8 @@ public class ChessBoard {
                     ChessPosition currentBlackBishopPosition = new ChessPosition (8, i);
                     ChessPosition currentWhiteBishopPosition = new ChessPosition (1, i);
 
-                    chess.ChessPieces.Bishop blackBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP, currentBlackBishopPosition);
-                    chess.ChessPieces.Bishop whiteBishop = new chess.ChessPieces.Bishop(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP, currentWhiteBishopPosition);
+                    Bishop blackBishop = new Bishop(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP, currentBlackBishopPosition);
+                    Bishop whiteBishop = new Bishop(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP, currentWhiteBishopPosition);
 
                     addPiece(currentBlackBishopPosition, blackBishop);
                     addPiece(currentWhiteBishopPosition, whiteBishop);
@@ -173,8 +175,8 @@ public class ChessBoard {
                     ChessPosition currentBlackQueenPosition = new ChessPosition (8, i);
                     ChessPosition currentWhiteQueenPosition = new ChessPosition (1, i);
 
-                    chess.ChessPieces.Queen blackQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN, currentBlackQueenPosition);
-                    chess.ChessPieces.Queen whiteQueen = new chess.ChessPieces.Queen(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN, currentWhiteQueenPosition);
+                    Queen blackQueen = new Queen(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN, currentBlackQueenPosition);
+                    Queen whiteQueen = new Queen(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN, currentWhiteQueenPosition);
 
                     addPiece(currentBlackQueenPosition, blackQueen);
                     addPiece(currentWhiteQueenPosition, whiteQueen);
@@ -184,8 +186,8 @@ public class ChessBoard {
                     ChessPosition currentBlackKingPosition = new ChessPosition (8, i);
                     ChessPosition currentWhiteKingPosition = new ChessPosition (1, i);
 
-                    chess.ChessPieces.King blackKing = new chess.ChessPieces.King(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING, currentBlackKingPosition, false);
-                    chess.ChessPieces.King whiteKing = new chess.ChessPieces.King(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING, currentWhiteKingPosition, false);
+                    King blackKing = new King(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING, currentBlackKingPosition, false);
+                    King whiteKing = new King(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING, currentWhiteKingPosition, false);
 
                     addPiece(currentBlackKingPosition, blackKing);
                     addPiece(currentWhiteKingPosition, whiteKing);
