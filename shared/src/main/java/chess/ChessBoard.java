@@ -74,7 +74,7 @@ public class ChessBoard {
                 // Here we're going to get the piece at each location. Then we're going to
                 // grab the visual representation of the variable and attach it to the string.
 
-                ChessPosition positionToCheck = new ChessPosition(i+ 1, j + 1);
+                ChessPosition positionToCheck = new ChessPosition(i + 1, j + 1);
 
                 if (getPiece(positionToCheck) != null){
                     currentBoardString += "|" + getPiece(positionToCheck).toString();

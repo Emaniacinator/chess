@@ -99,10 +99,9 @@ public class ChessGame {
 
         Collection<ChessMove> possibleMoves = validMoves(oldPosition);
 
-        // NOTE: This is implemented wrong and I need to make it a ChessMove instead of a
-        // ChessPosition to make contains() work
+        // NOTE: This may not place nice with pawns? But maybe it will?
 
-        if (possibleMoves.contains(newPosition)){
+        if (possibleMoves.contains(move)){
 
             ChessPiece pieceType = currentBoard.getPiece(oldPosition);
 
@@ -134,10 +133,10 @@ public class ChessGame {
 
             for (int j = 0; j < 8; j++) {
 
-                ChessPosition checkedPosition = new ChessPosition(i, j);
+                ChessPosition checkedPosition = new ChessPosition(i + 1, j + 1);
                 ChessPiece checkedPiece = currentBoard.getPiece(checkedPosition);
 
-                if (checkedPiece.type == KING){
+                if (checkedPiece != null && checkedPiece.type == KING){
 
                     return checkedPosition;
 
@@ -166,7 +165,7 @@ public class ChessGame {
 
             for (int j = 0; j < 8; j++){
 
-                ChessPosition checkedPosition = new ChessPosition(i, j);
+                ChessPosition checkedPosition = new ChessPosition(i + 1, j + 1);
                 ChessPiece couldCauseCheck = currentBoard.getPiece(checkedPosition);
 
                 /*
@@ -177,14 +176,15 @@ public class ChessGame {
                  *
                  */
 
-                if(couldCauseCheck.pieceColor != teamColor && couldCauseCheck.type != null){
+                if(couldCauseCheck != null && couldCauseCheck.pieceColor != teamColor){
 
                     Collection<ChessMove> possibleMoves = validMoves(checkedPosition);
 
-                    // NOTE: This is implemented wrong and I need to make it a ChessMove instead of a
-                    // ChessPosition to make contains() work
+                    // NOTE: This won't work quite right with pawns due to promotions.
 
-                    if (possibleMoves.contains(kingToCheck)){
+                    ChessMove moveToCheck = new ChessMove(checkedPosition, kingToCheck, null);
+
+                    if (possibleMoves.contains(moveToCheck)){
 
                         return true;
 
