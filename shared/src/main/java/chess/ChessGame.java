@@ -97,15 +97,22 @@ public class ChessGame {
         ChessPosition oldPosition = move.getStartPosition();
         ChessPosition newPosition = move.getEndPosition();
 
-        Collection<ChessMove> possibleMoves = validMoves(oldPosition);
+        if(currentBoard.getPiece(oldPosition) == null){
 
-        if (teamTurn != currentBoard.getPiece(oldPosition).getTeamColor()){
+            throw new InvalidMoveException("Attempted to move a piece that doesn't exist");
+
+        }
+
+        Collection<ChessMove> possibleMoves = validMoves(oldPosition);
+        TeamColor currentPieceTeam = currentBoard.getPiece(oldPosition).getTeamColor();
+
+        if(teamTurn != currentPieceTeam){
 
             throw new InvalidMoveException("Attempted to move out of turn");
 
         }
 
-        if (possibleMoves.contains(move)){
+        if(possibleMoves.contains(move)){
 
             ChessPiece pieceType = currentBoard.getPiece(oldPosition);
             pieceType.hasMovedUpdater();
@@ -113,6 +120,24 @@ public class ChessGame {
             currentBoard.addPiece(oldPosition, null);
 
             if (move.getPromotionPiece() == null){
+
+                if (pieceType.getPieceType() == KING){
+
+                    currentBoard.addPiece(newPosition, pieceType);
+
+                    // The following code mistakenly checks to see if the king is moving into check, not
+                    // to see if the move is valid while the king is in check. (eg, gets the king out
+                    // of check
+                    if (isInCheck(currentPieceTeam) == true) {
+
+                        currentBoard.addPiece(oldPosition, pieceType);
+                        currentBoard.addPiece(newPosition, null);
+
+                        throw new InvalidMoveException("Attempted to move king into check");
+
+                    }
+
+                }
 
                 currentBoard.addPiece(newPosition, pieceType);
 
@@ -130,6 +155,18 @@ public class ChessGame {
         else{
 
             throw new InvalidMoveException("Attempted to make an illegal move");
+
+        }
+
+        if (teamTurn == TeamColor.WHITE){
+
+            teamTurn = TeamColor.BLACK;
+
+        }
+
+        else {
+
+            teamTurn = TeamColor.WHITE;
 
         }
 
