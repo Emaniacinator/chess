@@ -46,6 +46,13 @@ public class ChessPiece {
     }
 
 
+    public void hasMovedUpdater(){
+
+        hasMoved = true;
+
+    }
+
+
     /**
      * @return Which team this chess piece belongs to
      */

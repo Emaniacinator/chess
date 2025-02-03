@@ -99,14 +99,31 @@ public class ChessGame {
 
         Collection<ChessMove> possibleMoves = validMoves(oldPosition);
 
-        // NOTE: This may not place nice with pawns? But maybe it will?
+        if (teamTurn != currentBoard.getPiece(oldPosition).getTeamColor()){
+
+            throw new InvalidMoveException("Attempted to move out of turn");
+
+        }
 
         if (possibleMoves.contains(move)){
 
             ChessPiece pieceType = currentBoard.getPiece(oldPosition);
+            pieceType.hasMovedUpdater();
 
             currentBoard.addPiece(oldPosition, null);
-            currentBoard.addPiece(newPosition, pieceType);
+
+            if (move.getPromotionPiece() == null){
+
+                currentBoard.addPiece(newPosition, pieceType);
+
+            }
+
+            else{
+
+                currentBoard.addPiece(newPosition, new ChessPiece(pieceType.getTeamColor(), move.getPromotionPiece(), true));
+
+            }
+
 
         }
 
@@ -115,8 +132,6 @@ public class ChessGame {
             throw new InvalidMoveException("Attempted to make an illegal move");
 
         }
-
-
 
     }
 
