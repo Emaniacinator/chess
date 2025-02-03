@@ -13,11 +13,25 @@ public class ChessGame {
     private TeamColor teamTurn;
     private ChessBoard currentBoard;
 
+    /**
+     * Initializes a brand new game
+     */
     public ChessGame() {
 
         teamTurn = TeamColor.WHITE;
         currentBoard = new ChessBoard();
         currentBoard.resetBoard();
+
+    }
+
+
+    /**
+     * Initializes a game using a previous board
+     */
+    public ChessGame(TeamColor teamTurn, ChessBoard currentBoard){
+
+        this.teamTurn = teamTurn;
+        this.currentBoard = currentBoard;
 
     }
 
@@ -33,7 +47,7 @@ public class ChessGame {
 
 
     /**
-     * Set's which teams turn it is
+     * Sets which team's turn it is
      *
      * @param team the team whose turn it is
      */
@@ -61,7 +75,11 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+
+        ChessPiece selectedPiece = currentBoard.getPiece(startPosition);
+
+        return selectedPiece.pieceMoves(currentBoard, startPosition);
+
     }
 
 
