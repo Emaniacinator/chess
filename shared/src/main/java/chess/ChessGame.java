@@ -1,6 +1,9 @@
 package chess;
 
 import java.util.Collection;
+import chess.InvalidMoveException;
+
+import static chess.ChessPiece.PieceType.KING;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -90,7 +93,62 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+
+        ChessPosition oldPosition = move.getStartPosition();
+        ChessPosition newPosition = move.getEndPosition();
+
+        Collection<ChessMove> possibleMoves = validMoves(oldPosition);
+
+        // NOTE: This is implemented wrong and I need to make it a ChessMove instead of a
+        // ChessPosition to make contains() work
+
+        if (possibleMoves.contains(newPosition)){
+
+            ChessPiece pieceType = currentBoard.getPiece(oldPosition);
+
+            currentBoard.addPiece(oldPosition, null);
+            currentBoard.addPiece(newPosition, pieceType);
+
+        }
+
+        else{
+
+            throw new InvalidMoveException("Attempted to make an illegal move");
+
+        }
+
+
+
+    }
+
+
+    /**
+     * Determines if the given team is in check
+     *
+     * @param teamColor which team to find the king for
+     * @return the king's position on the board for the specified team
+     */
+    public ChessPosition kingLocator(TeamColor teamColor){
+
+        for (int i = 0; i < 8; i++) {
+
+            for (int j = 0; j < 8; j++) {
+
+                ChessPosition checkedPosition = new ChessPosition(i, j);
+                ChessPiece checkedPiece = currentBoard.getPiece(checkedPosition);
+
+                if (checkedPiece.type == KING){
+
+                    return checkedPosition;
+
+                }
+
+            }
+
+        }
+
+        return null;
+
     }
 
 
@@ -101,7 +159,45 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+
+        ChessPosition kingToCheck = kingLocator(teamColor);
+
+        for (int i = 0; i < 8; i++){
+
+            for (int j = 0; j < 8; j++){
+
+                ChessPosition checkedPosition = new ChessPosition(i, j);
+                ChessPiece couldCauseCheck = currentBoard.getPiece(checkedPosition);
+
+                /*
+                 *
+                 * Time for pseudo code lol. Basically, pull each piece and then check to see if it's possible
+                 * moves include the tile that the king is in. Note that there is a need to check for weird
+                 * pawn shenanigans though :( Or maybe not? It might already be built into the pawn function.
+                 *
+                 */
+
+                if(couldCauseCheck.pieceColor != teamColor && couldCauseCheck.type != null){
+
+                    Collection<ChessMove> possibleMoves = validMoves(checkedPosition);
+
+                    // NOTE: This is implemented wrong and I need to make it a ChessMove instead of a
+                    // ChessPosition to make contains() work
+
+                    if (possibleMoves.contains(kingToCheck)){
+
+                        return true;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+        return false;
+
     }
 
 

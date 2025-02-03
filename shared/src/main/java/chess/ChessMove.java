@@ -12,6 +12,7 @@ public class ChessMove {
     private ChessPosition endPosition;
     private ChessPiece.PieceType promotionPiece;
 
+
     public ChessMove(ChessPosition startPosition, ChessPosition endPosition,
                      ChessPiece.PieceType promotionPiece) {
 
@@ -20,6 +21,7 @@ public class ChessMove {
         this.promotionPiece = promotionPiece;
 
     }
+
 
     /**
      * @return ChessPosition of starting location
@@ -30,6 +32,7 @@ public class ChessMove {
 
     }
 
+
     /**
      * @return ChessPosition of ending location
      */
@@ -38,6 +41,7 @@ public class ChessMove {
         return endPosition;
 
     }
+
 
     /**
      * Gets the type of piece to promote a pawn to if pawn promotion is part of this
@@ -50,6 +54,7 @@ public class ChessMove {
         return promotionPiece;
 
     }
+
 
     @Override
     public String toString() {
@@ -79,6 +84,7 @@ public class ChessMove {
         return move.toString().equals(this.toString());
 
     }
+
 
     @Override
     public int hashCode() {
