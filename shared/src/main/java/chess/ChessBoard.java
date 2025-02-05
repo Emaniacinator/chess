@@ -41,16 +41,6 @@ public class ChessBoard {
      */
     public ChessPiece getPiece(ChessPosition position) {
 
-        /*  This code seemed redundant because if the area is null, the return will be null anyways.
-
-        if (currentBoard[position.getRow()][position.getColumn()] == null){
-
-            return null;
-
-        }
-
-        */
-
         return currentBoard[position.getRow()][position.getColumn()];
 
     }
