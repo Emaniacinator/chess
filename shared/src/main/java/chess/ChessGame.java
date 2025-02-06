@@ -196,12 +196,16 @@ public class ChessGame {
 
             for (int j = 0; j < 8; j++) {
 
-                ChessPosition checkedPosition = new ChessPosition(i + 1, j + 1);
+                ChessPosition checkedPosition = new ChessPosition(j + 1, i + 1);
                 ChessPiece checkedPiece = currentBoard.getPiece(checkedPosition);
 
                 if (checkedPiece != null && checkedPiece.type == KING){
 
-                    return checkedPosition;
+                    if (checkedPiece.pieceColor == teamColor){
+
+                        return checkedPosition;
+
+                    }
 
                 }
 
@@ -231,14 +235,6 @@ public class ChessGame {
                 ChessPosition checkedPosition = new ChessPosition(i + 1, j + 1);
                 ChessPiece couldCauseCheck = currentBoard.getPiece(checkedPosition);
 
-                /*
-                 *
-                 * Time for pseudo code lol. Basically, pull each piece and then check to see if it's possible
-                 * moves include the tile that the king is in. Note that there is a need to check for weird
-                 * pawn shenanigans though :( Or maybe not? It might already be built into the pawn function.
-                 *
-                 */
-
                 if(couldCauseCheck != null && couldCauseCheck.pieceColor != teamColor){
 
                     Collection<ChessMove> possibleMoves = validMoves(checkedPosition);
@@ -247,9 +243,13 @@ public class ChessGame {
 
                     ChessMove moveToCheck = new ChessMove(checkedPosition, kingToCheck, null);
 
-                    if (possibleMoves.contains(moveToCheck)){
+                    for (ChessMove currentCheckedMove : possibleMoves) {
 
-                        return true;
+                        if (currentCheckedMove.equals(moveToCheck)){
+
+                            return true;
+
+                        }
 
                     }
 
