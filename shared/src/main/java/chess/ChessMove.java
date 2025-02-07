@@ -65,7 +65,7 @@ public class ChessMove {
 
         }
 
-        return "Promoted the piece to " + promotionPiece.toString();
+        return "Starting Position: " + startPosition.toString() + "    Ending Position: " + endPosition.toString() + "Promoted the piece to " + promotionPiece.toString() + "\n";
 
     }
 

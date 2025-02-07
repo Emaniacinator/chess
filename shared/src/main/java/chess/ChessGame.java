@@ -3,8 +3,9 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 import chess.InvalidMoveException;
+import jdk.jshell.spi.ExecutionControl;
 
-import static chess.ChessPiece.PieceType.KING;
+import static chess.ChessPiece.PieceType.*;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -297,13 +298,55 @@ public class ChessGame {
 
                     // NOTE: This won't work quite right with pawns due to promotions.
 
-                    ChessMove moveToCheck = new ChessMove(checkedPosition, kingToCheck, null);
+                    if (couldCauseCheck.getPieceType() == PAWN){
 
-                    for (ChessMove currentCheckedMove : possibleMoves) {
+                        for (ChessMove currentCheckedMove : possibleMoves) {
 
-                        if (currentCheckedMove.equals(moveToCheck)){
+                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, ROOK))){
 
-                            return true;
+                                return true;
+
+                            }
+
+                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, KNIGHT))){
+
+                                return true;
+
+                            }
+
+                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, BISHOP))){
+
+                                return true;
+
+                            }
+
+                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, QUEEN))){
+
+                                return true;
+
+                            }
+
+                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, null))){
+
+                                return true;
+
+                            }
+
+                        }
+
+                    }
+
+                    else{
+
+                        ChessMove moveToCheck = new ChessMove(checkedPosition, kingToCheck, null);
+
+                        for (ChessMove currentCheckedMove : possibleMoves) {
+
+                            if (currentCheckedMove.equals(moveToCheck)){
+
+                                return true;
+
+                            }
 
                         }
 
@@ -328,7 +371,9 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
 
-        if (isInCheck(teamColor)){
+        Collection<ChessMove> validMoves = getAllValidTeamMoves(teamColor);
+
+        if (isInCheck(teamColor) == true){
 
             if (validMoves.isEmpty() == true){
 
@@ -347,6 +392,58 @@ public class ChessGame {
         // Especially problematic will maybe be pawns?
 
         return false;
+
+    }
+
+
+    public Collection<ChessMove> getAllValidTeamMoves(TeamColor teamColor){
+
+        return getAllValidTeamMoves(teamColor, currentBoard);
+
+    }
+
+
+    public Collection<ChessMove> getAllValidTeamMoves(TeamColor teamColor, ChessBoard board){
+
+        Collection<ChessPosition> teamPieces = getAllTeamPieceLocations(teamColor, board);
+        Collection<ChessMove> allMoves = new ArrayList<>();
+        Collection<ChessMove> allValidMoves = new ArrayList<>();
+
+        // For en passant and castling, add them to the possible moves list in the king and pawn classes
+
+        return allValidMoves;
+
+    }
+
+
+    public Collection<ChessPosition> getAllTeamPieceLocations(TeamColor teamColor){
+
+        return getAllTeamPieceLocations(teamColor, currentBoard);
+
+    }
+
+
+    public Collection<ChessPosition> getAllTeamPieceLocations(TeamColor teamColor, ChessBoard board){
+
+        Collection<ChessPosition> teamPieces = new ArrayList<>();
+
+        for (int i = 0; i < 8; i++){
+
+            for (int j = 0; j < 8; j++){
+
+                ChessPosition temporaryPosition = new ChessPosition(i + 1, j + 1);
+
+                if (board.getPiece(temporaryPosition) != null && board.getPiece(temporaryPosition).getTeamColor() == teamColor){
+
+                    teamPieces.add(temporaryPosition);
+
+                }
+
+            }
+
+        }
+
+        return teamPieces;
 
     }
 
