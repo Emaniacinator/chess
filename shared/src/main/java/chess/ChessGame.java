@@ -406,10 +406,16 @@ public class ChessGame {
     public Collection<ChessMove> getAllValidTeamMoves(TeamColor teamColor, ChessBoard board){
 
         Collection<ChessPosition> teamPieces = getAllTeamPieceLocations(teamColor, board);
-        Collection<ChessMove> allMoves = new ArrayList<>();
         Collection<ChessMove> allValidMoves = new ArrayList<>();
 
         // For en passant and castling, add them to the possible moves list in the king and pawn classes
+
+        for (ChessPosition currentCheckedPieceLocation: teamPieces){
+
+            Collection<ChessMove> possibleValidMoves = validMoves(currentCheckedPieceLocation);
+            allValidMoves.addAll(possibleValidMoves);
+
+        }
 
         return allValidMoves;
 
@@ -500,7 +506,7 @@ public class ChessGame {
 
         if (isInCheck(teamColor) != true){
 
-            if (getNonCheckKingMoves(teamColor).isEmpty() == false){
+            if (getAllValidTeamMoves(teamColor).isEmpty() == true){
 
                 return true;
 
