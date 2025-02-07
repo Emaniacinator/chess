@@ -109,7 +109,21 @@ public class ChessGame {
 
                 if (teamTurn != selectedPieceColor && InvalidMoveException.toString().equals("chess.InvalidMoveException: Attempted to move out of turn")){
 
-                    finalMoveList.add(checkedMove);
+
+                    try {
+
+                        teamTurn = selectedPieceColor;
+                        makeMove(checkedMove, backupBoard);
+                        finalMoveList.add(checkedMove);
+                        teamTurn = currentTeamTurn;
+
+                    }
+
+                    catch(Exception anotherInvalidMoveException){
+
+                        teamTurn = currentTeamTurn;
+
+                    }
 
                 }
 
@@ -149,13 +163,11 @@ public class ChessGame {
 
         TeamColor currentPieceTeam = currentPiece.getTeamColor();
 
-        if(teamTurn != currentPieceTeam){ // This will cause problems in phase 6, so implement it to happen later
+        if(teamTurn != currentPieceTeam){ // This might cause problems in phase 6, so implement it to happen later
 
             throw new InvalidMoveException("Attempted to move out of turn");
 
         }
-
-        ChessPiece.PieceType currentPieceType = currentPiece.getPieceType();
 
         // Throw an exception if someone tries to make a move that isn't in the possible moves for the chess piece.
 
@@ -180,8 +192,6 @@ public class ChessGame {
                 throw new InvalidMoveException("Attempted to make a move that leaves the king in check");
 
             }
-
-            currentPiece.hasMovedUpdater();
 
         }
 
@@ -212,8 +222,16 @@ public class ChessGame {
 
         }
 
+        currentPiece.hasMovedUpdater();
+
     }
 
+
+    public ChessPosition kingLocator(TeamColor teamColor) {
+
+        return kingLocator(teamColor, currentBoard);
+
+    }
 
     /**
      * Determines if the given team is in check
@@ -221,14 +239,14 @@ public class ChessGame {
      * @param teamColor which team to find the king for
      * @return the king's position on the board for the specified team
      */
-    public ChessPosition kingLocator(TeamColor teamColor){
+    public ChessPosition kingLocator(TeamColor teamColor, ChessBoard board){
 
         for (int i = 0; i < 8; i++) {
 
             for (int j = 0; j < 8; j++) {
 
                 ChessPosition checkedPosition = new ChessPosition(j + 1, i + 1);
-                ChessPiece checkedPiece = currentBoard.getPiece(checkedPosition);
+                ChessPiece checkedPiece = board.getPiece(checkedPosition);
 
                 if (checkedPiece != null && checkedPiece.type == KING){
 
@@ -264,7 +282,7 @@ public class ChessGame {
      */
     public boolean isInCheck(TeamColor teamColor, ChessBoard board) {
 
-        ChessPosition kingToCheck = kingLocator(teamColor);
+        ChessPosition kingToCheck = kingLocator(teamColor, board);
 
         for (int i = 0; i < 8; i++){
 
@@ -312,7 +330,7 @@ public class ChessGame {
 
         if (isInCheck(teamColor)){
 
-            if (getNonCheckKingMoves(teamColor).isEmpty() == true){
+            if (validMoves.isEmpty() == true){
 
                 return true;
 
