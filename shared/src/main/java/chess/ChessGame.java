@@ -80,92 +80,123 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
 
+        TeamColor currentTeamTurn = teamTurn;
         ChessPiece selectedPiece = currentBoard.getPiece(startPosition);
+        TeamColor selectedPieceColor = selectedPiece.getTeamColor();
+        Collection<ChessMove> initialMoveList = selectedPiece.pieceMoves(currentBoard, startPosition);
+        Collection<ChessMove> finalMoveList = new ArrayList<>();
 
-        return selectedPiece.pieceMoves(currentBoard, startPosition);
+        for(ChessMove checkedMove: initialMoveList){
+
+            // Call the move function for each checkedMove. If it results in the king in
+            // check, have the makeMove function call an invalidMoveException. Any time
+            // the exception is called, don't add it to the list. If no exception is
+            // called, add it to the list. Then always undo the move by calling it backwards.
+
+            ChessPosition checkedEndPosition = checkedMove.getEndPosition();
+            ChessPiece.PieceType checkedPieceType = selectedPiece.getPieceType();
+            ChessBoard backupBoard = new ChessBoard(currentBoard);
+
+            try {
+
+                makeMove(checkedMove, backupBoard);
+                finalMoveList.add(checkedMove);
+                teamTurn = selectedPieceColor;
+
+            }
+
+            catch (Exception InvalidMoveException){
+
+                if (teamTurn != selectedPieceColor && InvalidMoveException.toString().equals("chess.InvalidMoveException: Attempted to move out of turn")){
+
+                    finalMoveList.add(checkedMove);
+
+                }
+
+            }
+
+        }
+
+        return finalMoveList;
 
     }
 
 
+
+    public void makeMove(ChessMove move) throws InvalidMoveException{
+
+        makeMove(move, currentBoard);
+
+    }
+
     /**
-     * Makes a move in a chess game
+     * Makes a move in a chess game. Also undoes the move if it's invalid.
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
      */
-    public void makeMove(ChessMove move) throws InvalidMoveException {
+    public void makeMove(ChessMove move, ChessBoard board) throws InvalidMoveException {
 
         ChessPosition oldPosition = move.getStartPosition();
         ChessPosition newPosition = move.getEndPosition();
+        ChessPiece currentPiece = board.getPiece(oldPosition);
 
-        if(currentBoard.getPiece(oldPosition) == null){
+        if(currentPiece == null){
 
             throw new InvalidMoveException("Attempted to move a piece that doesn't exist");
 
         }
 
-        Collection<ChessMove> possibleMoves = validMoves(oldPosition);
-        TeamColor currentPieceTeam = currentBoard.getPiece(oldPosition).getTeamColor();
+        TeamColor currentPieceTeam = currentPiece.getTeamColor();
 
-        if(teamTurn != currentPieceTeam){
+        if(teamTurn != currentPieceTeam){ // This will cause problems in phase 6, so implement it to happen later
 
             throw new InvalidMoveException("Attempted to move out of turn");
 
         }
 
-        if (possibleMoves.contains(move)){
+        ChessPiece.PieceType currentPieceType = currentPiece.getPieceType();
 
-            ChessPiece pieceType = currentBoard.getPiece(oldPosition);
+        // Throw an exception if someone tries to make a move that isn't in the possible moves for the chess piece.
 
-            currentBoard.addPiece(oldPosition, null);
+        Collection<ChessMove> possiblePieceMoves = currentPiece.pieceMoves(board, oldPosition);
 
-            if (move.getPromotionPiece() == null){
+        if (possiblePieceMoves.contains(move) != true){
 
-                if (pieceType.getPieceType() == KING){
+            throw new InvalidMoveException("Attempted to make a move that is illegal");
 
-                    currentBoard.addPiece(newPosition, pieceType);
+        }
 
-                    // The following code mistakenly checks to see if the king is moving into check, not
-                    // to see if the move is valid while the king is in check. (eg, gets the king out
-                    // of check
-                    if (isInCheck(currentPieceTeam) == true) {
+        if (move.getPromotionPiece() == null){
 
-                        currentBoard.addPiece(oldPosition, pieceType);
-                        currentBoard.addPiece(newPosition, null);
+            board.addPiece(newPosition, currentPiece);
+            board.addPiece(oldPosition, null);
 
-                        throw new InvalidMoveException("Attempted to move king into check");
+            if(isInCheck(currentPieceTeam, board) == true){
 
-                    }
 
-                }
-
-                currentBoard.addPiece(newPosition, pieceType);
-
-                if (isInCheck(currentPieceTeam) == true){ // This should throw an exception if the king is still in check after a move
-
-                    currentBoard.addPiece(oldPosition, pieceType);
-                    currentBoard.addPiece(newPosition, null);
-
-                    throw new InvalidMoveException("Attempted to move king into check");
-
-                }
-
-                pieceType.hasMovedUpdater();
+                board.addPiece(newPosition, null);
+                board.addPiece(oldPosition, currentPiece);
+                throw new InvalidMoveException("Attempted to make a move that leaves the king in check");
 
             }
 
-            else{
-
-                currentBoard.addPiece(newPosition, new ChessPiece(pieceType.getTeamColor(), move.getPromotionPiece(), true));
-
-            }
-
+            currentPiece.hasMovedUpdater();
 
         }
 
         else{
 
-            throw new InvalidMoveException("Attempted to make an illegal move");
+            board.addPiece(newPosition, new ChessPiece(currentPieceTeam, move.getPromotionPiece(), true));
+            board.addPiece(oldPosition, null);
+
+            if(isInCheck(currentPieceTeam) == true) {
+
+                board.addPiece(newPosition, null);
+                board.addPiece(oldPosition, currentPiece);
+                throw new InvalidMoveException("Attempted to make a move that leaves the king in check");
+
+            }
 
         }
 
@@ -218,13 +249,20 @@ public class ChessGame {
     }
 
 
+    public boolean isInCheck(TeamColor teamColor){
+
+        return isInCheck(teamColor, currentBoard);
+
+    }
+
+
     /**
      * Determines if the given team is in check
      *
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor) {
+    public boolean isInCheck(TeamColor teamColor, ChessBoard board) {
 
         ChessPosition kingToCheck = kingLocator(teamColor);
 
@@ -233,11 +271,11 @@ public class ChessGame {
             for (int j = 0; j < 8; j++){
 
                 ChessPosition checkedPosition = new ChessPosition(i + 1, j + 1);
-                ChessPiece couldCauseCheck = currentBoard.getPiece(checkedPosition);
+                ChessPiece couldCauseCheck = board.getPiece(checkedPosition);
 
                 if(couldCauseCheck != null && couldCauseCheck.pieceColor != teamColor){
 
-                    Collection<ChessMove> possibleMoves = validMoves(checkedPosition);
+                    Collection<ChessMove> possibleMoves = couldCauseCheck.pieceMoves(board, checkedPosition);
 
                     // NOTE: This won't work quite right with pawns due to promotions.
 

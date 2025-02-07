@@ -18,6 +18,23 @@ public class ChessBoard {
         
     }
 
+    public ChessBoard(ChessBoard copiedBoard){
+
+        for (int i = 0; i < 8; i++){
+
+            for (int j = 0; j < 8; j++){
+
+                ChessPosition locationToCopy = new ChessPosition(i + 1, j + 1);
+                ChessPiece pieceToCopy = copiedBoard.getPiece(locationToCopy);
+
+                addPiece(locationToCopy, pieceToCopy);
+
+            }
+
+        }
+
+    }
+
 
     /**
      * Adds a chess piece to the chessboard

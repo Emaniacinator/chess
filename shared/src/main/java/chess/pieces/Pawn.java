@@ -9,18 +9,14 @@ public class Pawn extends ChessPiece {
 
     private boolean hasMoved;
     private ChessPosition currentPosition;
+    private boolean justMadeFirstMove;
 
     public Pawn(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, ChessPosition currentPosition, boolean hasMoved) {
+
         super(pieceColor, type);
         this.currentPosition = currentPosition;
         this.hasMoved = hasMoved;
-
-    }
-
-
-    public void firstMoveUpdater(){ // Should I check if the movement is already true first, or just do this? Which is more efficient?
-
-        hasMoved = true;
+        this.justMadeFirstMove = false; // Could maybe cause problems?
 
     }
 
@@ -247,6 +243,28 @@ public class Pawn extends ChessPiece {
             return "p";
 
         }
+
+    }
+
+
+    @Override
+    public void hasMovedUpdater() {
+
+        if (this.hasMoved == false){
+
+            justMadeFirstMove = true;
+
+            // This will need to also see if any other moves have been taken and become false if they have.
+
+        }
+
+        else{
+
+            justMadeFirstMove = false;
+
+        }
+
+        super.hasMovedUpdater();
 
     }
 

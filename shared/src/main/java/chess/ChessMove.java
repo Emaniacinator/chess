@@ -61,7 +61,7 @@ public class ChessMove {
 
         if (this.getPromotionPiece() == null){
 
-            return "Starting Position: " + startPosition.toString() + "    Ending Position: " + endPosition.toString();
+            return "Starting Position: " + startPosition.toString() + "    Ending Position: " + endPosition.toString() + "\n";
 
         }
 
