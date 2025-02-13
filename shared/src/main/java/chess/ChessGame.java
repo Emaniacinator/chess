@@ -383,14 +383,6 @@ public class ChessGame {
 
         }
 
-        // Here are the things that might cause trouble:
-        // Pieces that can move to block the king being in check
-        // You could implement a function to find the piece creating the check
-        // and then see if it prevents the king from being in check and see if that
-        // works for this.
-        //
-        // Especially problematic will maybe be pawns?
-
         return false;
 
     }
@@ -455,47 +447,6 @@ public class ChessGame {
 
 
     /**
-     *
-     * @param teamColor
-     * @return nonCheckKingMoves, which is a collection of all the moves that a king
-     * can take without being in check
-     */
-    public Collection<ChessMove> getNonCheckKingMoves(TeamColor teamColor){
-
-        Collection<ChessMove> nonCheckMoves = new ArrayList<>();
-
-        ChessPosition kingLocation = kingLocator(teamColor);
-        ChessPiece currentKing = currentBoard.getPiece(kingLocation);
-        Collection<ChessMove> possibleKingMoves = currentKing.pieceMoves(currentBoard, kingLocation);
-
-        for (ChessMove currentMoveCheck : possibleKingMoves) {
-
-            ChessPosition moveStart = currentMoveCheck.getStartPosition();
-            ChessPosition moveEnd = currentMoveCheck.getEndPosition();
-
-
-            try{
-
-                makeMove(currentMoveCheck);
-                nonCheckMoves.add(currentMoveCheck);
-                makeMove(new ChessMove(moveEnd, moveStart, null)); // Undoes the move since we only want to check it, not make it
-
-            }
-
-            catch (chess.InvalidMoveException failedMove){
-
-                // This just does nothing because we only want to create changes if the move is valid.
-
-            }
-
-        }
-
-        return nonCheckMoves;
-
-    }
-
-
-    /**
      * Determines if the given team is in stalemate, which here is defined as having
      * no valid moves
      *
@@ -544,4 +495,5 @@ public class ChessGame {
         return currentBoard;
 
     }
+
 }

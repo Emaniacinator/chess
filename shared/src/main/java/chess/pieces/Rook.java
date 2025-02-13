@@ -18,11 +18,11 @@ public class Rook extends ChessPiece {
     }
 
 
-    public void firstMoveUpdater(){ // Should I check if the movement is already true first, or just do this? Which is more efficient?
+    /* public void firstMoveUpdater(){ // Should I check if the movement is already true first, or just do this? Which is more efficient?
 
         hasMoved = true;
 
-    }
+    } */ // This could be helpful later if you decide to go for bonus points or refine this program
 
 
     public ChessPosition getCurrentPosition() {
