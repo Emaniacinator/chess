@@ -297,59 +297,41 @@ public class ChessGame {
 
                     Collection<ChessMove> possibleMoves = couldCauseCheck.pieceMoves(board, checkedPosition);
 
-                    // NOTE: This won't work quite right with pawns due to promotions.
+                    ChessMove moveToCheck = new ChessMove(checkedPosition, kingToCheck, null);
 
-                    if (couldCauseCheck.getPieceType() == PAWN){
+                    if (possibleMoves.contains(new ChessMove(checkedPosition, kingToCheck, ROOK))){
 
-                        for (ChessMove currentCheckedMove : possibleMoves) {
-
-                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, ROOK))){
-
-                                return true;
-
-                            }
-
-                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, KNIGHT))){
-
-                                return true;
-
-                            }
-
-                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, BISHOP))){
-
-                                return true;
-
-                            }
-
-                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, QUEEN))){
-
-                                return true;
-
-                            }
-
-                            if (currentCheckedMove.equals(new ChessMove(checkedPosition, kingToCheck, null))){
-
-                                return true;
-
-                            }
-
-                        }
+                        return true;
 
                     }
 
-                    else{
+                    else if (possibleMoves.contains(new ChessMove(checkedPosition, kingToCheck, KNIGHT))){
 
-                        ChessMove moveToCheck = new ChessMove(checkedPosition, kingToCheck, null);
+                        return true;
 
-                        for (ChessMove currentCheckedMove : possibleMoves) {
+                    }
 
-                            if (currentCheckedMove.equals(moveToCheck)){
+                    else if (possibleMoves.contains(new ChessMove(checkedPosition, kingToCheck, BISHOP))){
 
-                                return true;
+                        return true;
 
-                            }
+                    }
 
-                        }
+                    else if (possibleMoves.contains(new ChessMove(checkedPosition, kingToCheck, QUEEN))){
+
+                        return true;
+
+                    }
+
+                    else if (possibleMoves.contains(new ChessMove(checkedPosition, kingToCheck, null))){
+
+                        return true;
+
+                    }
+
+                    else if (possibleMoves.contains(moveToCheck)){
+
+                        return true;
 
                     }
 
