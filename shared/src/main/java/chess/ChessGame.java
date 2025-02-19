@@ -108,7 +108,8 @@ public class ChessGame {
 
             catch (Exception InvalidMoveException){
 
-                if (teamTurn != selectedPieceColor && InvalidMoveException.toString().equals("chess.InvalidMoveException: Attempted to move out of turn")){
+                if (teamTurn != selectedPieceColor &&
+                            InvalidMoveException.toString().equals("chess.InvalidMoveException: Attempted to move out of turn")){
 
 
                     try {

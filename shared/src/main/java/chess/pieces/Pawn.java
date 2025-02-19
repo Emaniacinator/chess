@@ -53,7 +53,7 @@ public class Pawn extends ChessPiece {
 
                 }
 
-                if (currentCol - 1 > 1) { // Something about this is registering when there's nothing to capture
+                if (currentCol - 1 > 1) {
 
                     ChessPosition whitePromotionCaptureLeft = new ChessPosition(currentRow + 1, currentCol - 1);
 
@@ -68,7 +68,7 @@ public class Pawn extends ChessPiece {
 
                 }
 
-                if (currentCol + 1 < 8) { // Something about this is registering when there's nothing to capture
+                if (currentCol + 1 < 8) {
 
                     ChessPosition whitePromotionCaptureRight = new ChessPosition(currentRow + 1, currentCol + 1);
 
