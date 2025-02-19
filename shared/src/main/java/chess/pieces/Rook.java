@@ -33,15 +33,13 @@ public class Rook extends ChessPiece {
 
 
     @Override
-    public String toString(){
+    public String toString() {
 
-        if(pieceColor == ChessGame.TeamColor.WHITE){
+        if (pieceColor == ChessGame.TeamColor.WHITE) {
 
             return "R";
 
-        }
-
-        else {
+        } else {
 
             return "r";
 
@@ -58,15 +56,37 @@ public class Rook extends ChessPiece {
 
         Collection<ChessMove> possibleMoves = new ArrayList<ChessMove>();
 
-        for (int i = currentCol + 1; i <= 8; i++){
+        Collection<ChessMove> rightMoves = columnMoves(board, myPosition, 1);
+        possibleMoves.addAll(rightMoves);
+
+        Collection<ChessMove> leftMoves = columnMoves(board, myPosition, -1);
+        possibleMoves.addAll(leftMoves);
+
+        Collection<ChessMove> upMoves = rowMoves(board, myPosition, 1);
+        possibleMoves.addAll(upMoves);
+
+        Collection<ChessMove> downMoves = rowMoves(board, myPosition, -1);
+        possibleMoves.addAll(downMoves);
+
+        return possibleMoves;
+
+    }
+
+    public Collection<ChessMove> columnMoves(ChessBoard board, ChessPosition myPosition, int incrementer) {
+
+        Collection<ChessMove> possibleMoves = new ArrayList();
+        int currentCol = myPosition.getColumn() + 1;
+        int currentRow = myPosition.getRow() + 1;
+
+        for (int i = currentCol + incrementer; i <= 8 && i >= 1; i = i + incrementer) {
 
             ChessPosition checkedPosition = new ChessPosition(currentRow, i);
 
-            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != pieceColor){
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != pieceColor) {
 
                 possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
 
-                if(board.getPiece(checkedPosition) != null){
+                if (board.getPiece(checkedPosition) != null && board.getPiece(checkedPosition).getTeamColor() != pieceColor) {
 
                     break;
 
@@ -74,79 +94,7 @@ public class Rook extends ChessPiece {
 
             }
 
-            else{
-
-                break;
-
-            }
-
-        }
-
-        for (int i = currentCol - 1; i >= 1; i--){
-
-            ChessPosition checkedPosition = new ChessPosition(currentRow, i);
-
-            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != pieceColor){
-
-                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
-
-                if(board.getPiece(checkedPosition) != null){
-
-                    break;
-
-                }
-
-            }
-
-            else{
-
-                break;
-
-            }
-
-        }
-
-        for (int j = currentRow + 1; j <= 8; j++){
-
-            ChessPosition checkedPosition = new ChessPosition(j, currentCol);
-
-            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != pieceColor){
-
-                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
-
-                if(board.getPiece(checkedPosition) != null){
-
-                    break;
-
-                }
-
-            }
-
-            else{
-
-                break;
-
-            }
-
-        }
-
-        for (int j = currentRow - 1; j >= 1; j--){
-
-            ChessPosition checkedPosition = new ChessPosition(j, currentCol);
-
-            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != pieceColor){
-
-                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
-
-                if(board.getPiece(checkedPosition) != null){
-
-                    break;
-
-                }
-
-            }
-
-            else{
+            else {
 
                 break;
 
@@ -157,5 +105,42 @@ public class Rook extends ChessPiece {
         return possibleMoves;
 
     }
+
+
+    public Collection<ChessMove> rowMoves(ChessBoard board, ChessPosition myPosition, int incrementer){
+
+        Collection<ChessMove> possibleMoves = new ArrayList();
+        int currentCol = myPosition.getColumn() + 1;
+        int currentRow = myPosition.getRow() + 1;
+
+        for (int i = currentRow + incrementer; i <= 8 && i >= 1; i = i + incrementer) {
+
+            ChessPosition checkedPosition = new ChessPosition(i, currentCol);
+
+            if (board.getPiece(checkedPosition) == null || board.getPiece(checkedPosition).getTeamColor() != pieceColor) {
+
+                possibleMoves.add(new ChessMove(myPosition, checkedPosition, null));
+
+                if (board.getPiece(checkedPosition) != null && board.getPiece(checkedPosition).getTeamColor() != pieceColor) {
+
+                    break;
+
+                }
+
+            }
+
+            else {
+
+                break;
+
+            }
+
+        }
+
+        return possibleMoves;
+
+    }
+
+
 }
 
