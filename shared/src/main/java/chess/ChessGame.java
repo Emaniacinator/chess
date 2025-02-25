@@ -86,6 +86,7 @@ public class ChessGame {
         TeamColor selectedPieceColor = selectedPiece.getTeamColor();
         Collection<ChessMove> initialMoveList = selectedPiece.pieceMoves(currentBoard, startPosition);
         Collection<ChessMove> finalMoveList = new ArrayList<>();
+        boolean movedBeforeThis = selectedPiece.checkHasMoved();
 
         for(ChessMove checkedMove: initialMoveList){
 
@@ -97,6 +98,7 @@ public class ChessGame {
             ChessPosition checkedEndPosition = checkedMove.getEndPosition();
             ChessPiece.PieceType checkedPieceType = selectedPiece.getPieceType();
             ChessBoard backupBoard = new ChessBoard(currentBoard);
+            selectedPiece.firstMoveRevert(movedBeforeThis);
 
             try {
 
@@ -107,6 +109,8 @@ public class ChessGame {
             }
 
             catch (Exception InvalidMoveException){
+
+                selectedPiece.firstMoveRevert(movedBeforeThis);
 
                 if (teamTurn != selectedPieceColor &&
                             InvalidMoveException.toString().equals("chess.InvalidMoveException: Attempted to move out of turn")){
@@ -128,6 +132,8 @@ public class ChessGame {
                     }
 
                 }
+
+                selectedPiece.firstMoveRevert(movedBeforeThis);
 
             }
 

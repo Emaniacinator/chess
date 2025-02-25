@@ -73,6 +73,19 @@ public class ChessPiece {
     }
 
 
+    public boolean checkHasMoved(){
+
+        return hasMoved;
+
+    }
+
+
+    public void firstMoveRevert(boolean previousMovement){
+
+        hasMoved = previousMovement;
+
+    }
+
     // In the coding test, this might all just be better implemented as a set of helper functions instead of as
     // a bunch of individual inherited classes
     /**

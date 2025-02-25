@@ -11,9 +11,12 @@ import java.util.UUID;
 public class GeneralDataAccess implements DataAccessFramework{
 
 
-    final private HashMap<Integer, UserData> userDataMap = new HashMap<>();
-    final private HashMap<Integer, AuthData> authDataMap = new HashMap<>();
-    final private HashMap<Integer, GameData> gameDataMap = new HashMap<>();
+    int userDataIterator = 1;
+    int authDataIterator = 1;
+    int gameDataIterator = 1;
+    private HashMap<Integer, UserData> userDataMap = new HashMap<>();
+    private HashMap<Integer, AuthData> authDataMap = new HashMap<>();
+    private HashMap<Integer, GameData> gameDataMap = new HashMap<>();
 
 
     public GeneralDataAccess(){
@@ -23,18 +26,35 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public AuthData addUserData(UserData newUserData) {
+    public AuthData addUserData(UserData newUserData) throws DataAccessException{
 
-        // Should this return AuthData instead? Like, make and then return it? Or should that be done by the Service
+        if (newUserData.username() == null){
 
-        userDataMap.put(newUserData.hashCode(), newUserData);
+            throw new DataAccessException(400, "Error: Can't register without a username");
+
+        }
+
+        if (newUserData.passcode() == null){
+
+            throw new DataAccessException(400, "Error: Can't register without a passcode");
+
+        }
+
+        if (newUserData.email() == null){
+
+            throw new DataAccessException(400, "Error: Can't register without an email");
+
+        }
+
+        userDataMap.put(userDataIterator, newUserData);
+        userDataIterator++;
 
         return addAuthData(newUserData.username());
 
     }
 
 
-    public UserData getUserData(String username) {
+    public UserData getUserData(String username) throws DataAccessException{
 
         for (Map.Entry<Integer, UserData> currentData : userDataMap.entrySet()){
 
@@ -47,14 +67,19 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         }
 
-        return null;
+        throw new DataAccessException(404, "Error: User is not in database");
 
     }
 
 
     public AuthData addAuthData(String username) {
 
-        return new AuthData(username, UUID.randomUUID().toString());
+        AuthData addedData = new AuthData(username, UUID.randomUUID().toString());
+
+        authDataMap.put(authDataIterator, addedData);
+        authDataIterator++;
+
+        return addedData;
 
     }
 
