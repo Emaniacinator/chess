@@ -6,6 +6,7 @@ import chess.model.UserData;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 public class GeneralDataAccess implements DataAccessFramework{
 
@@ -15,13 +16,20 @@ public class GeneralDataAccess implements DataAccessFramework{
     final private HashMap<Integer, GameData> gameDataMap = new HashMap<>();
 
 
-    public UserData addUserData(UserData newUserData) {
+    public GeneralDataAccess(){
+
+
+
+    }
+
+
+    public AuthData addUserData(UserData newUserData) {
 
         // Should this return AuthData instead? Like, make and then return it? Or should that be done by the Service
 
         userDataMap.put(newUserData.hashCode(), newUserData);
 
-        return newUserData;
+        return addAuthData(newUserData.username());
 
     }
 
@@ -44,8 +52,10 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public AuthData addAuthData(AuthData newAuthData) {
-        return null;
+    public AuthData addAuthData(String username) {
+
+        return new AuthData(username, UUID.randomUUID().toString());
+
     }
 
 
@@ -71,6 +81,15 @@ public class GeneralDataAccess implements DataAccessFramework{
 
     public GameData[] getAllGameData() {
         return new GameData[0];
+    }
+
+
+    public void deleteAllData(){
+
+        userDataMap.clear();
+        authDataMap.clear();
+        gameDataMap.clear();
+
     }
 
 }

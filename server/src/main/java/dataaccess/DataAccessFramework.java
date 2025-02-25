@@ -6,11 +6,13 @@ import chess.model.GameData;
 
 public interface DataAccessFramework {
 
-    UserData addUserData(UserData newUserData);
+    AuthData addUserData(UserData newUserData);
+    // Note that this is an AuthData return despite the UserData input because it simplifies
+    // the process of creating a user and then immediately authorizint their login.
 
     UserData getUserData(String username);
 
-    AuthData addAuthData(AuthData newAuthData);
+    AuthData addAuthData(String username);
 
     AuthData getAuthData(String authToken);
 
