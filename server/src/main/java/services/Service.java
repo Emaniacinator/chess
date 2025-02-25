@@ -43,17 +43,21 @@ public class Service {
 
     public AuthData loginUser(UserData loginUserData) throws DataAccessException{
 
+        if (loginUserData.password() == null || loginUserData.username() == null){
+
+            throw new DataAccessException(500, "Error: Did not input either username or passcode");
+
+        }
 
         UserData checkData = dataAccess.getUserData(loginUserData.username());
 
-        if (!Objects.equals(loginUserData.passcode(), checkData.passcode())){
+        if (!Objects.equals(loginUserData.password(), checkData.password())){
 
             throw new DataAccessException(401, "Error: Incorrect passcode or username");
 
         }
 
         return dataAccess.addAuthData(checkData.username());
-
 
     }
 

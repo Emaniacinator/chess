@@ -34,7 +34,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         }
 
-        if (newUserData.passcode() == null){
+        if (newUserData.password() == null){
 
             throw new DataAccessException(400, "Error: Can't register without a passcode");
 
@@ -67,7 +67,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         }
 
-        throw new DataAccessException(404, "Error: User is not in database");
+        throw new DataAccessException(401, "Error: User is not in database");
 
     }
 

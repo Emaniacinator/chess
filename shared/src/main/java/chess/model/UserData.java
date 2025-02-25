@@ -2,7 +2,7 @@ package chess.model;
 
 import com.google.gson.*;
 
-public record UserData(String username, String passcode, String email) {
+public record UserData(String username, String password, String email) {
 
 
 
