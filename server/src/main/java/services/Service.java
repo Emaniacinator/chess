@@ -1,5 +1,6 @@
 package services;
 
+import chess.ChessGame;
 import chess.model.AuthData;
 import chess.model.GameData;
 import chess.model.UserData;
@@ -7,6 +8,8 @@ import dataaccess.DataAccessException;
 import dataaccess.GeneralDataAccess;
 
 import java.util.Objects;
+
+import static chess.ChessGame.TeamColor.*;
 
 public class Service {
 
@@ -86,9 +89,42 @@ public class Service {
     }
 
 
-    public GameData[] getAllGameData(){
+    public GameData[] getAllGameData(String authToken) throws DataAccessException{
+
+        AuthData checkLogin = dataAccess.getAuthData(authToken);
 
         return dataAccess.getAllGameData();
+
+    }
+
+
+    // I really dislike this implementation of updating the usernames, but I'll have to get back to it tomorrow.
+    // Also it's not finished hahaha
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameId) throws DataAccessException{
+
+        AuthData checkLogin = dataAccess.getAuthData(authToken);
+
+        if (playerColor == null || gameId < 1){
+
+            throw new DataAccessException(400, "Error: Input an invalid gameID or playerColor");
+
+        }
+
+        GameData foundGame = dataAccess.getGameData(gameId);
+
+        if (playerColor == WHITE && foundGame.whiteUsername() == null){
+
+
+
+        }
+
+        else if (playerColor == BLACK && foundGame.blackUsername() == null){
+
+
+
+        }
+
+        throw new DataAccessException(403, "Error: There is already a user in that game for the " + playerColor + " team");
 
     }
 

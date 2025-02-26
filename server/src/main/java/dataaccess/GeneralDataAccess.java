@@ -12,7 +12,7 @@ import java.util.UUID;
 public class GeneralDataAccess implements DataAccessFramework{
 
 
-    int gameDataIterator = 1;
+    int gameDataIterator = 0;
     private HashMap<Integer, UserData> userDataMap = new HashMap<>();
     private static HashMap<Integer, AuthData> authDataMap = new HashMap<>();
     private HashMap<Integer, GameData> gameDataMap = new HashMap<>();
@@ -118,13 +118,44 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public GameData getGameData(int gameIdToGet) {
-        return null;
+    public GameData getGameData(int gameIdToGet) throws DataAccessException {
+
+        for (Map.Entry<Integer, GameData> currentData : gameDataMap.entrySet()){
+
+            GameData checkedData = currentData.getValue();
+            if (Objects.equals(checkedData.gameID(), gameIdToGet)){
+
+                return checkedData;
+
+            }
+
+        }
+
+        throw new DataAccessException(401, "Error: No authorized user in database");
+
     }
 
+    // I dislike this conceptually. Find a way to update the game since records are weird. Keep in mind that you
+    //    // might have to update the HashMap database as a result of updaing the game data. (Thanks again, records).
+    public GameData updateWhiteUsername(GameData oldGame, String username) {
 
-    public GameData updateGameData(int gameIdToGet, GameData updatedGame) {
         return null;
+
+    }
+
+    // I also dislike this conceptually. Find a way to update the game since records are weird. Keep in mind that you
+    // might have to update the HashMap database as a result of updaing the game data. (Thanks again, records).
+    public GameData updateBlackUsername(GameData oldGame, String username){
+
+        return null;
+
+    }
+
+    // Probably this will need to be removed but for now it lets the code compile
+    public GameData updateGameData(GameData oldGame, GameData newGame){
+
+        return null;
+
     }
 
 

@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import chess.model.GameData;
 import chess.model.UserData;
 import dataaccess.DataAccessException;
@@ -33,7 +34,6 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         //This line initializes the server and can be removed once you have a functioning endpoint
-        Spark.init();
 
         Spark.post("/user", this::registerUserHandler);
         Spark.post("/session", this::loginHandler);
@@ -66,9 +66,8 @@ public class Server {
     }
 
 
-    public Object registerUserHandler(Request request, Response response) throws DataAccessException{ // Does this need to throw some kind of exception or is it good?
+    public Object registerUserHandler(Request request, Response response) throws DataAccessException{
 
-        // I have NO CLUE why, but for some reason this keeps reading the wrong data in and thus keeps failing test cases.
         UserData newUser = new Gson().fromJson(request.body(), UserData.class);
 
         AuthData resultingAuth = services.registerNewUser(newUser);
@@ -91,7 +90,7 @@ public class Server {
 
     public Object logoutHandler(Request request, Response response) throws DataAccessException{
 
-        String authToken = request.headers("authorization");
+        String authToken = request.headers("authorization"); // Uhhh... you might need to from Json this for it to work right. But only maybe
 
         services.logoutUser(authToken);
 
@@ -102,9 +101,9 @@ public class Server {
 
     public Object listGameHandler(Request request, Response response) throws DataAccessException{
 
-        String authToken = request.headers("authorization");
+        String authToken = request.headers("authorization"); // Uhhh... you might need to from Json this for it to work right. But only maybe
 
-        GameList allGames = new GameList(services.getAllGameData());
+        GameList allGames = new GameList(services.getAllGameData(authToken));
 
         return new Gson().toJson(allGames);
 
@@ -115,7 +114,7 @@ public class Server {
 
         String authToken = request.headers("authorization");
 
-        String gameName = request.body();
+        String gameName = request.body(); // Uhhh... you might need to from Json this for it to work right. But only maybe
 
         GameData newGame = services.createGame(authToken, gameName);
 
@@ -126,9 +125,15 @@ public class Server {
     }
 
 
-    public Object joinGameHandler(Request request, Response response){
+    public Object joinGameHandler(Request request, Response response) throws DataAccessException{
 
-        return null;
+        String authToken = request.headers("authorization"); // Uhhh... you might need to from Json this for it to work right. But only maybe
+
+        WeirdWrapper values = new Gson().fromJson(request.body(), WeirdWrapper.class);
+
+        services.joinGame(authToken, values.playerColor(), values.gameId());
+
+        return new Gson().toJson(null);
 
     }
 
@@ -152,6 +157,13 @@ record GameID(int gameID){
 
 
 record GameList(GameData[] games){
+
+
+
+}
+
+
+record WeirdWrapper(ChessGame.TeamColor playerColor, int gameId){
 
 
 

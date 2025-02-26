@@ -20,9 +20,9 @@ public interface DataAccessFramework {
 
     GameData addGameData(String gameName);
 
-    GameData getGameData(int gameIdToGet);
+    GameData getGameData(int gameIdToGet) throws DataAccessException;
 
-    GameData updateGameData(int gameIdToGet, GameData updatedGame);
+    GameData updateGameData(GameData oldGame, GameData updatedGame);
 
     GameData[] getAllGameData(); // Should this be a collection instead? Or is a list fine?
 
