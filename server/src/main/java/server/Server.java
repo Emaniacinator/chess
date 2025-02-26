@@ -1,5 +1,6 @@
 package server;
 
+import chess.model.GameData;
 import chess.model.UserData;
 import dataaccess.DataAccessException;
 import jdk.jshell.spi.ExecutionControl;
@@ -94,7 +95,7 @@ public class Server {
 
         services.logoutUser(authToken);
 
-        return new Gson().toJson("");
+        return new Gson().toJson(null);
 
     }
 
@@ -106,9 +107,17 @@ public class Server {
     }
 
 
-    public Object createGameHandler(Request request, Response response){
+    public Object createGameHandler(Request request, Response response) throws DataAccessException{
 
-        return null;
+        String authToken = request.headers("authorization");
+
+        String gameName = request.body();
+
+        GameData newGame = services.createGame(authToken, gameName);
+
+        GameID idItem = new GameID(newGame.gameID());
+
+        return new Gson().toJson(idItem);
 
     }
 
@@ -127,5 +136,11 @@ public class Server {
         return new JsonObject();
 
     }
+
+}
+
+record GameID(int gameID){
+
+
 
 }

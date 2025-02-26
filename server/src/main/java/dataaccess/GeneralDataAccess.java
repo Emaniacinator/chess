@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import chess.model.AuthData;
 import chess.model.GameData;
 import chess.model.UserData;
@@ -11,8 +12,6 @@ import java.util.UUID;
 public class GeneralDataAccess implements DataAccessFramework{
 
 
-    int userDataIterator = 1;
-    int authDataIterator = 1;
     int gameDataIterator = 1;
     private HashMap<Integer, UserData> userDataMap = new HashMap<>();
     private static HashMap<Integer, AuthData> authDataMap = new HashMap<>();
@@ -46,8 +45,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         }
 
-        userDataMap.put(userDataIterator, newUserData);
-        userDataIterator++;
+        userDataMap.put(newUserData.hashCode(), newUserData);
 
         return addAuthData(newUserData.username());
 
@@ -76,8 +74,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         AuthData addedData = new AuthData(username, UUID.randomUUID().toString());
 
-        authDataMap.put(authDataIterator, addedData);
-        authDataIterator++;
+        authDataMap.put(addedData.hashCode(), addedData);
 
         return addedData;
 
@@ -109,8 +106,15 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public GameData addGameData(GameData newGameData) {
-        return null;
+    public GameData addGameData(String gameName) {
+
+        ChessGame defaultBoard = new ChessGame();
+        gameDataIterator++;
+        GameData newGame =  new GameData(gameDataIterator, null, null, gameName, defaultBoard);
+        gameDataMap.put(gameDataIterator, newGame);
+
+        return newGame;
+
     }
 
 

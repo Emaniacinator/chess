@@ -1,6 +1,7 @@
 package services;
 
 import chess.model.AuthData;
+import chess.model.GameData;
 import chess.model.UserData;
 import dataaccess.DataAccessException;
 import dataaccess.GeneralDataAccess;
@@ -67,6 +68,20 @@ public class Service {
         AuthData checkedData = dataAccess.getAuthData(authToken);
 
         dataAccess.deleteAuthData(checkedData);
+
+    }
+
+    public GameData createGame(String authToken, String gameName) throws DataAccessException{
+
+        AuthData checkLogin = dataAccess.getAuthData(authToken);
+
+        if (gameName == null){
+
+            throw new DataAccessException(400, "Error: No game name specified");
+
+        }
+
+        return dataAccess.addGameData(gameName);
 
     }
 

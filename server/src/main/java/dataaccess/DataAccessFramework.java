@@ -18,7 +18,7 @@ public interface DataAccessFramework {
 
     static void deleteAuthData(AuthData dataToDelete){};
 
-    GameData addGameData(GameData newGameData);
+    GameData addGameData(String gameName);
 
     GameData getGameData(int gameIdToGet);
 
