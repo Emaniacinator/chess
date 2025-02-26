@@ -100,9 +100,13 @@ public class Server {
     }
 
 
-    public Object listGameHandler(Request request, Response response){
+    public Object listGameHandler(Request request, Response response) throws DataAccessException{
 
-        return null;
+        String authToken = request.headers("authorization");
+
+        GameList allGames = new GameList(services.getAllGameData());
+
+        return new Gson().toJson(allGames);
 
     }
 
@@ -139,7 +143,15 @@ public class Server {
 
 }
 
+
 record GameID(int gameID){
+
+
+
+}
+
+
+record GameList(GameData[] games){
 
 
 

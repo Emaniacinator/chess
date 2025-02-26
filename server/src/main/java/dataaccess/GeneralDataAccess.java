@@ -129,7 +129,11 @@ public class GeneralDataAccess implements DataAccessFramework{
 
 
     public GameData[] getAllGameData() {
-        return new GameData[0];
+
+        int arraySize = gameDataMap.size();
+
+        return gameDataMap.values().toArray(new GameData[arraySize]);
+
     }
 
 

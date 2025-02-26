@@ -86,6 +86,13 @@ public class Service {
     }
 
 
+    public GameData[] getAllGameData(){
+
+        return dataAccess.getAllGameData();
+
+    }
+
+
     public void clearAllDatabases(){
 
         dataAccess.deleteAllData();
