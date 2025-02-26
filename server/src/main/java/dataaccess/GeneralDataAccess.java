@@ -15,7 +15,7 @@ public class GeneralDataAccess implements DataAccessFramework{
     int authDataIterator = 1;
     int gameDataIterator = 1;
     private HashMap<Integer, UserData> userDataMap = new HashMap<>();
-    private HashMap<Integer, AuthData> authDataMap = new HashMap<>();
+    private static HashMap<Integer, AuthData> authDataMap = new HashMap<>();
     private HashMap<Integer, GameData> gameDataMap = new HashMap<>();
 
 
@@ -84,8 +84,28 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public AuthData getAuthData(String authToken) {
-        return null;
+    public AuthData getAuthData(String authToken) throws DataAccessException{
+
+        for (Map.Entry<Integer, AuthData> currentData : authDataMap.entrySet()){
+
+            AuthData checkedData = currentData.getValue();
+            if (Objects.equals(checkedData.authToken(), authToken)){
+
+                return checkedData;
+
+            }
+
+        }
+
+        throw new DataAccessException(401, "Error: No authorized user in database");
+
+    }
+
+
+    public static void deleteAuthData(AuthData dataToDelete) throws DataAccessException{
+
+        authDataMap.values().remove(dataToDelete);
+
     }
 
 

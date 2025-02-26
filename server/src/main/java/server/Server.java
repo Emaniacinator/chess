@@ -88,9 +88,13 @@ public class Server {
     }
 
 
-    public Object logoutHandler(Request request, Response response){
+    public Object logoutHandler(Request request, Response response) throws DataAccessException{
 
-        return null;
+        String authToken = request.headers("authorization");
+
+        services.logoutUser(authToken);
+
+        return new Gson().toJson("");
 
     }
 

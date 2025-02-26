@@ -12,9 +12,9 @@ public interface DataAccessFramework {
 
     UserData getUserData(String username) throws DataAccessException;
 
-    AuthData addAuthData(String username);
+    AuthData addAuthData(String username) throws DataAccessException;
 
-    AuthData getAuthData(String authToken);
+    AuthData getAuthData(String authToken) throws DataAccessException;
 
     static void deleteAuthData(AuthData dataToDelete){};
 

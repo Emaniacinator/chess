@@ -62,6 +62,15 @@ public class Service {
     }
 
 
+    public void logoutUser(String authToken) throws DataAccessException{
+
+        AuthData checkedData = dataAccess.getAuthData(authToken);
+
+        dataAccess.deleteAuthData(checkedData);
+
+    }
+
+
     public void clearAllDatabases(){
 
         dataAccess.deleteAllData();
