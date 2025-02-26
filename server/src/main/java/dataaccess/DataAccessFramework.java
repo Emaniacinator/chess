@@ -22,7 +22,7 @@ public interface DataAccessFramework {
 
     GameData getGameData(int gameIdToGet) throws DataAccessException;
 
-    GameData updateGameData(GameData oldGame, GameData updatedGame);
+    static void updateGameData(Integer gameID, GameData newGame) throws DataAccessException{};
 
     GameData[] getAllGameData(); // Should this be a collection instead? Or is a list fine?
 

@@ -7,7 +7,6 @@ import java.util.Collection;
 
 public class Pawn extends ChessPiece {
 
-    private boolean hasMoved;
     private ChessPosition currentPosition;
     private boolean justMadeFirstMove;
 

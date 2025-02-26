@@ -104,27 +104,33 @@ public class Service {
 
         AuthData checkLogin = dataAccess.getAuthData(authToken);
 
-        if (playerColor == null || gameId < 1){
+        if (playerColor == null || gameId < 0){
 
             throw new DataAccessException(400, "Error: Input an invalid gameID or playerColor");
 
         }
 
-        GameData foundGame = dataAccess.getGameData(gameId);
+        GameData foundGame = dataAccess.getGameData(gameId + 1);
 
         if (playerColor == WHITE && foundGame.whiteUsername() == null){
 
-
+            GameData updatedGame = foundGame.setWhiteUsername(checkLogin.username());
+            dataAccess.updateGameData(gameId, updatedGame);
 
         }
 
         else if (playerColor == BLACK && foundGame.blackUsername() == null){
 
-
+            GameData updatedGame = foundGame.setBlackUsername(checkLogin.username());
+            dataAccess.updateGameData(gameId, updatedGame);
 
         }
 
-        throw new DataAccessException(403, "Error: There is already a user in that game for the " + playerColor + " team");
+        else{
+
+            throw new DataAccessException(403, "Error: There is already a user in that game for the " + playerColor + " team");
+
+        }
 
     }
 

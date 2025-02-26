@@ -135,26 +135,11 @@ public class GeneralDataAccess implements DataAccessFramework{
 
     }
 
-    // I dislike this conceptually. Find a way to update the game since records are weird. Keep in mind that you
-    //    // might have to update the HashMap database as a result of updaing the game data. (Thanks again, records).
-    public GameData updateWhiteUsername(GameData oldGame, String username) {
-
-        return null;
-
-    }
-
-    // I also dislike this conceptually. Find a way to update the game since records are weird. Keep in mind that you
-    // might have to update the HashMap database as a result of updaing the game data. (Thanks again, records).
-    public GameData updateBlackUsername(GameData oldGame, String username){
-
-        return null;
-
-    }
 
     // Probably this will need to be removed but for now it lets the code compile
-    public GameData updateGameData(GameData oldGame, GameData newGame){
+    public void updateGameData(Integer gameID, GameData newGame) throws DataAccessException{
 
-        return null;
+        gameDataMap.put(gameID, newGame);
 
     }
 

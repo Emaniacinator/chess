@@ -7,7 +7,6 @@ import java.util.Collection;
 
 public class King extends ChessPiece {
 
-    private boolean hasMoved;
     private ChessPosition currentPosition;
 
     public King(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, ChessPosition currentPosition, boolean hasMoved) {

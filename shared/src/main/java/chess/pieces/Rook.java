@@ -7,7 +7,6 @@ import java.util.Collection;
 
 public class Rook extends ChessPiece {
 
-    private boolean hasMoved = false;
     private ChessPosition currentPosition;
 
     public Rook(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type, ChessPosition currentPosition, boolean hasMoved) {
