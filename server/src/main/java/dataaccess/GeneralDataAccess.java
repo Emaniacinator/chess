@@ -28,19 +28,19 @@ public class GeneralDataAccess implements DataAccessFramework{
 
     public AuthData addUserData(UserData newUserData) throws DataAccessException{
 
-        if (newUserData.username() == null){
+        if (newUserData.username() == null || newUserData.username().isEmpty()){
 
             throw new DataAccessException(400, "Error: Can't register without a username");
 
         }
 
-        if (newUserData.password() == null){
+        if (newUserData.password() == null || newUserData.password().isEmpty()){
 
             throw new DataAccessException(400, "Error: Can't register without a passcode");
 
         }
 
-        if (newUserData.email() == null){
+        if (newUserData.email() == null || newUserData.email().isEmpty()){
 
             throw new DataAccessException(400, "Error: Can't register without an email");
 
@@ -83,6 +83,12 @@ public class GeneralDataAccess implements DataAccessFramework{
 
 
     public AuthData getAuthData(String authToken) throws DataAccessException{
+
+        if (authToken.equals("")){
+
+            throw new DataAccessException(401, "Error: Not logged in");
+
+        }
 
         for (Map.Entry<Integer, AuthData> currentData : authDataMap.entrySet()){
 
