@@ -43,14 +43,19 @@ public class UserServiceTests {
      *  - Success case [200]                                          Written
      *
      * getAllGameData
-     *  - User doesn't exist in AuthData [401]
-     *  - Passed in null authToken (not logged in) [401]
-     *  - Success case [200]
+     *  - User doesn't exist in AuthData [401]                        Written
+     *  - Passed in null authToken (not logged in) [401]              Written
+     *  - Success case [200]                                          Written
      *
      * joinGame
-     *  - User doesn't exist in AuthData [401]
-     *  - Passed in null authToken (not logged in) [401]
-     *  - Color space is already taken [403]
+     *  - User doesn't exist in AuthData [401]                        Written
+     *  - Passed in null authToken (not logged in) [401]              Written
+     *  - No gameID passed in
+     *  - Negative gameID passed in
+     *  - No game in database
+     *  - No teamColor passed in
+     *  - Color space is already taken white [403]
+     *  - Color space is already taken black [403]
      *  - Success case [200]
      *
      * clearAllDatabases
@@ -471,6 +476,60 @@ public class UserServiceTests {
             assertEquals("GameTwo", gameList[1].gameName());
             assertEquals("GameThree", gameList[2].gameName());
             assertEquals("GameFour", gameList[3].gameName());
+
+        }
+
+    }
+
+
+    @Nested
+    @DisplayName("createGame Tests")
+    public class joinGameTests {
+
+        AuthData initialData;
+
+        @BeforeEach
+        public void joinGameSetup() {
+
+            UserData initialUser = new UserData("user", "1234", "email");
+
+            try {
+
+                serviceTest.clearAllDatabases();
+                initialData = serviceTest.registerNewUser(initialUser);
+                serviceTest.createGame(initialData.authToken(), "game");
+
+            } catch (DataAccessException ignored) {
+
+
+            }
+
+        }
+
+
+        @Test
+        @DisplayName("User isn't in database")
+        public void createGameUserNotInDatabase() {
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.joinGame("apples", ChessGame.TeamColor.WHITE, 1));
+
+            assertEquals(401, expectedException.getErrorCode());
+            assertEquals("Error: No authorized user in database", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("No authToken passed in")
+        public void createGameNoAuthToken() {
+
+            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class, () -> serviceTest.joinGame("", ChessGame.TeamColor.WHITE, 1));
+            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class, () -> serviceTest.joinGame(null, ChessGame.TeamColor.WHITE, 1));
+
+            assertEquals(401, expectedExceptionEmpty.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionEmpty.getMessage());
+            assertEquals(401, expectedExceptionNull.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionNull.getMessage());
 
         }
 
