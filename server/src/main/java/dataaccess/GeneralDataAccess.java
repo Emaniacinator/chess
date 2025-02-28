@@ -13,6 +13,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
 
     int gameDataIterator = 0;
+
     private static HashMap<Integer, UserData> userDataMap = new HashMap<>();
     private static HashMap<Integer, AuthData> authDataMap = new HashMap<>();
     private static HashMap<Integer, GameData> gameDataMap = new HashMap<>();
@@ -118,12 +119,12 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public GameData getGameData(int gameIdToGet) throws DataAccessException {
+    public GameData getGameData(int gameIDToGet) throws DataAccessException {
 
         for (Map.Entry<Integer, GameData> currentData : gameDataMap.entrySet()){
 
             GameData checkedData = currentData.getValue();
-            if (Objects.equals(checkedData.gameID(), gameIdToGet)){
+            if (Objects.equals(checkedData.gameID(), gameIDToGet)){
 
                 return checkedData;
 
@@ -131,7 +132,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         }
 
-        throw new DataAccessException(401, "Error: No authorized user in database");
+        throw new DataAccessException(400, "Error: No game with that ID in database");
 
     }
 
@@ -159,6 +160,8 @@ public class GeneralDataAccess implements DataAccessFramework{
         userDataMap.clear();
         authDataMap.clear();
         gameDataMap.clear();
+
+        gameDataIterator = 0;
 
     }
 

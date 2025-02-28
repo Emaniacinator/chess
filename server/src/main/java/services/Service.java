@@ -100,29 +100,29 @@ public class Service {
 
     // I really dislike this implementation of updating the usernames, but I'll have to get back to it tomorrow.
     // Also it's not finished hahaha
-    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameId) throws DataAccessException{
+    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException{
 
         AuthData checkLogin = dataAccess.getAuthData(authToken);
 
-        if (playerColor == null || gameId < 0){
+        if (playerColor == null || gameID < 0){
 
             throw new DataAccessException(400, "Error: Input an invalid gameID or playerColor");
 
         }
 
-        GameData foundGame = dataAccess.getGameData(gameId + 1);
+        GameData foundGame = dataAccess.getGameData(gameID);
 
         if (playerColor == WHITE && foundGame.whiteUsername() == null){
 
             GameData updatedGame = foundGame.setWhiteUsername(checkLogin.username());
-            dataAccess.updateGameData(gameId + 1, updatedGame);
+            dataAccess.updateGameData(gameID, updatedGame);
 
         }
 
         else if (playerColor == BLACK && foundGame.blackUsername() == null){
 
             GameData updatedGame = foundGame.setBlackUsername(checkLogin.username());
-            dataAccess.updateGameData(gameId + 1, updatedGame);
+            dataAccess.updateGameData(gameID, updatedGame);
 
         }
 

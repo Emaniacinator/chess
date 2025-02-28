@@ -131,7 +131,7 @@ public class Server {
 
         JoinGameRequest values = new Gson().fromJson(request.body(), JoinGameRequest.class);
 
-        services.joinGame(authToken, values.playerColor(), values.gameId());
+        services.joinGame(authToken, values.playerColor(), values.gameID());
 
         return new Gson().toJson(null);
 
@@ -163,7 +163,7 @@ record GameList(GameData[] games){
 }
 
 
-record JoinGameRequest(ChessGame.TeamColor playerColor, int gameId){
+record JoinGameRequest(ChessGame.TeamColor playerColor, int gameID){
 
 
 
