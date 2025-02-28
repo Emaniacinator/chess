@@ -13,9 +13,9 @@ public class GeneralDataAccess implements DataAccessFramework{
 
 
     int gameDataIterator = 0;
-    private HashMap<Integer, UserData> userDataMap = new HashMap<>();
+    private static HashMap<Integer, UserData> userDataMap = new HashMap<>();
     private static HashMap<Integer, AuthData> authDataMap = new HashMap<>();
-    private HashMap<Integer, GameData> gameDataMap = new HashMap<>();
+    private static HashMap<Integer, GameData> gameDataMap = new HashMap<>();
 
 
     public GeneralDataAccess(){
@@ -88,7 +88,7 @@ public class GeneralDataAccess implements DataAccessFramework{
             AuthData checkedData = currentData.getValue();
             if (Objects.equals(checkedData.authToken(), authToken)){
 
-                return checkedData;
+                 return checkedData;
 
             }
 
@@ -139,6 +139,7 @@ public class GeneralDataAccess implements DataAccessFramework{
     // Probably this will need to be removed but for now it lets the code compile
     public void updateGameData(Integer gameID, GameData newGame) throws DataAccessException{
 
+        gameDataMap.remove(gameID);
         gameDataMap.put(gameID, newGame);
 
     }

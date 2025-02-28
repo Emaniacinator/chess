@@ -115,14 +115,14 @@ public class Service {
         if (playerColor == WHITE && foundGame.whiteUsername() == null){
 
             GameData updatedGame = foundGame.setWhiteUsername(checkLogin.username());
-            dataAccess.updateGameData(gameId, updatedGame);
+            dataAccess.updateGameData(gameId + 1, updatedGame);
 
         }
 
         else if (playerColor == BLACK && foundGame.blackUsername() == null){
 
             GameData updatedGame = foundGame.setBlackUsername(checkLogin.username());
-            dataAccess.updateGameData(gameId, updatedGame);
+            dataAccess.updateGameData(gameId + 1, updatedGame);
 
         }
 

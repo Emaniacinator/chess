@@ -114,9 +114,9 @@ public class Server {
 
         String authToken = request.headers("authorization");
 
-        String gameName = request.body(); // Uhhh... you might need to from Json this for it to work right. But only maybe
+        CreateGameRequest requestedName = new Gson().fromJson(request.body(), CreateGameRequest.class); // Uhhh... you might need to from Json this for it to work right. But only maybe
 
-        GameData newGame = services.createGame(authToken, gameName);
+        GameData newGame = services.createGame(authToken, requestedName.gameName());
 
         GameID idItem = new GameID(newGame.gameID());
 
@@ -129,7 +129,7 @@ public class Server {
 
         String authToken = request.headers("authorization"); // Uhhh... you might need to from Json this for it to work right. But only maybe
 
-        WeirdWrapper values = new Gson().fromJson(request.body(), WeirdWrapper.class);
+        JoinGameRequest values = new Gson().fromJson(request.body(), JoinGameRequest.class);
 
         services.joinGame(authToken, values.playerColor(), values.gameId());
 
@@ -163,7 +163,14 @@ record GameList(GameData[] games){
 }
 
 
-record WeirdWrapper(ChessGame.TeamColor playerColor, int gameId){
+record JoinGameRequest(ChessGame.TeamColor playerColor, int gameId){
+
+
+
+}
+
+
+record CreateGameRequest(String gameName){
 
 
 
