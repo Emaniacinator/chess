@@ -47,7 +47,7 @@ public class Service {
 
     public AuthData loginUser(UserData loginUserData) throws DataAccessException{
 
-        if (loginUserData.password() == null || loginUserData.username() == null){
+        if (loginUserData.password() == null || loginUserData.username() == null  || loginUserData.password().isEmpty()  || loginUserData.username().isEmpty()){
 
             throw new DataAccessException(500, "Error: Did not input either username or passcode");
 

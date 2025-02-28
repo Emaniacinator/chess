@@ -23,11 +23,11 @@ public class UserServiceTests {
      *  - Success case [200]                                          Written
      *
      * loginUser
-     *  - Doesn't input a username [500]
-     *  - Doesn't input a passcode [500]
-     *  - User doesn't exist in database [401]
-     *  - The passcode doesn't match what's in the UserData [401]
-     *  - Success case [200]
+     *  - Doesn't input a username [500]                              Written
+     *  - Doesn't input a passcode [500]                              Written
+     *  - User doesn't exist in database [401]                        Written
+     *  - The passcode doesn't match what's in the UserData [401]     Written
+     *  - Success case [200]                                          Written
      *
      * logoutUser
      *  - User isn't in AuthData [401]
@@ -151,4 +151,101 @@ public class UserServiceTests {
         }
 
     }
+
+
+    @Nested
+    @DisplayName("loginUser Tests")
+    class loginUserTests{
+
+
+        @BeforeEach
+        public void loginSetup(){
+
+            UserData initialUser = new UserData("user", "1234", "email");
+
+            try{
+
+                serviceTest.registerNewUser(initialUser);
+
+            }
+
+            catch(DataAccessException ignored){
+
+
+
+            }
+
+        }
+
+
+        @Test
+        @DisplayName ("No input username")
+        public void loginUserNoUsername(){
+
+            UserData testedLoginData = new UserData("", "1234", "");
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.loginUser(testedLoginData));
+
+            assertEquals(500, expectedException.getErrorCode());
+            assertEquals("Error: Did not input either username or passcode", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName ("No input passcode")
+        public void loginUserNoPasscode(){
+
+            UserData testedLoginData = new UserData("user", "", "");
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.loginUser(testedLoginData));
+
+            assertEquals(500, expectedException.getErrorCode());
+            assertEquals("Error: Did not input either username or passcode", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName ("User doesn't exist")
+        public void loginUserNotExist(){
+
+            UserData testedLoginData = new UserData("guccigang", "1234", "");
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.loginUser(testedLoginData));
+
+            assertEquals(401, expectedException.getErrorCode());
+            assertEquals("Error: User is not in database", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName ("Passcode is incorrect")
+        public void loginUserIncorrectPasscode(){
+
+            UserData testedLoginData = new UserData("user", "abcde", "");
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.loginUser(testedLoginData));
+
+            assertEquals(401, expectedException.getErrorCode());
+            assertEquals("Error: Incorrect passcode or username", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("Successfully logged in")
+        public void loginUserSuccess(){
+
+            UserData testedLoginData = new UserData("user", "1234", "");
+
+            AuthData testedAuthData = assertDoesNotThrow(() -> serviceTest.loginUser(testedLoginData));
+
+            assertEquals("user", testedAuthData.username());
+
+        }
+
+    }
+
 }
