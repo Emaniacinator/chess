@@ -78,7 +78,7 @@ public class Service {
 
         AuthData checkLogin = dataAccess.getAuthData(authToken);
 
-        if (gameName == null){
+        if (gameName == null || gameName.isEmpty()){
 
             throw new DataAccessException(400, "Error: No game name specified");
 

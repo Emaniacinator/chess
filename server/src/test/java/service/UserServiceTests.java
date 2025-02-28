@@ -1,6 +1,8 @@
 package service;
 
+import chess.ChessGame;
 import chess.model.AuthData;
+import chess.model.GameData;
 import chess.model.UserData;
 import dataaccess.DataAccessException;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,8 +37,8 @@ public class UserServiceTests {
      *  - Success case [200]                                          Written
      *
      * createGame
-     *  - User doesn't exist in AuthData [401]
-     *  - Passed in null authToken (not logged in) [401]
+     *  - User doesn't exist in AuthData [401]                        Written
+     *  - Passed in null authToken (not logged in) [401]              Written
      *  - Didn't input a game name
      *  - Success case [200]
      *
@@ -304,7 +306,7 @@ public class UserServiceTests {
 
 
         @Test
-        @DisplayName("Successful logout")
+        @DisplayName("Successfully logged out")
         public void logoutUserSuccess(){
 
             String userToken = initialData.authToken();
@@ -318,5 +320,90 @@ public class UserServiceTests {
         }
 
     }
+
+
+    @Nested
+    @DisplayName("createGame Tests")
+    public class creatGameTests {
+
+        AuthData initialData;
+
+        @BeforeEach
+        public void createGameSetup() {
+
+            UserData initialUser = new UserData("user", "1234", "email");
+
+            try {
+
+                serviceTest.clearAllDatabases();
+                initialData = serviceTest.registerNewUser(initialUser);
+
+            }
+
+            catch (DataAccessException ignored) {
+
+
+
+            }
+
+        }
+
+
+        @Test
+        @DisplayName("User isn't in database")
+        public void createGameUserNotInDatabase() {
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser("apples"));
+
+            assertEquals(401, expectedException.getErrorCode());
+            assertEquals("Error: No authorized user in database", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("No authToken passed in")
+        public void createGameNoAuthToken() {
+
+            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser(""));
+            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser(null));
+
+            assertEquals(401, expectedExceptionEmpty.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionEmpty.getMessage());
+            assertEquals(401, expectedExceptionNull.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionNull.getMessage());
+
+        }
+
+        @Test
+        @DisplayName("No gameName passed in")
+        public void createGameNoGameName(){
+
+            // Right now this one should fail and return data, since line 81 of service.java is incomplete
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.createGame(initialData.authToken(), ""));
+
+            assertEquals(400, expectedException.getErrorCode());
+            assertEquals("Error: No game name specified", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("Successfully created game")
+        public void createGameSuccess(){
+
+            GameData resultingGame = assertDoesNotThrow(() -> serviceTest.createGame(initialData.authToken(), "real name"));
+
+            assertEquals(1, resultingGame.gameID());
+            assertNull(resultingGame.whiteUsername());
+            assertNull(resultingGame.blackUsername());
+            assertEquals("real name", resultingGame.gameName());
+            assertSame(ChessGame.class, resultingGame.game().getClass());
+
+        }
+
+    }
+
+
 
 }
