@@ -39,8 +39,8 @@ public class UserServiceTests {
      * createGame
      *  - User doesn't exist in AuthData [401]                        Written
      *  - Passed in null authToken (not logged in) [401]              Written
-     *  - Didn't input a game name
-     *  - Success case [200]
+     *  - Didn't input a game name                                    Written
+     *  - Success case [200]                                          Written
      *
      * getAllGameData
      *  - User doesn't exist in AuthData [401]
@@ -324,7 +324,7 @@ public class UserServiceTests {
 
     @Nested
     @DisplayName("createGame Tests")
-    public class creatGameTests {
+    public class createGameTests {
 
         AuthData initialData;
 
@@ -353,7 +353,7 @@ public class UserServiceTests {
         @DisplayName("User isn't in database")
         public void createGameUserNotInDatabase() {
 
-            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser("apples"));
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.createGame("apples", "name"));
 
             assertEquals(401, expectedException.getErrorCode());
             assertEquals("Error: No authorized user in database", expectedException.getMessage());
@@ -365,8 +365,8 @@ public class UserServiceTests {
         @DisplayName("No authToken passed in")
         public void createGameNoAuthToken() {
 
-            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser(""));
-            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser(null));
+            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class, () -> serviceTest.createGame("", "name"));
+            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class, () -> serviceTest.createGame(null, "name"));
 
             assertEquals(401, expectedExceptionEmpty.getErrorCode());
             assertEquals("Error: Not logged in", expectedExceptionEmpty.getMessage());
@@ -405,5 +405,75 @@ public class UserServiceTests {
     }
 
 
+    @Nested
+    @DisplayName("getAllGameData Tests")
+    public class getAllGameDataTests {
+
+        AuthData initialData;
+
+        @BeforeEach
+        public void getAllGameDataSetup() {
+
+            UserData initialUser = new UserData("user", "1234", "email");
+
+            try {
+
+                serviceTest.clearAllDatabases();
+                initialData = serviceTest.registerNewUser(initialUser);
+                serviceTest.createGame(initialData.authToken(), "GameOne");
+                serviceTest.createGame(initialData.authToken(), "GameTwo");
+                serviceTest.createGame(initialData.authToken(), "GameThree");
+                serviceTest.createGame(initialData.authToken(), "GameFour");
+
+            } catch (DataAccessException ignored) {
+
+
+            }
+
+        }
+
+
+        @Test
+        @DisplayName("User isn't in database")
+        public void getAllGameDataUserNotInDatabase() {
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.getAllGameData("apples"));
+
+            assertEquals(401, expectedException.getErrorCode());
+            assertEquals("Error: No authorized user in database", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("No authToken passed in")
+        public void getAllGameDataNoAuthToken() {
+
+            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class, () -> serviceTest.getAllGameData(""));
+            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class, () -> serviceTest.getAllGameData(null));
+
+            assertEquals(401, expectedExceptionEmpty.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionEmpty.getMessage());
+            assertEquals(401, expectedExceptionNull.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionNull.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("Successfully got all game data")
+        public void getAllGameDataSuccess(){
+
+            GameData[] gameList = assertDoesNotThrow(() -> serviceTest.getAllGameData(initialData.authToken()));
+
+            assertEquals(4, gameList.length);
+            assertEquals("GameOne", gameList[0].gameName());
+            assertEquals("GameTwo", gameList[1].gameName());
+            assertEquals("GameThree", gameList[2].gameName());
+            assertEquals("GameFour", gameList[3].gameName());
+
+        }
+
+    }
 
 }
