@@ -30,9 +30,9 @@ public class UserServiceTests {
      *  - Success case [200]                                          Written
      *
      * logoutUser
-     *  - User isn't in AuthData [401]
-     *  - Passed in null authToken (not logged in) [401]
-     *  - Success case [200]
+     *  - User isn't in AuthData [401]                                Written
+     *  - Passed in null authToken (not logged in) [401]              Written
+     *  - Success case [200]                                          Written
      *
      * createGame
      *  - User doesn't exist in AuthData [401]
@@ -243,6 +243,77 @@ public class UserServiceTests {
             AuthData testedAuthData = assertDoesNotThrow(() -> serviceTest.loginUser(testedLoginData));
 
             assertEquals("user", testedAuthData.username());
+
+        }
+
+    }
+
+
+    @Nested
+    @DisplayName("logoutUser Tests")
+    class logoutUserTests{
+
+        AuthData initialData;
+
+        @BeforeEach
+        public void logoutSetup(){
+
+            UserData initialUser = new UserData("user", "1234", "email");
+
+            try{
+
+                serviceTest.clearAllDatabases();
+                initialData = serviceTest.registerNewUser(initialUser);
+
+            }
+
+            catch(DataAccessException ignored){
+
+
+
+            }
+
+        }
+
+
+        @Test
+        @DisplayName("User isn't in database")
+        public void logoutUserNotInDatabase(){
+
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser("apples"));
+
+            assertEquals(401, expectedException.getErrorCode());
+            assertEquals("Error: No authorized user in database", expectedException.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("No authToken passed in")
+        public void logoutUserNoAuthToken(){
+
+            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser(""));
+            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class, () -> serviceTest.logoutUser(null));
+
+            assertEquals(401, expectedExceptionEmpty.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionEmpty.getMessage());
+            assertEquals(401, expectedExceptionNull.getErrorCode());
+            assertEquals("Error: Not logged in", expectedExceptionNull.getMessage());
+
+        }
+
+
+        @Test
+        @DisplayName("Successful logout")
+        public void logoutUserSuccess(){
+
+            String userToken = initialData.authToken();
+
+            // Make sure it logs out correclty and has no exception
+            assertDoesNotThrow(() -> serviceTest.logoutUser(userToken));
+
+            // Then make sure this DOES throw an exception since they should no longer exist
+            assertThrows(DataAccessException.class, ()-> serviceTest.logoutUser(userToken));
 
         }
 

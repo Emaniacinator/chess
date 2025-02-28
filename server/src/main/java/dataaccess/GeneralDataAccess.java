@@ -84,7 +84,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
     public AuthData getAuthData(String authToken) throws DataAccessException{
 
-        if (authToken.equals("")){
+        if (authToken == null || authToken.isEmpty()){
 
             throw new DataAccessException(401, "Error: Not logged in");
 
