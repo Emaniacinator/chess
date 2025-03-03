@@ -20,10 +20,10 @@ public record GameData (int gameID, String whiteUsername, String blackUsername ,
     }
 
 
-    public GameData updateGameState(ChessGame gameUpdate){
+    /* public GameData updateGameState(ChessGame gameUpdate){
 
         return new GameData(gameID, whiteUsername, blackUsername, gameName, gameUpdate);
 
-    }
+    } */
 
 }
