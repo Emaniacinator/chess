@@ -25,7 +25,7 @@ public class UserServiceTests {
 
     @Nested
     @DisplayName("registerNewUser Tests")
-    class registerUserTests{
+    class RegisterUserTests{
 
         @Test
         @DisplayName("No input username")
@@ -256,8 +256,8 @@ public class UserServiceTests {
         @Test
         @DisplayName("No gameName passed in")
         public void createGameNoGameName(){
-            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.createGame(initialData.authToken(), ""));
-
+            DataAccessException expectedException = assertThrows(DataAccessException.class,
+                    () -> serviceTest.createGame(initialData.authToken(), ""));
             assertEquals(400, expectedException.getErrorCode());
             assertEquals("Error: No game name specified", expectedException.getMessage());
         }
@@ -365,7 +365,8 @@ public class UserServiceTests {
         @Test
         @DisplayName("User isn't in database")
         public void joinGameUserNotInDatabase() {
-            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.joinGame("apples", ChessGame.TeamColor.WHITE, 1));
+            DataAccessException expectedException = assertThrows(DataAccessException.class,
+                    () -> serviceTest.joinGame("apples", ChessGame.TeamColor.WHITE, 1));
             assertEquals(401, expectedException.getErrorCode());
             assertEquals("Error: No authorized user in database", expectedException.getMessage());
         }
@@ -374,9 +375,10 @@ public class UserServiceTests {
         @Test
         @DisplayName("No authToken passed in")
         public void joinGameNoAuthToken() {
-            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class, () -> serviceTest.joinGame("", ChessGame.TeamColor.WHITE, 1));
-            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class, () -> serviceTest.joinGame(null, ChessGame.TeamColor.WHITE, 1));
-
+            DataAccessException expectedExceptionEmpty = assertThrows(DataAccessException.class,
+                    () -> serviceTest.joinGame("", ChessGame.TeamColor.WHITE, 1));
+            DataAccessException expectedExceptionNull = assertThrows(DataAccessException.class,
+                    () -> serviceTest.joinGame(null, ChessGame.TeamColor.WHITE, 1));
             assertEquals(401, expectedExceptionEmpty.getErrorCode());
             assertEquals("Error: Not logged in", expectedExceptionEmpty.getMessage());
             assertEquals(401, expectedExceptionNull.getErrorCode());
@@ -387,8 +389,8 @@ public class UserServiceTests {
         @Test
         @DisplayName("No valid gameID passed in")
         public void joinGameNoGameID(){
-            DataAccessException expectedExceptionNegative = assertThrows(DataAccessException.class, () -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.WHITE, -1));
-
+            DataAccessException expectedExceptionNegative = assertThrows(DataAccessException.class,
+                    () -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.WHITE, -1));
             assertEquals(400, expectedExceptionNegative.getErrorCode());
             assertEquals("Error: Input an invalid gameID or playerColor", expectedExceptionNegative.getMessage());
         }
@@ -397,7 +399,8 @@ public class UserServiceTests {
         @Test
         @DisplayName("No game in database")
         public void joinGameNoGameInDatabase(){
-            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.WHITE, 7));
+            DataAccessException expectedException = assertThrows(DataAccessException.class,
+                    () -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.WHITE, 7));
             assertEquals(400, expectedException.getErrorCode());
             assertEquals("Error: No game with that ID in database", expectedException.getMessage());
         }
@@ -406,7 +409,8 @@ public class UserServiceTests {
         @Test
         @DisplayName("No team color passed in")
         public void joinGameNoTeamColor(){
-            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.joinGame(initialData.authToken(), null, 1));
+            DataAccessException expectedException = assertThrows(DataAccessException.class,
+                    () -> serviceTest.joinGame(initialData.authToken(), null, 1));
             assertEquals(400, expectedException.getErrorCode());
             assertEquals("Error: Input an invalid gameID or playerColor", expectedException.getMessage());
         }
@@ -425,7 +429,8 @@ public class UserServiceTests {
         @DisplayName("White team already taken")
         public void joinGameWhiteAlreadyTaken(){
             assertDoesNotThrow(() -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.WHITE, 1));
-            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.WHITE, 1));
+            DataAccessException expectedException = assertThrows(DataAccessException.class,
+                    () -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.WHITE, 1));
             assertEquals(403, expectedException.getErrorCode());
             assertEquals("Error: There is already a user in that game for the WHITE team", expectedException.getMessage());
         }
@@ -435,7 +440,8 @@ public class UserServiceTests {
         @DisplayName("Black team already taken")
         public void joinGameBlackAlreadyTaken(){
             assertDoesNotThrow(() -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.BLACK, 1));
-            DataAccessException expectedException = assertThrows(DataAccessException.class, () -> serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.BLACK, 1));
+            DataAccessException expectedException = assertThrows(DataAccessException.class, () ->
+                    serviceTest.joinGame(initialData.authToken(), ChessGame.TeamColor.BLACK, 1));
 
             assertEquals(403, expectedException.getErrorCode());
             assertEquals("Error: There is already a user in that game for the BLACK team", expectedException.getMessage());
@@ -452,10 +458,10 @@ public class UserServiceTests {
         @BeforeEach
         public void joinGameSetup() {
 
-            UserData initialUser = new UserData("user", "1234", "email");
+            serviceTest.clearAllDatabases();
+            UserData initialUser = new UserData("test", "12345", "email@email.com");
 
             try {
-                serviceTest.clearAllDatabases();
                 initialData = serviceTest.registerNewUser(initialUser);
                 serviceTest.createGame(initialData.authToken(), "game");
             }

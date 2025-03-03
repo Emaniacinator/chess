@@ -114,7 +114,7 @@ public class Server {
 
         String authToken = request.headers("authorization");
 
-        CreateGameRequest requestedName = new Gson().fromJson(request.body(), CreateGameRequest.class); // Uhhh... you might need to from Json this for it to work right. But only maybe
+        CreateGameRequest requestedName = new Gson().fromJson(request.body(), CreateGameRequest.class);
 
         GameData newGame = services.createGame(authToken, requestedName.gameName());
 
@@ -127,7 +127,7 @@ public class Server {
 
     public Object joinGameHandler(Request request, Response response) throws DataAccessException{
 
-        String authToken = request.headers("authorization"); // Uhhh... you might need to from Json this for it to work right. But only maybe
+        String authToken = request.headers("authorization");
 
         JoinGameRequest values = new Gson().fromJson(request.body(), JoinGameRequest.class);
 
