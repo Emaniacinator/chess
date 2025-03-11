@@ -1,15 +1,21 @@
 package dataaccess;
 
+import chess.ChessGame;
 import chess.model.AuthData;
 import chess.model.GameData;
 import chess.model.UserData;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.sql.*;
+import java.util.UUID;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static java.sql.Types.NULL;
 
 public class MySqlDataAccess implements DataAccessFramework{
 
+    // Please note that in this framework, all ChessGame instances have been made into JSON.
 
     public MySqlDataAccess() throws DataAccessException {
 
@@ -20,9 +26,31 @@ public class MySqlDataAccess implements DataAccessFramework{
 
     public AuthData addUserData(UserData newUserData) throws DataAccessException {
 
-        String newUserUpdateString = "UPDATE userData SET [info in table] WHERE [pass in the id]";
+        if (newUserData.username() == null || newUserData.username().isEmpty()){
 
-        return null;
+            throw new DataAccessException(400, "Error: Can't register without a username");
+
+        }
+
+        if (newUserData.password() == null || newUserData.password().isEmpty()){
+
+            throw new DataAccessException(400, "Error: Can't register without a passcode");
+
+        }
+
+        if (newUserData.email() == null || newUserData.email().isEmpty()){
+
+            throw new DataAccessException(400, "Error: Can't register without an email");
+
+        }
+
+        var jsonToAdd = new Gson().toJson(newUserData);
+
+        String newUserUpdateString = "INSERT INTO userDataTable (username, password, email, json) VALUES (?, ?, ?, ?)";
+
+        updateDatabase(newUserUpdateString, newUserData.username(), newUserData.password(), newUserData.email(), jsonToAdd);
+
+        return addAuthData(newUserData.username());
 
     }
 
@@ -36,7 +64,15 @@ public class MySqlDataAccess implements DataAccessFramework{
 
     public AuthData addAuthData(String username) throws DataAccessException {
 
-        return null;
+        String newAuthDataUpdateString = "INSERT INTO authDataTable (username, authToken, json) VALUES (?, ?, ?)";
+
+        AuthData addedData = new AuthData(username, UUID.randomUUID().toString());
+
+        var jsonToAdd = new Gson().toJson(addedData);
+
+        updateDatabase(newAuthDataUpdateString, addedData.username(), addedData.authToken(), jsonToAdd);
+
+        return addedData;
 
     }
 
@@ -69,18 +105,21 @@ public class MySqlDataAccess implements DataAccessFramework{
     }
 
 
-    /* private int updateDatabase(String inputStatement, Object... parameters) throws DataAccessException{
+    public void deleteAllData() throws DataAccessException{
 
-        // Will this need to consider what database table it's being put into? I think that
-        // it probably will, but I'm not sure how to specify that yet.
+        updateDatabase("TRUNCATE userDataTable");
+        updateDatabase("TRUNCATE authDataTable");
+        updateDatabase("TRUNCATE gameDataTable");
+
+    }
+
+
+    // json *should* just read through as text so you  *should* be fine in theory
+    private void updateDatabase(String inputStatement, Object... parameters) throws DataAccessException{
 
         try(var connection = DatabaseManager.getConnection()){
 
             try (var updateStatement = connection.prepareStatement(inputStatement, RETURN_GENERATED_KEYS)){ // Maybe I don't like this try section honestly.
-
-                int objectPosition = 0;
-
-                String updateString = "";
 
                 for(int i = 0; i < parameters.length; i++){
 
@@ -88,11 +127,25 @@ public class MySqlDataAccess implements DataAccessFramework{
 
                     if (currentParameter instanceof Integer test){
 
+                        updateStatement.setInt(i + 1, test);
 
+                    }
+
+                    else if (currentParameter instanceof String test){
+
+                        updateStatement.setString(i + 1, test);
+
+                    }
+
+                    else if (currentParameter == null){
+
+                        updateStatement.setNull(i + 1, NULL);
 
                     }
 
                 }
+
+                updateStatement.executeUpdate();
 
             }
 
@@ -104,12 +157,15 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         }
 
-    } */
+    }
 
 
     private final String[] databaseSetupStatements = {
 
             // You may not need an ID field for the userDataTable and authDataTable if you set this up well
+            // When you turn the game into json, it *should* read through as text. So you can update your whole
+            // program to reflect this
+
             "CREATE TABLE IF NOT EXISTS userDataTable (" +
                     "'username' varchar(256) NOT NULL, " +
                     "'password' varchar(256) NOT NULL, " +
@@ -126,7 +182,7 @@ public class MySqlDataAccess implements DataAccessFramework{
                     "'whiteUsername' varchar(256) NOT NULL, " +
                     "'blackUsername' varchar(256) NOT NULL, " +
                     "'gameName' varchar(256) NOT NULL, " +
-                    "'game' ChessGame, " +
+                    "'game' varchar NOT NULL, " +
                     "`json` TEXT DEFAULT NULL"};
 
 
@@ -134,7 +190,11 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         DatabaseManager.createDatabase();
 
+        System.out.println("Starting configuration...");
+
         try(var connection = DatabaseManager.getConnection()){
+
+            System.out.println("Connection acquired");
 
             for (String statement : databaseSetupStatements){
 
@@ -145,6 +205,8 @@ public class MySqlDataAccess implements DataAccessFramework{
                 }
 
             }
+
+            System.out.println("Successfully configured database");
 
         }
 

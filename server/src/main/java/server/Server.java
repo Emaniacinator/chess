@@ -46,20 +46,27 @@ public class Server {
 
         Spark.awaitInitialization();
         return Spark.port();
+
     }
 
 
     public void stop() {
+
         Spark.stop();
+
         Spark.awaitStop();
+
     }
 
 
     private void exceptionHandler(DataAccessException exception, Request request, Response response){
 
         int errorCode = exception.getErrorCode();
+
         String errorMessage = exception.getMessage();
+
         response.status(errorCode);
+
         response.body(new Gson().toJson(Map.of("error", errorCode, "message", errorMessage)));
 
 

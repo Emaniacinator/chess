@@ -26,4 +26,6 @@ public interface DataAccessFramework {
 
     GameData[] getAllGameData(); // Should this be a collection instead? Or is a list fine?
 
+    static void deleteAllData(){};
+
 }
