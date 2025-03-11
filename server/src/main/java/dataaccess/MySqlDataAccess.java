@@ -20,6 +20,8 @@ public class MySqlDataAccess implements DataAccessFramework{
 
     public AuthData addUserData(UserData newUserData) throws DataAccessException {
 
+        String newUserUpdateString = "UPDATE userData SET [info in table] WHERE [pass in the id]";
+
         return null;
 
     }
@@ -67,7 +69,7 @@ public class MySqlDataAccess implements DataAccessFramework{
     }
 
 
-    private int updateDatabase(String inputStatement, Object... parameters) throws DataAccessException{
+    /* private int updateDatabase(String inputStatement, Object... parameters) throws DataAccessException{
 
         // Will this need to consider what database table it's being put into? I think that
         // it probably will, but I'm not sure how to specify that yet.
@@ -77,6 +79,8 @@ public class MySqlDataAccess implements DataAccessFramework{
             try (var updateStatement = connection.prepareStatement(inputStatement, RETURN_GENERATED_KEYS)){ // Maybe I don't like this try section honestly.
 
                 int objectPosition = 0;
+
+                String updateString = "";
 
                 for(int i = 0; i < parameters.length; i++){
 
@@ -100,24 +104,29 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         }
 
-    }
+    } */
 
 
     private final String[] databaseSetupStatements = {
 
+            // You may not need an ID field for the userDataTable and authDataTable if you set this up well
             "CREATE TABLE IF NOT EXISTS userDataTable (" +
-                    "'id' int NOT NULL AUTO_INCREMENT, " +
-                    "'userData' UserData NOT NULL, " +
+                    "'username' varchar(256) NOT NULL, " +
+                    "'password' varchar(256) NOT NULL, " +
+                    "'email' varchar(256) NOT NULL, " +
                     "`json` TEXT DEFAULT NULL",
 
             "CFREATE TABLE IF NOT EXISTS authDataTable (" +
-                    "'id', int NOT NULL AUTO_INCREMENT, " +
-                    "'authData' AuthData NOT NULL, " +
+                    "'username' varchar(256) NOT NULL, " +
+                    "'authToken' varchar(256) NOT NULL, " +
                     "`json` TEXT DEFAULT NULL",
 
             "CREATE TABLE IF NOT EXISTS gameDataTable (" +
-                    "'id' int NOT NULL AUTO_INCREMENT, " +
-                    "'gameData' GameData NOT NULL, " +
+                    "'gameID' int NOT NULL AUTO_INCREMENT, " +
+                    "'whiteUsername' varchar(256) NOT NULL, " +
+                    "'blackUsername' varchar(256) NOT NULL, " +
+                    "'gameName' varchar(256) NOT NULL, " +
+                    "'game' ChessGame, " +
                     "`json` TEXT DEFAULT NULL"};
 
 
