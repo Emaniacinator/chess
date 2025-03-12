@@ -6,6 +6,8 @@ import chess.model.GameData;
 import chess.model.UserData;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.mindrot.jbcrypt.BCrypt;
+
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -48,10 +50,13 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         }
 
-        var jsonToAdd = new Gson().toJson(newUserData);
+        UserData malleable = newUserData.createCopy();
+
+        var jsonToAdd = new Gson().toJson(malleable);
 
         String newUserUpdateString = "INSERT INTO userDataTable (username, password, email, json) VALUES (?, ?, ?, ?)";
 
+        //updateDatabase(newUserUpdateString, newUserData.username(), BCrypt.hashpw(malleable.password(), BCrypt.gensalt()), newUserData.email(), jsonToAdd);
         updateDatabase(newUserUpdateString, newUserData.username(), newUserData.password(), newUserData.email(), jsonToAdd);
 
         return addAuthData(newUserData.username());

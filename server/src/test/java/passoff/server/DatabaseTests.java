@@ -84,7 +84,6 @@ public class DatabaseTests {
     @Order(2)
     public void bcrypt() {
         serverFacade.register(TEST_USER);
-
         executeForAllTables(this::checkTableForPassword);
     }
 

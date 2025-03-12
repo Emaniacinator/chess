@@ -4,6 +4,8 @@ import chess.ChessGame;
 import chess.model.AuthData;
 import chess.model.GameData;
 import chess.model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -45,6 +47,8 @@ public class GeneralDataAccess implements DataAccessFramework{
             throw new DataAccessException(400, "Error: Can't register without an email");
 
         }
+
+        //UserData passcodeHashedNewUserData = new UserData(newUserData.username(), BCrypt.hashpw(newUserData.password(), BCrypt.gensalt()), newUserData.email());
 
         userDataMap.put(newUserData.hashCode(), newUserData);
 

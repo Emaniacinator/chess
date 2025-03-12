@@ -355,4 +355,19 @@ public class MySqlDataAccessTests {
 
     }
 
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void deleteAllDataSuccess(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException{
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        assertDoesNotThrow(() -> dataAccess.deleteAllData());
+
+        GameData[] gameList = assertDoesNotThrow(() -> dataAccess.getAllGameData());
+
+        assertEquals(0, gameList.length);
+
+    }
+
 }
