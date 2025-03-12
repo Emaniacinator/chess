@@ -16,16 +16,16 @@ public interface DataAccessFramework {
 
     AuthData getAuthData(String authToken) throws DataAccessException;
 
-    static void deleteAuthData(AuthData dataToDelete){};
+    void deleteAuthData(AuthData dataToDelete);
 
     GameData addGameData(String gameName);
 
     GameData getGameData(int gameIdToGet) throws DataAccessException;
 
-    static void updateGameData(Integer gameID, GameData newGame) throws DataAccessException{};
+    void updateGameData(Integer gameID, GameData newGame) throws DataAccessException;
 
     GameData[] getAllGameData(); // Should this be a collection instead? Or is a list fine?
 
-    static void deleteAllData(){};
+    void deleteAllData();
 
 }

@@ -5,7 +5,9 @@ import chess.model.AuthData;
 import chess.model.GameData;
 import chess.model.UserData;
 import dataaccess.DataAccessException;
+import dataaccess.DataAccessFramework;
 import dataaccess.GeneralDataAccess;
+import dataaccess.MySqlDataAccess;
 
 import java.util.Objects;
 
@@ -13,12 +15,21 @@ import static chess.ChessGame.TeamColor.*;
 
 public class Service {
 
-
-    GeneralDataAccess dataAccess = new GeneralDataAccess();
+    DataAccessFramework dataAccess;
 
     public Service(){
 
+        try{
 
+            dataAccess = new MySqlDataAccess();
+
+        }
+
+        catch(DataAccessException exception){
+
+            dataAccess = new GeneralDataAccess();
+
+        }
 
     }
 

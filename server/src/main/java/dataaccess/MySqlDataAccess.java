@@ -69,6 +69,8 @@ public class MySqlDataAccess implements DataAccessFramework{
 
                 try (var responseStatement = preparedStatement.executeQuery()){
 
+                    responseStatement.next();
+
                     var toJson = responseStatement.getString("json");
 
                     return new Gson().fromJson(toJson, UserData.class);
@@ -126,6 +128,8 @@ public class MySqlDataAccess implements DataAccessFramework{
                 preparedStatement.setString(1, authToken);
 
                 try (var responseStatement = preparedStatement.executeQuery()){
+
+                    responseStatement.next();
 
                     var makeJson = responseStatement.getString("json");
 
