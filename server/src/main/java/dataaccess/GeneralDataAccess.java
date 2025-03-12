@@ -125,7 +125,13 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public GameData addGameData(String gameName) {
+    public GameData addGameData(String gameName) throws DataAccessException{
+
+        if (gameName == null || gameName.isEmpty()){
+
+            throw new DataAccessException(400, "Error: No received game name");
+
+        }
 
         ChessGame defaultBoard = new ChessGame();
         gameDataIterator++;
@@ -157,6 +163,12 @@ public class GeneralDataAccess implements DataAccessFramework{
 
     // Probably this will need to be removed but for now it lets the code compile
     public void updateGameData(Integer gameID, GameData newGame) throws DataAccessException{
+
+        if(gameDataMap.containsKey(gameID) == false){
+
+            throw new DataAccessException(400, "Error: No game data to update");
+
+        }
 
         gameDataMap.remove(gameID);
         gameDataMap.put(gameID, newGame);

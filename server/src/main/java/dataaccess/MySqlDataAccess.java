@@ -18,6 +18,8 @@ public class MySqlDataAccess implements DataAccessFramework{
 
     // Please note that in this framework, all ChessGame instances have been made into JSON.
 
+    int gameDataIterator = 0;
+
     public MySqlDataAccess() throws DataAccessException {
 
         configureDatabase();
@@ -60,7 +62,7 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         try (var connection = DatabaseManager.getConnection()){
 
-            String getterStatement = "SELECT json FROM chess.userDataTable WHERE username = ?";
+            String getterStatement = "SELECT json FROM userDataTable WHERE username = ?";
 
             try (var preparedStatement = connection.prepareStatement(getterStatement)){
 
@@ -122,7 +124,7 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         try (var connection = DatabaseManager.getConnection()){
 
-            String authGetter = "SELECT json FROM chess.authDataTable WHERE authToken = ?";
+            String authGetter = "SELECT json FROM authDataTable WHERE authToken = ?";
 
             try (var preparedStatement = connection.prepareStatement(authGetter)){
 
@@ -166,23 +168,83 @@ public class MySqlDataAccess implements DataAccessFramework{
     }
 
 
-    public GameData addGameData(String gameName) {
+    public GameData addGameData(String gameName)  throws DataAccessException{
 
-        return null;
+        if (gameName == null || gameName.isEmpty()){
+
+            throw new DataAccessException(400, "Error: No received game name");
+
+        }
+
+        ChessGame defaultBoard = new ChessGame();
+
+        gameDataIterator++;
+
+        GameData addedGame =  new GameData(gameDataIterator, null, null, gameName, defaultBoard);
+
+        String newGameDataString = "INSERT INTO gameDataTable (gameID, whiteUsername, blackUsername, gameName, game, json) VALUES (?, ?, ?, ?, ?, ?)";
+
+        var jsonOfBoard = new Gson().toJson(defaultBoard);
+
+        var jsonToAdd = new Gson().toJson(addedGame);
+
+        updateDatabase(newGameDataString, gameDataIterator, null, null, gameName, jsonOfBoard, jsonToAdd);
+
+        return addedGame;
 
     }
 
 
-    public GameData getGameData(int gameIdToGet) throws DataAccessException {
+    public GameData getGameData(int gameIDToGet) throws DataAccessException {
 
-        return null;
+        try (var connection = DatabaseManager.getConnection()){
+
+            String gameGetter = "SELECT json FROM gameDataTable WHERE gameID = ?";
+
+            try (var preparedStatement = connection.prepareStatement(gameGetter)){
+
+                preparedStatement.setInt(1, gameIDToGet);
+
+                try (var responseStatement = preparedStatement.executeQuery()){
+
+                    responseStatement.next();
+
+                    var makeJson = responseStatement.getString("json");
+
+                    return new Gson().fromJson(makeJson, GameData.class);
+
+                }
+
+            }
+
+        }
+
+        catch (SQLException foundNothing){
+
+            throw new DataAccessException(400, "Error: No game with that ID in database");
+
+        }
 
     }
 
 
     public void updateGameData(Integer gameID, GameData newGame) throws DataAccessException {
 
+        try{
 
+            GameData originalGame = getGameData(gameID);
+
+            String updateGameDataString = "UPDATE gameDataTable SET whiteUsername = ?, blackUsername = ?, game = ?, json = ? WHERE gameID = ?";
+
+            updateDatabase(updateGameDataString, newGame.whiteUsername(), newGame.blackUsername(), new Gson().toJson(newGame.game().getBoard()), new Gson().toJson(newGame), gameID);
+
+        }
+
+        catch(DataAccessException foundNothing){
+
+            throw new DataAccessException(400, "Error: No game data to update");
+
+        }
 
     }
 
@@ -268,10 +330,10 @@ public class MySqlDataAccess implements DataAccessFramework{
 
             "CREATE TABLE IF NOT EXISTS gameDataTable (" + // This one has a flaw of never incrementing since you deleted the auto_increment part.
                     "`gameID` int NOT NULL, " +
-                    "`whiteUsername` varchar(256) NOT NULL, " +
-                    "`blackUsername` varchar(256) NOT NULL, " +
+                    "`whiteUsername` varchar(256), " +
+                    "`blackUsername` varchar(256), " +
                     "`gameName` varchar(256) NOT NULL, " +
-                    "`game` varchar(1024) NOT NULL, " +
+                    "`game` TEXT NOT NULL, " +
                     "`json` TEXT DEFAULT NULL)"};
 
 

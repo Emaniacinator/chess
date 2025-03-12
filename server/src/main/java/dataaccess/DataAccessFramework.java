@@ -18,7 +18,7 @@ public interface DataAccessFramework {
 
     void deleteAuthData(AuthData dataToDelete) throws DataAccessException;
 
-    GameData addGameData(String gameName);
+    GameData addGameData(String gameName) throws DataAccessException;
 
     GameData getGameData(int gameIdToGet) throws DataAccessException;
 

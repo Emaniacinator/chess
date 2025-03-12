@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.model.AuthData;
 import chess.model.GameData;
@@ -215,6 +216,107 @@ public class MySqlDataAccessTests {
         UserData testedUser = new UserData ("username", "password", "email");
         AuthData testData = assertDoesNotThrow(() -> dataAccess.addUserData(testedUser));
         assertDoesNotThrow(() -> dataAccess.deleteAuthData(testData));
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void addGameDataNoName(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        DataAccessException expectedException = assertThrows(DataAccessException.class, () -> dataAccess.addGameData(null));
+
+        assertEquals(400, expectedException.getErrorCode());
+        assertEquals("Error: No received game name", expectedException.getMessage());
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void addGameDataSuccess(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        GameData testData = assertDoesNotThrow(() -> dataAccess.addGameData("namedGame"));
+
+        assertEquals(1, testData.gameID());
+        assertEquals(null, testData.whiteUsername());
+        assertEquals(null, testData.blackUsername());
+        assertEquals("namedGame", testData.gameName());
+        assertEquals(new ChessGame().getBoard(), testData.game().getBoard());
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void getGameDataNotInDatabase(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        DataAccessException expectedException = assertThrows(DataAccessException.class, () -> dataAccess.getGameData(-3));
+
+        assertEquals(400, expectedException.getErrorCode());
+        assertEquals("Error: No game with that ID in database", expectedException.getMessage());
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void getGameDataSuccess(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        GameData testInput = assertDoesNotThrow(() -> dataAccess.addGameData("newGame"));
+        GameData testOutput = assertDoesNotThrow(() -> dataAccess.getGameData(testInput.gameID()));
+
+        assertEquals(testInput.gameID(), testOutput.gameID());
+        assertEquals(testInput.whiteUsername(), testOutput.whiteUsername());
+        assertEquals(testInput.blackUsername(), testOutput.blackUsername());
+        assertEquals(testInput.gameName(), testOutput.gameName());
+        assertEquals(testInput.game().getBoard(), testOutput.game().getBoard());
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void updateGameDataNotInDatabase(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        GameData testGame = new GameData(-3, null, null, "aName", new ChessGame());
+
+        DataAccessException expectedException = assertThrows(DataAccessException.class, () -> dataAccess.updateGameData(-3, testGame));
+
+        assertEquals(400, expectedException.getErrorCode());
+        assertEquals("Error: No game data to update", expectedException.getMessage());
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void updateGameDataPlayersSuccess(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        GameData originalGame = assertDoesNotThrow(() -> dataAccess.addGameData("aGame"));
+        GameData updatedData = new GameData (originalGame.gameID(), "John", "Lucy", "aGame", originalGame.game());
+
+        assertDoesNotThrow(() -> dataAccess.updateGameData(originalGame.gameID(), updatedData));
+
+        GameData retrievalTest = assertDoesNotThrow(() -> dataAccess.getGameData(originalGame.gameID()));
+
+        assertEquals(updatedData.gameID(), retrievalTest.gameID());
+        assertEquals(updatedData.whiteUsername(), retrievalTest.whiteUsername());
+        assertEquals(updatedData.blackUsername(), retrievalTest.blackUsername());
+        assertEquals(updatedData.gameName(), retrievalTest.gameName());
+        assertEquals(updatedData.game().getBoard(), retrievalTest.game().getBoard());
 
     }
 
