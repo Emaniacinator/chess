@@ -71,7 +71,13 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public AuthData addAuthData(String username) {
+    public AuthData addAuthData(String username) throws DataAccessException{
+
+        if (username == null || username.isEmpty()){
+
+            throw new DataAccessException(500, "No valid username to make AuthData for");
+
+        }
 
         AuthData addedData = new AuthData(username, UUID.randomUUID().toString());
 

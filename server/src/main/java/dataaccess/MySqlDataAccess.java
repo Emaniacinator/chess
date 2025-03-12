@@ -57,12 +57,44 @@ public class MySqlDataAccess implements DataAccessFramework{
 
     public UserData getUserData(String username) throws DataAccessException {
 
-        return null;
+        try (var connection = DatabaseManager.getConnection()){
+
+            String getterStatement = "SELECT json FROM chess.userDataTable WHERE username = ?";
+
+            try (var preparedStatement = connection.prepareStatement(getterStatement)){
+
+                preparedStatement.setString(1, username);
+
+                System.out.println(preparedStatement);
+
+                try (var responseStatement = preparedStatement.executeQuery()){
+
+                    var toJson = responseStatement.getString("json");
+
+                    return new Gson().fromJson(toJson, UserData.class);
+
+                }
+
+            }
+
+        }
+
+        catch (SQLException foundNothing){
+
+            throw new DataAccessException(401, "Error: User is not in database");
+
+        }
 
     }
 
 
     public AuthData addAuthData(String username) throws DataAccessException {
+
+        if (username == null || username.isEmpty()){
+
+            throw new DataAccessException(500, "No valid username to make AuthData for");
+
+        }
 
         String newAuthDataUpdateString = "INSERT INTO authDataTable (username, authToken, json) VALUES (?, ?, ?)";
 
@@ -79,7 +111,37 @@ public class MySqlDataAccess implements DataAccessFramework{
 
     public AuthData getAuthData(String authToken) throws DataAccessException {
 
-        return null;
+        if (authToken == null || authToken.isEmpty()){
+
+            throw new DataAccessException(401, "Error: Not logged in");
+
+        }
+
+        try (var connection = DatabaseManager.getConnection()){
+
+            String authGetter = "SELECT json FROM chess.authDataTable WHERE authToken = ?";
+
+            try (var preparedStatement = connection.prepareStatement(authGetter)){
+
+                preparedStatement.setString(1, authToken);
+
+                try (var responseStatement = preparedStatement.executeQuery()){
+
+                    var makeJson = responseStatement.getString("json");
+
+                    return new Gson().fromJson(makeJson, AuthData.class);
+
+                }
+
+            }
+
+        }
+
+        catch(SQLException foundNothing){
+
+            throw new DataAccessException(401, "Error: No authorized user in database");
+
+        }
 
     }
 
@@ -167,23 +229,23 @@ public class MySqlDataAccess implements DataAccessFramework{
             // program to reflect this
 
             "CREATE TABLE IF NOT EXISTS userDataTable (" +
-                    "'username' varchar(256) NOT NULL, " +
-                    "'password' varchar(256) NOT NULL, " +
-                    "'email' varchar(256) NOT NULL, " +
-                    "`json` TEXT DEFAULT NULL",
+                    "`username` varchar(256) NOT NULL, " +
+                    "`password` varchar(256) NOT NULL, " +
+                    "`email` varchar(256) NOT NULL, " +
+                    "`json` TEXT DEFAULT NULL)",
 
-            "CFREATE TABLE IF NOT EXISTS authDataTable (" +
-                    "'username' varchar(256) NOT NULL, " +
-                    "'authToken' varchar(256) NOT NULL, " +
-                    "`json` TEXT DEFAULT NULL",
+            "CREATE TABLE IF NOT EXISTS authDataTable (" +
+                    "`username` varchar(256) NOT NULL, " +
+                    "`authToken` varchar(256) NOT NULL, " +
+                    "`json` TEXT DEFAULT NULL)",
 
-            "CREATE TABLE IF NOT EXISTS gameDataTable (" +
-                    "'gameID' int NOT NULL AUTO_INCREMENT, " +
-                    "'whiteUsername' varchar(256) NOT NULL, " +
-                    "'blackUsername' varchar(256) NOT NULL, " +
-                    "'gameName' varchar(256) NOT NULL, " +
-                    "'game' varchar NOT NULL, " +
-                    "`json` TEXT DEFAULT NULL"};
+            "CREATE TABLE IF NOT EXISTS gameDataTable (" + // This one has a flaw of never incrementing since you deleted the auto_increment part.
+                    "`gameID` int NOT NULL, " +
+                    "`whiteUsername` varchar(256) NOT NULL, " +
+                    "`blackUsername` varchar(256) NOT NULL, " +
+                    "`gameName` varchar(256) NOT NULL, " +
+                    "`game` varchar(1024) NOT NULL, " +
+                    "`json` TEXT DEFAULT NULL)"};
 
 
     private void configureDatabase() throws DataAccessException {
