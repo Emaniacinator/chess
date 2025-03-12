@@ -166,7 +166,7 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         }
 
-        String authDeleteString = "DELETE FROM chess.authDataTable WHERE authToken = ?";
+        String authDeleteString = "DELETE FROM authDataTable WHERE authToken = ?";
 
         updateDatabase(authDeleteString, dataToDelete.authToken());
 
