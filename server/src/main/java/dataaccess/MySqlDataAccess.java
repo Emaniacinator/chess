@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.sql.*;
+import java.util.Objects;
 import java.util.UUID;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
@@ -150,6 +151,21 @@ public class MySqlDataAccess implements DataAccessFramework{
     }
 
 
+    public void deleteAuthData(AuthData dataToDelete) throws DataAccessException {
+
+        if (dataToDelete == null || Objects.equals(dataToDelete.authToken(), "")) {
+
+            throw new DataAccessException(401, "Error: No AuthData to delete");
+
+        }
+
+        String authDeleteString = "DELETE FROM chess.authDataTable WHERE authToken = ?";
+
+        updateDatabase(authDeleteString, dataToDelete.authToken());
+
+    }
+
+
     public GameData addGameData(String gameName) {
 
         return null;
@@ -160,6 +176,13 @@ public class MySqlDataAccess implements DataAccessFramework{
     public GameData getGameData(int gameIdToGet) throws DataAccessException {
 
         return null;
+
+    }
+
+
+    public void updateGameData(Integer gameID, GameData newGame) throws DataAccessException {
+
+
 
     }
 

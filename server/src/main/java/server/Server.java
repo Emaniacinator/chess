@@ -145,7 +145,7 @@ public class Server {
     }
 
 
-    public Object clearAllDatabases(Request request, Response response){
+    public Object clearAllDatabases(Request request, Response response) throws DataAccessException{
 
         services.clearAllDatabases();
 

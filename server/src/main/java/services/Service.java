@@ -147,7 +147,7 @@ public class Service {
     }
 
 
-    public void clearAllDatabases(){
+    public void clearAllDatabases() throws DataAccessException{
 
         dataAccess.deleteAllData();
 

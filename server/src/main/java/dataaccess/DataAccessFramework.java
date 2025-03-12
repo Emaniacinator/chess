@@ -16,7 +16,7 @@ public interface DataAccessFramework {
 
     AuthData getAuthData(String authToken) throws DataAccessException;
 
-    void deleteAuthData(AuthData dataToDelete);
+    void deleteAuthData(AuthData dataToDelete) throws DataAccessException;
 
     GameData addGameData(String gameName);
 
@@ -26,6 +26,6 @@ public interface DataAccessFramework {
 
     GameData[] getAllGameData(); // Should this be a collection instead? Or is a list fine?
 
-    void deleteAllData();
+    void deleteAllData() throws DataAccessException;
 
 }

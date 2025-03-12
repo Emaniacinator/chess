@@ -112,7 +112,13 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public static void deleteAuthData(AuthData dataToDelete) throws DataAccessException{
+    public void deleteAuthData(AuthData dataToDelete) throws DataAccessException{
+
+        if (dataToDelete == null || Objects.equals(dataToDelete.authToken(), "")) {
+
+            throw new DataAccessException(401, "Error: No AuthData to delete");
+
+        }
 
         authDataMap.values().remove(dataToDelete);
 

@@ -16,14 +16,6 @@ import services.Service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
-
-/*
- * Here is a list of all the tests that you will need to write:
- *
- *
- */
-
 public class MySqlDataAccessTests {
 
 
@@ -199,5 +191,31 @@ public class MySqlDataAccessTests {
 
     }
 
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void deleteAuthDataNoDataPassedIn(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        DataAccessException expectedException = assertThrows(DataAccessException.class, () -> dataAccess.deleteAuthData(null));
+
+        assertEquals(401, expectedException.getErrorCode());
+        assertEquals("Error: No AuthData to delete", expectedException.getMessage());
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void deleteAuthDataSuccess(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException {
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        UserData testedUser = new UserData ("username", "password", "email");
+        AuthData testData = assertDoesNotThrow(() -> dataAccess.addUserData(testedUser));
+        assertDoesNotThrow(() -> dataAccess.deleteAuthData(testData));
+
+    }
 
 }

@@ -458,10 +458,11 @@ public class UserServiceTests {
         @BeforeEach
         public void joinGameSetup() {
 
-            serviceTest.clearAllDatabases();
-            UserData initialUser = new UserData("test", "12345", "email@email.com");
+            UserData initialUser;
 
             try {
+                serviceTest.clearAllDatabases();
+                initialUser = new UserData("test", "12345", "email@email.com");
                 initialData = serviceTest.registerNewUser(initialUser);
                 serviceTest.createGame(initialData.authToken(), "game");
             }
