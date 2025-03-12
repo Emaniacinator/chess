@@ -320,4 +320,39 @@ public class MySqlDataAccessTests {
 
     }
 
+
+    // I'm not sure how to get this one to fail, so I'll write a couple success cases instead
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void getAllGameDataSuccessManyGames(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException{
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        assertDoesNotThrow(() -> dataAccess.addGameData("I"));
+        assertDoesNotThrow(() -> dataAccess.addGameData("Want"));
+        assertDoesNotThrow(() -> dataAccess.addGameData("To"));
+        assertDoesNotThrow(() -> dataAccess.addGameData("Be"));
+        assertDoesNotThrow(() -> dataAccess.addGameData("A"));
+        assertDoesNotThrow(() -> dataAccess.addGameData("Hippie"));
+        assertDoesNotThrow(() -> dataAccess.addGameData("And"));
+
+        GameData[] retrievedList = assertDoesNotThrow(() -> dataAccess.getAllGameData());
+
+        assertEquals(7, retrievedList.length);
+
+    }
+
+
+    @ParameterizedTest
+    @ValueSource(classes = {MySqlDataAccess.class, GeneralDataAccess.class})
+    void getAllGameDataSuccessNoGames(Class<? extends DataAccessFramework> specificDatabase) throws DataAccessException{
+
+        DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
+
+        GameData[] retrievedList = assertDoesNotThrow(() -> dataAccess.getAllGameData());
+
+        assertEquals(0, retrievedList.length);
+
+    }
+
 }

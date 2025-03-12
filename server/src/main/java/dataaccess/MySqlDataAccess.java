@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -249,9 +250,48 @@ public class MySqlDataAccess implements DataAccessFramework{
     }
 
 
-    public GameData[] getAllGameData() {
+    public GameData[] getAllGameData() throws DataAccessException{
 
-        return new GameData[0];
+        ArrayList<GameData> allGameData = new ArrayList<>();
+
+        try(var connection = DatabaseManager.getConnection()){
+
+            String allGamesRequest = "SELECT json FROM gameDataTable";
+
+            var preparedStatement = connection.prepareStatement(allGamesRequest);
+
+            var responseStatement = preparedStatement.executeQuery();
+
+            while(responseStatement.next()){
+
+                var gameAsJson = responseStatement.getString("json");
+
+                allGameData.add(new Gson().fromJson(gameAsJson, GameData.class));
+
+            }
+
+        }
+
+        catch(Exception exception){
+
+            throw new DataAccessException(500, "Error: Unexpected error while reading from game data");
+
+        }
+
+        int listSize = allGameData.size();
+
+        GameData[] returnArray = new GameData[listSize];
+
+        int iteratorHelper = 0;
+
+        for(GameData currentData : allGameData){
+
+            returnArray[iteratorHelper] = currentData;
+            iteratorHelper++;
+
+        }
+
+        return returnArray;
 
     }
 
@@ -368,6 +408,5 @@ public class MySqlDataAccess implements DataAccessFramework{
         }
 
     }
-
 
 }

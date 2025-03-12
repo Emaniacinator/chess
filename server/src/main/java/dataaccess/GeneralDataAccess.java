@@ -161,7 +161,6 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    // Probably this will need to be removed but for now it lets the code compile
     public void updateGameData(Integer gameID, GameData newGame) throws DataAccessException{
 
         if(gameDataMap.containsKey(gameID) == false){
@@ -176,7 +175,7 @@ public class GeneralDataAccess implements DataAccessFramework{
     }
 
 
-    public GameData[] getAllGameData() {
+    public GameData[] getAllGameData() throws DataAccessException{
 
         int arraySize = gameDataMap.size();
 
