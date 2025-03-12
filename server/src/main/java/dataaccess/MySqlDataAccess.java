@@ -89,7 +89,7 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         }
 
-        catch (SQLException foundNothing){
+        catch (Exception foundNothing){
 
             throw new DataAccessException(401, "Error: User is not in database");
 
@@ -149,7 +149,7 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         }
 
-        catch(SQLException foundNothing){
+        catch(Exception foundNothing){
 
             throw new DataAccessException(401, "Error: No authorized user in database");
 
