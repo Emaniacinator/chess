@@ -241,7 +241,8 @@ public class MySqlDataAccess implements DataAccessFramework{
 
             String updateGameDataString = "UPDATE gameDataTable SET whiteUsername = ?, blackUsername = ?, game = ?, json = ? WHERE gameID = ?";
 
-            updateDatabase(updateGameDataString, newGame.whiteUsername(), newGame.blackUsername(), new Gson().toJson(newGame.game().getBoard()), new Gson().toJson(newGame), gameID);
+            updateDatabase(updateGameDataString, newGame.whiteUsername(), newGame.blackUsername(),
+                    new Gson().toJson(newGame.game().getBoard()), new Gson().toJson(newGame), gameID);
 
         }
 
@@ -314,7 +315,7 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         try(var connection = DatabaseManager.getConnection()){
 
-            try (var updateStatement = connection.prepareStatement(inputStatement, RETURN_GENERATED_KEYS)){ // Maybe I don't like this try section honestly.
+            try (var updateStatement = connection.prepareStatement(inputStatement, RETURN_GENERATED_KEYS)){
 
                 for(int i = 0; i < parameters.length; i++){
 
@@ -348,7 +349,8 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         catch(SQLException exception){
 
-            throw new DataAccessException(500, String.format("Unable to update database for statement: %s \n Error message: %s", inputStatement, exception.getMessage()));
+            throw new DataAccessException(500, String.format("Unable to update database for statement: %s " +
+                    "\n Error message: %s", inputStatement, exception.getMessage()));
 
         }
 
