@@ -48,9 +48,9 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         }
 
-        //UserData passcodeHashedNewUserData = new UserData(newUserData.username(), BCrypt.hashpw(newUserData.password(), BCrypt.gensalt()), newUserData.email());
+        UserData passcodeHashedNewUserData = new UserData(newUserData.username(), BCrypt.hashpw(newUserData.password(), BCrypt.gensalt()), newUserData.email());
 
-        userDataMap.put(newUserData.hashCode(), newUserData);
+        userDataMap.put(passcodeHashedNewUserData.hashCode(), passcodeHashedNewUserData);
 
         return addAuthData(newUserData.username());
 

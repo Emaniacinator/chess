@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mindrot.jbcrypt.BCrypt;
 import server.Server;
 import services.Service;
 
@@ -187,7 +188,7 @@ public class MySqlDataAccessTests {
         UserData resultingData = assertDoesNotThrow(() -> dataAccess.getUserData("username"));
 
         assertEquals(testedUser.username(), resultingData.username());
-        assertEquals(testedUser.password(), resultingData.password());
+        assertTrue(BCrypt.checkpw(testedUser.password(), resultingData.password()));
         assertEquals(testedUser.email(), resultingData.email());
 
     }

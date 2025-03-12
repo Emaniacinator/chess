@@ -8,6 +8,7 @@ import dataaccess.DataAccessException;
 import dataaccess.DataAccessFramework;
 import dataaccess.GeneralDataAccess;
 import dataaccess.MySqlDataAccess;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.Objects;
 
@@ -67,7 +68,7 @@ public class Service {
 
         UserData checkData = dataAccess.getUserData(loginUserData.username());
 
-        if (!Objects.equals(loginUserData.password(), checkData.password())){
+        if (!BCrypt.checkpw(loginUserData.password(), checkData.password())){
 
             throw new DataAccessException(401, "Error: Incorrect passcode or username");
 

@@ -50,14 +50,13 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         }
 
-        UserData malleable = newUserData.createCopy();
+        UserData malleable = new UserData (newUserData.username(), BCrypt.hashpw(newUserData.password(), BCrypt.gensalt()), newUserData.email());
 
         var jsonToAdd = new Gson().toJson(malleable);
 
         String newUserUpdateString = "INSERT INTO userDataTable (username, password, email, json) VALUES (?, ?, ?, ?)";
 
-        //updateDatabase(newUserUpdateString, newUserData.username(), BCrypt.hashpw(malleable.password(), BCrypt.gensalt()), newUserData.email(), jsonToAdd);
-        updateDatabase(newUserUpdateString, newUserData.username(), newUserData.password(), newUserData.email(), jsonToAdd);
+        updateDatabase(newUserUpdateString, malleable.username(), malleable.password(), malleable.email(), jsonToAdd);
 
         return addAuthData(newUserData.username());
 
