@@ -61,5 +61,9 @@ public class EscapeSequences {
     public static final String BLACK_PAWN = " ♟ ";
     public static final String EMPTY = " \u2003 ";
 
+    public static final String HELPER_SPACE = "\u2002";
+    public static final String WEIRD_SPACE = "\u2001";
+    public static final String PERIOD_SPACE = "\u2008";
+
     public static String moveCursorToLocation(int x, int y) { return UNICODE_ESCAPE + "[" + y + ";" + x + "H"; }
 }
