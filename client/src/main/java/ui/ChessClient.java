@@ -76,11 +76,13 @@ public class ChessClient {
         boolean colorSwitcher = true;
         int incrementer;
         int initialRow;
+        int initialColumn;
         if (displaySide == WHITE){
 
             // In this case, you start with black at the top, resulting in incrementing numerically downwards for the row.
             incrementer = -1;
             initialRow = 8;
+            initialColumn = 1;
 
         }
 
@@ -89,6 +91,7 @@ public class ChessClient {
             // In this case, you start with white at the top, resulting in incrementing numerically upwards for the row.
             incrementer = 1;
             initialRow = 1;
+            initialColumn = 8;
 
         }
 
@@ -100,7 +103,7 @@ public class ChessClient {
 
             entireBoard = entireBoard + getCharacterSpacing((char)('0' + i));
 
-            for (int j = initialRow; j >= 1 && j <= 8; j = j + incrementer){ // Increments through columns
+            for (int j = initialColumn; j >= 1 && j <= 8; j = j - incrementer){ // Increments through columns
 
                 ChessPosition specificPiece = new ChessPosition (i, j);
                 ChessPiece currentPiece = displayedBoard.getPiece(specificPiece);
@@ -167,7 +170,7 @@ public class ChessClient {
 
         returnRow = returnRow + EMPTY;
 
-        return returnRow + RESET_BG_COLOR;
+        return returnRow + RESET_BG_COLOR + RESET_TEXT_COLOR;
 
     }
 

@@ -34,9 +34,15 @@ public class ServerFacadeTests {
 
         ChessGame starterGame = new ChessGame();
 
+        System.out.println(starterGame.getBoard());
+
         System.out.println();
 
         System.out.println(testClient.displayBoard(starterGame.getBoard(), WHITE));
+
+        System.out.println();
+
+        System.out.println(starterGame.getBoard());
 
         System.out.println();
 
