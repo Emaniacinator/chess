@@ -1,9 +1,11 @@
 package client;
 
+import chess.ChessBoard;
 import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ChessClient;
 
+import static chess.ChessGame.TeamColor.*;
 import static ui.EscapeSequences.*;
 
 
@@ -29,7 +31,9 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() {
 
-        System.out.println(testClient.displayBoard());
+        ChessBoard starterBoard = new ChessBoard();
+
+        System.out.println(testClient.displayBoard(starterBoard, WHITE));
         Assertions.assertTrue(true);
 
         System.out.println();

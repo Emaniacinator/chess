@@ -3,6 +3,7 @@ package ui;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 import static chess.ChessGame.TeamColor.*;
 import static ui.ClientState.*;
@@ -93,11 +94,44 @@ public class ChessClient {
 
         String topAndBottom = firstAndLastRow(incrementer, initialRow);
 
-        return null;
+        String entireBoard = topAndBottom + "\n";
+
+        for (int i = initialRow; i >= 1 && i <= 8; i = i + incrementer){ // Increments through rows
+
+            entireBoard = entireBoard + getCharacterSpacing((char)initialRow);
+
+            for (int j = initialRow; j >= 1 && j <= 8; j = j + incrementer){ // Increments through columns
+
+                ChessPosition specificPiece = new ChessPosition (i, j);
+                ChessPiece currentPiece = displayedBoard.getPiece(specificPiece);
+                entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide);
+
+                if (colorSwitcher == true){
+
+                    colorSwitcher = false;
+
+                }
+
+                else{
+
+                    colorSwitcher = true;
+
+                }
+
+            }
+
+            entireBoard = entireBoard + getCharacterSpacing((char)initialRow) + RESET_BG_COLOR + "\n";
+
+        }
+
+        entireBoard = entireBoard + topAndBottom;
+
+        return entireBoard;
 
     }
 
 
+    // Returns the labels for the top and bottom rows of the chess board
     public String firstAndLastRow(int incrementer, int initialRow){
 
         String returnRow = EMPTY;
@@ -108,7 +142,9 @@ public class ChessClient {
 
         }
 
-        return returnRow;
+        returnRow = returnRow + EMPTY;
+
+        return returnRow + RESET_BG_COLOR;
 
     }
 
