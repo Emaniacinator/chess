@@ -1,6 +1,7 @@
 package client;
 
 import chess.ChessBoard;
+import chess.ChessGame;
 import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ChessClient;
@@ -31,15 +32,17 @@ public class ServerFacadeTests {
     @Test
     public void sampleTest() {
 
-        ChessBoard starterBoard = new ChessBoard();
-
-        System.out.println(testClient.displayBoard(starterBoard, WHITE));
-        Assertions.assertTrue(true);
+        ChessGame starterGame = new ChessGame();
 
         System.out.println();
-        System.out.println(SET_BG_COLOR_LIGHT_GREY + EMPTY + RESET_BG_COLOR);
-        System.out.println(SET_BG_COLOR_DARK_GREEN + WHITE_KING + RESET_BG_COLOR);
-        System.out.println(testClient.getCharacterSpacing('a') + RESET_BG_COLOR);
+
+        System.out.println(testClient.displayBoard(starterGame.getBoard(), WHITE));
+
+        System.out.println();
+
+        System.out.println(testClient.displayBoard(starterGame.getBoard(), BLACK));
+
+        Assertions.assertTrue(true);
 
     }
 

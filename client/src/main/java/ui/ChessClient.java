@@ -98,13 +98,24 @@ public class ChessClient {
 
         for (int i = initialRow; i >= 1 && i <= 8; i = i + incrementer){ // Increments through rows
 
-            entireBoard = entireBoard + getCharacterSpacing((char)initialRow);
+            entireBoard = entireBoard + getCharacterSpacing((char)('0' + i));
 
             for (int j = initialRow; j >= 1 && j <= 8; j = j + incrementer){ // Increments through columns
 
                 ChessPosition specificPiece = new ChessPosition (i, j);
                 ChessPiece currentPiece = displayedBoard.getPiece(specificPiece);
-                entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide);
+
+                if (currentPiece != null){
+
+                    entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor());
+
+                }
+
+                else{
+
+                    entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide);
+
+                }
 
                 if (colorSwitcher == true){
 
@@ -120,7 +131,19 @@ public class ChessClient {
 
             }
 
-            entireBoard = entireBoard + getCharacterSpacing((char)initialRow) + RESET_BG_COLOR + "\n";
+            entireBoard = entireBoard + getCharacterSpacing((char)('0' + i)) + RESET_BG_COLOR + "\n";
+
+            if (colorSwitcher == true){
+
+                colorSwitcher = false;
+
+            }
+
+            else{
+
+                colorSwitcher = true;
+
+            }
 
         }
 
@@ -134,7 +157,7 @@ public class ChessClient {
     // Returns the labels for the top and bottom rows of the chess board
     public String firstAndLastRow(int incrementer, int initialRow){
 
-        String returnRow = EMPTY;
+        String returnRow = SET_BG_COLOR_LIGHT_GREY + EMPTY;
 
         for (int i = initialRow; i >= 1 && i <=8; i = i + incrementer){
 
@@ -176,7 +199,7 @@ public class ChessClient {
 
         if (currentTeam == WHITE){
 
-            pieceColor = SET_TEXT_COLOR_MAGENTA;
+            pieceColor = SET_TEXT_COLOR_BLUE;
 
         }
 
@@ -282,39 +305,39 @@ public class ChessClient {
     // Takes a number and turns it into the corresponding column label
     public String determineLetter(int input){
 
-        Character letter;
+        char letter;
 
         switch(input){
 
-            case 1:
+            case 8:
                 letter = 'A';
                 break;
 
-            case 2:
+            case 7:
                 letter = 'B';
                 break;
 
-            case 3:
+            case 6:
                 letter = 'C';
                 break;
 
-            case 4:
+            case 5:
                 letter = 'D';
                 break;
 
-            case 5:
+            case 4:
                 letter = 'E';
                 break;
 
-            case 6:
+            case 3:
                 letter = 'F';
                 break;
 
-            case 7:
+            case 2:
                 letter = 'G';
                 break;
 
-            case 8:
+            case 1:
                 letter = 'H';
                 break;
 
@@ -329,7 +352,7 @@ public class ChessClient {
 
 
     // Get the proper spacing for a character to label rows and columns on the board.
-    public String getCharacterSpacing(Character input){
+    public String getCharacterSpacing(char input){
 
         return SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + PERIOD_SPACE + WEIRD_SPACE + input + WEIRD_SPACE + PERIOD_SPACE;
 
