@@ -4,7 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 
-import static chess.ChessGame.TeamColor.WHITE;
+import static chess.ChessGame.TeamColor.*;
 import static ui.ClientState.*;
 import static ui.EscapeSequences.*;
 
@@ -70,10 +70,45 @@ public class ChessClient {
     }
 
 
-    public String displayBoard(/*ChessBoard displayedBoard, TeamColor displaySide*/){
+    public String displayBoard(ChessBoard displayedBoard, ChessGame.TeamColor displaySide){
 
-        return SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + EMPTY + HELPER_SPACE + "A" + HELPER_SPACE + "B   C  D   E   F  G  H " + EMPTY + RESET_BG_COLOR + "\n" +
-                SET_BG_COLOR_LIGHT_GREY + EMPTY + SET_BG_COLOR_DARK_GREEN + WHITE_KING + SET_BG_COLOR_WHITE + WHITE_KNIGHT + SET_BG_COLOR_DARK_GREEN + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_DARK_GREEN + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_DARK_GREEN + EMPTY + SET_BG_COLOR_WHITE + EMPTY + SET_BG_COLOR_LIGHT_GREY + EMPTY + RESET_BG_COLOR;
+        boolean colorSwitcher = true;
+        int incrementer;
+        int initialRow;
+        if (displaySide == WHITE){
+
+            // In this case, you start with black at the top, resulting in incrementing numerically downwards for the row.
+            incrementer = -1;
+            initialRow = 8;
+
+        }
+
+        else{
+
+            // In this case, you start with white at the top, resulting in incrementing numerically upwards for the row.
+            incrementer = 1;
+            initialRow = 1;
+
+        }
+
+        String topAndBottom = firstAndLastRow(incrementer, initialRow);
+
+        return null;
+
+    }
+
+
+    public String firstAndLastRow(int incrementer, int initialRow){
+
+        String returnRow = EMPTY;
+
+        for (int i = initialRow; i >= 1 && i <=8; i = i + incrementer){
+
+            returnRow = returnRow + determineLetter(i);
+
+        }
+
+        return returnRow;
 
     }
 
@@ -92,6 +127,12 @@ public class ChessClient {
         else{
 
             backgroundColor = SET_BG_COLOR_DARK_GREEN;
+
+        }
+
+        if (currentPiece == null){
+
+            return backgroundColor + EMPTY;
 
         }
 
@@ -198,6 +239,55 @@ public class ChessClient {
         }
 
         return null;
+
+    }
+
+
+    // Takes a number and turns it into the corresponding column label
+    public String determineLetter(int input){
+
+        Character letter;
+
+        switch(input){
+
+            case 1:
+                letter = 'A';
+                break;
+
+            case 2:
+                letter = 'B';
+                break;
+
+            case 3:
+                letter = 'C';
+                break;
+
+            case 4:
+                letter = 'D';
+                break;
+
+            case 5:
+                letter = 'E';
+                break;
+
+            case 6:
+                letter = 'F';
+                break;
+
+            case 7:
+                letter = 'G';
+                break;
+
+            case 8:
+                letter = 'H';
+                break;
+
+            default:
+                return EMPTY;
+
+        }
+
+        return getCharacterSpacing(letter);
 
     }
 
