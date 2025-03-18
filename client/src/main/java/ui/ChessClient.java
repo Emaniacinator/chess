@@ -13,23 +13,74 @@ public class ChessClient {
 
     private ClientState currentState = LOGGEDOUT;
 
-    public void determineMenuActions(){
+    public ClientState returnState(){
 
-        switch(currentState){
+        return currentState;
 
-            case LOGGEDOUT:
+    }
+
+
+    // Create another override of this where it doesn't need the otherTokens string
+    public void determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
+
+        switch (inputCommand){
+
+            case "help":
+
+                if (otherTokens.length != 0 || otherTokens != null){
+
+                    throw new Exception("Error: 'help' doesn't accept any additional inputs. Please try again.");
+
+                }
+
+                System.out.println(getHelpMenu());
+
                 break;
 
-            case LOGGEDIN:
+            case "quit":
+
+                if (otherTokens.length != 0 || otherTokens != null){
+
+                    throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
+
+                }
+
+                if (currentState != LOGGEDOUT){
+
+                    throw new Exception("Error: Please log out before attempting to quit the chess client.");
+
+                }
+
+                System.out.println("Quitting the program");
+
                 break;
 
-            case GAMESELECT:
+            case "login":
+
                 break;
 
-            case INGAME:
+            case "register":
+
                 break;
 
-            case OBSERVINGGAME:
+            case "logout":
+
+                break;
+
+            case "create":
+
+                break;
+
+            case "join":
+
+                break;
+
+            case "observe":
+
+                break;
+
+            case "list":
+
                 break;
 
         }
@@ -54,9 +105,6 @@ public class ChessClient {
                         "list - display a list of chess games\n" +
                         "logout - log out of the chess client\n" +
                         "help - display a list of available commands";
-
-            case GAMESELECT:
-                break;
 
             case INGAME:
                 break;
