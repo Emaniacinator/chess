@@ -20,6 +20,13 @@ public class ChessClient {
     }
 
 
+    public void determineTakenAction(String inputCommand) throws Exception{
+
+        determineTakenAction(inputCommand, null);
+
+    }
+
+
     // Create another override of this where it doesn't need the otherTokens string
     public void determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
 
@@ -39,15 +46,15 @@ public class ChessClient {
 
             case "quit":
 
-                if (otherTokens.length != 0 || otherTokens != null){
-
-                    throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
-
-                }
-
                 if (currentState != LOGGEDOUT){
 
                     throw new Exception("Error: Please log out before attempting to quit the chess client.");
+
+                }
+
+                if (otherTokens.length != 0 || otherTokens != null){
+
+                    throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
 
                 }
 
@@ -57,29 +64,141 @@ public class ChessClient {
 
             case "login":
 
+                if (currentState != LOGGEDOUT){
+
+                    throw new Exception("Error: You are already logged in. Type 'help' for a list of commands.");
+
+                }
+
+                // create an exception case for the wrong number of arguments
+
+                // run the login on the serverFacade
+
+                currentState = LOGGEDIN;
+
                 break;
 
             case "register":
+
+                if (currentState != LOGGEDOUT){
+
+                    throw new Exception("Error: Already logged in, can't register a new user. Type 'help' for a list of commands.");
+
+                }
+
+                // create an exception case for the wrong number of arguments
+
+                // run the login on the serverFacade
+
+                currentState = LOGGEDIN;
 
                 break;
 
             case "logout":
 
+                if (otherTokens.length != 0 || otherTokens != null){
+
+                    throw new Exception("Error: 'logout' doesn't accept any additional inputs. Please try again.");
+
+                }
+
+                if (currentState == LOGGEDOUT){
+
+                    throw new Exception("Error: You are already logged out. Type 'help' for a list of commands.");
+
+                }
+
+                if (currentState != LOGGEDIN){
+
+                    throw new Exception("Error: Please leave the game before attempting to log out. Type 'help' for a list of commands.");
+
+                }
+
+                // run the logout on the serverFacade
+
+                currentState = LOGGEDOUT;
+
                 break;
 
             case "create":
+
+                if (currentState == LOGGEDOUT){
+
+                    throw new Exception("Error: Not logged in, can't create game. Type 'help' for a list of commands.");
+
+                }
+
+                if (currentState != LOGGEDIN){
+
+                    throw new Exception("Error: Please leave the game before making a new one. Type 'help' for a list of commands.");
+
+                }
+
+                // Create an exception case for the wrong number of arguments
+
+                // run the createGame on the serverFacade
 
                 break;
 
             case "join":
 
+                if (currentState == LOGGEDOUT){
+
+                    throw new Exception("Error: Not logged in, can't join game. Type 'help' for a list of commands.");
+
+                }
+
+                if (currentState != LOGGEDIN){
+
+                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing. Type 'help' for a list of commands.");
+
+                }
+
+                // Create an exception case for the wrong number of arguments
+
+                // run joinGame from serverFacade
+
+                currentState = INGAME;
+
                 break;
 
             case "observe":
 
+                if (currentState == LOGGEDOUT){
+
+                    throw new Exception("Error: Not logged in, can't observe game. Type 'help' for a list of commands.");
+
+                }
+
+                if (currentState != LOGGEDIN){
+
+                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing. Type 'help' for a list of commands.");
+
+                }
+
+                // Create an exception case for the wrong number of arguments
+
+                // run observeGame from serverFacade
+
+                currentState = OBSERVINGGAME;
+
                 break;
 
             case "list":
+
+                if (currentState == LOGGEDOUT){
+
+                    throw new Exception("Error: Not logged in, can't list games. Type 'help' for a list of commands.");
+
+                }
+
+                if (currentState != LOGGEDIN){
+
+                    throw new Exception("Error: Can't list games while in game. Please leave current game before continuing. Type 'help' for a list of commands.");
+
+                }
+
+                // run listGames from serverFacade
 
                 break;
 
@@ -107,10 +226,10 @@ public class ChessClient {
                         "help - display a list of available commands";
 
             case INGAME:
-                break;
+                return "What in-game commands are there? I don't really know yet.";
 
             case OBSERVINGGAME:
-                break;
+                return "What commands are there when observing a game? I also dont' have much info on this.";
 
         }
 

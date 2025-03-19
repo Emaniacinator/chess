@@ -31,9 +31,11 @@ public class Repl {
 
                 String inputTokens[] = inputLine.toLowerCase().split(" ");
 
+                // if inputTokens.length is 0, print that no command was received and then print the help section.
+
                 if (inputTokens.length == 1){
 
-
+                    client.determineTakenAction(inputTokens[0]);
 
                 }
 

@@ -63,6 +63,7 @@ public class GeneralDataAccess implements DataAccessFramework{
         for (Map.Entry<Integer, UserData> currentData : userDataMap.entrySet()){
 
             UserData checkedData = currentData.getValue();
+
             if (Objects.equals(checkedData.username(), username)){
 
                 return checkedData;
