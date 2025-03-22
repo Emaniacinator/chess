@@ -52,7 +52,7 @@ public class Repl {
 
             catch(Exception exception){
 
-
+                System.out.println(exception.getMessage());
 
             }
 

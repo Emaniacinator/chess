@@ -27,7 +27,7 @@ public class ChessClient {
     }
 
 
-    // Create another override of this where it doesn't need the otherTokens string
+    // You may need to force inputCommand to lowercase for this all to work.
     public void determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
 
         switch (inputCommand){
@@ -226,9 +226,11 @@ public class ChessClient {
                         "help - display a list of available commands";
 
             case INGAME:
+
                 return "What in-game commands are there? I don't really know yet.";
 
             case OBSERVINGGAME:
+
                 return "What commands are there when observing a game? I also dont' have much info on this.";
 
         }
