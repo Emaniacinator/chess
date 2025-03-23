@@ -4,6 +4,7 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import server.ServerFacade;
 
 import static chess.ChessGame.TeamColor.*;
 import static ui.ClientState.*;
@@ -12,6 +13,17 @@ import static ui.EscapeSequences.*;
 public class ChessClient {
 
     private ClientState currentState = LOGGEDOUT;
+    private final String serverURL;
+    private final ServerFacade serverFacade;
+
+
+    public ChessClient(String serverURL){
+
+        this.serverURL = serverURL;
+        serverFacade = new ServerFacade(serverURL);
+
+    }
+
 
     public ClientState returnState(){
 
@@ -30,9 +42,11 @@ public class ChessClient {
     // You may need to force inputCommand to lowercase for this all to work.
     public void determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
 
-        switch (inputCommand){
+        switch (inputCommand.toLowerCase()){
 
             case "help":
+
+                // create an exception case for extra arguments
 
                 if (otherTokens.length != 0 || otherTokens != null){
 
@@ -46,11 +60,15 @@ public class ChessClient {
 
             case "quit":
 
+                // check that the program is in the right state
+
                 if (currentState != LOGGEDOUT){
 
                     throw new Exception("Error: Please log out before attempting to quit the chess client.");
 
                 }
+
+                // create an exception case for extra arguments
 
                 if (otherTokens.length != 0 || otherTokens != null){
 
@@ -64,6 +82,8 @@ public class ChessClient {
 
             case "login":
 
+                // check that the program is in the right state
+
                 if (currentState != LOGGEDOUT){
 
                     throw new Exception("Error: You are already logged in. Type 'help' for a list of commands.");
@@ -72,13 +92,23 @@ public class ChessClient {
 
                 // create an exception case for the wrong number of arguments
 
+                if (otherTokens.length != 2){
+
+                    throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
+
+                }
+
                 // run the login on the serverFacade
+
+
 
                 currentState = LOGGEDIN;
 
                 break;
 
             case "register":
+
+                // check that the program is in the right state
 
                 if (currentState != LOGGEDOUT){
 
@@ -102,11 +132,15 @@ public class ChessClient {
 
                 }
 
+                // check that the program is in the right state
+
                 if (currentState == LOGGEDOUT){
 
                     throw new Exception("Error: You are already logged out. Type 'help' for a list of commands.");
 
                 }
+
+                // check that the program is in the right state
 
                 if (currentState != LOGGEDIN){
 
@@ -122,11 +156,15 @@ public class ChessClient {
 
             case "create":
 
+                // check that the program is in the right state
+
                 if (currentState == LOGGEDOUT){
 
                     throw new Exception("Error: Not logged in, can't create game. Type 'help' for a list of commands.");
 
                 }
+
+                // check that the program is in the right state
 
                 if (currentState != LOGGEDIN){
 
@@ -142,11 +180,15 @@ public class ChessClient {
 
             case "join":
 
+                // check that the program is in the right state
+
                 if (currentState == LOGGEDOUT){
 
                     throw new Exception("Error: Not logged in, can't join game. Type 'help' for a list of commands.");
 
                 }
+
+                // check that the program is in the right state
 
                 if (currentState != LOGGEDIN){
 
@@ -164,11 +206,15 @@ public class ChessClient {
 
             case "observe":
 
+                // check that the program is in the right state
+
                 if (currentState == LOGGEDOUT){
 
                     throw new Exception("Error: Not logged in, can't observe game. Type 'help' for a list of commands.");
 
                 }
+
+                // check that the program is in the right state
 
                 if (currentState != LOGGEDIN){
 
@@ -186,15 +232,19 @@ public class ChessClient {
 
             case "list":
 
+                // check that the program is in the right state
+
                 if (currentState == LOGGEDOUT){
 
                     throw new Exception("Error: Not logged in, can't list games. Type 'help' for a list of commands.");
 
                 }
 
+                // check that the program is in the right state
+
                 if (currentState != LOGGEDIN){
 
-                    throw new Exception("Error: Can't list games while in game. Please leave current game before continuing. Type 'help' for a list of commands.");
+                    throw new Exception("Error: Can't list games while in a game. Please leave current game before continuing. Type 'help' for a list of commands.");
 
                 }
 
@@ -227,11 +277,11 @@ public class ChessClient {
 
             case INGAME:
 
-                return "What in-game commands are there? I don't really know yet.";
+                return "What in-game commands are there? I don't really know yet";
 
             case OBSERVINGGAME:
 
-                return "What commands are there when observing a game? I also dont' have much info on this.";
+                return "What commands are there when observing a game? I also don't have much info on this";
 
         }
 
