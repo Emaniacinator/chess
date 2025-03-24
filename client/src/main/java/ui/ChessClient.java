@@ -94,13 +94,16 @@ public class ChessClient {
 
                 if (otherTokens.length != 2){
 
-                    throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
+                    throw new Exception("Error: 'login'only accepts exactly 2 inputs. Please try again.");
 
                 }
 
-                // run the login on the serverFacade
+                // run loginUser on the serverFacade
 
-
+                // You'll need to convert the args to the proper formatting and stuff first in the loginUser method probably
+                // Or I guess you could do it before passing it in too but that seems weird for some reason
+                // Actually, do you have a function for that in the Client?
+                serverFacade.loginUser();
 
                 currentState = LOGGEDIN;
 
@@ -118,7 +121,15 @@ public class ChessClient {
 
                 // create an exception case for the wrong number of arguments
 
-                // run the login on the serverFacade
+                if (otherTokens.length != 3){
+
+                    throw new Exception("Error: 'register' only accepts exactly 3 inputs. Please try again.");
+
+                }
+
+                // run registerUser on the serverFacade
+
+                serverFacade.registerUser();
 
                 currentState = LOGGEDIN;
 
@@ -148,7 +159,10 @@ public class ChessClient {
 
                 }
 
-                // run the logout on the serverFacade
+                // run logoutUser on the serverFacade
+
+                // remember that you'll need to pass in the user's authData when you finish this part.
+                serverFacade.logoutUser();
 
                 currentState = LOGGEDOUT;
 
@@ -174,7 +188,16 @@ public class ChessClient {
 
                 // Create an exception case for the wrong number of arguments
 
-                // run the createGame on the serverFacade
+                if (otherTokens.length != 1){
+
+                    throw new Exception("Error: 'create' only accepts exactly 1 input. Please try again.");
+
+                }
+
+                // run createGame on the serverFacade
+
+                // remember you'll need to pass in a game name and the user's AuthData for this one
+                serverFacade.createGame();
 
                 break;
 
@@ -198,7 +221,40 @@ public class ChessClient {
 
                 // Create an exception case for the wrong number of arguments
 
-                // run joinGame from serverFacade
+                if (otherTokens.length != 2){
+
+                    throw new Exception("Error: 'join' only accepts exactly 2 inputs. Please try again.");
+
+                }
+
+                // Create an exception case for if the GameID section isn't an integer
+
+                try{
+
+                    Integer.parseInt(otherTokens[1]);
+
+                }
+
+                catch(Exception exception){
+
+                    throw new Exception("Error: input gameID value is not a valid number. Please try again.");
+
+                }
+
+                // Create an exception case for if the playerColor section isn't a teamColor
+
+                if (otherTokens[2].toUpperCase() != "WHITE" && otherTokens[2].toUpperCase() != "BLACK"){
+
+                    throw new Exception("Error: Can't join game without a valid team color. Please try again.");
+
+                }
+
+                // run joinGame on the serverFacade
+
+                // remember that you'll need to return the joined game to the user and get it to display at this point.
+                // also remember that you'll need to pass the user's AuthData in here.
+                // maybe add an ingame section to the run method so that it loops that part.
+                serverFacade.joinGame();
 
                 currentState = INGAME;
 
@@ -224,7 +280,30 @@ public class ChessClient {
 
                 // Create an exception case for the wrong number of arguments
 
-                // run observeGame from serverFacade
+                if (otherTokens.length != 2){
+
+                    throw new Exception("Error: 'observe' only accepts exactly 1 input. Please try again.");
+
+                }
+
+                // Create an exception for if the gameID is not an integer
+
+                try{
+
+                    Integer.parseInt(otherTokens[1]);
+
+                }
+
+                catch(Exception exception){
+
+                    throw new Exception("Error: input gameID value is not a valid number. Please try again.");
+
+                }
+
+                // run observeGame on the serverFacade
+
+                // remember that you'll also need to pass in the user's authData
+                serverFacade.observeGame();
 
                 currentState = OBSERVINGGAME;
 
@@ -248,7 +327,10 @@ public class ChessClient {
 
                 }
 
-                // run listGames from serverFacade
+                // run listGames on the serverFacade
+
+                // remember that you'll also need to pass in the user authData
+                serverFacade.listGames();
 
                 break;
 
@@ -269,8 +351,8 @@ public class ChessClient {
 
             case LOGGEDIN:
                 return "create <NAME> - create a new game\n" +
-                        "join <ID> [WHITE|BLACK] - join a game as the specified team\n" +
-                        "observe <ID> - watch a game in progress\n" +
+                        "join <gameID> [WHITE|BLACK] - join a game as the specified team\n" +
+                        "observe <gameID> - watch a game in progress\n" +
                         "list - display a list of chess games\n" +
                         "logout - log out of the chess client\n" +
                         "help - display a list of available commands";
