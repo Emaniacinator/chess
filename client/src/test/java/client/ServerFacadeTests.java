@@ -28,7 +28,7 @@ public class ServerFacadeTests {
 
         server = new Server();
 
-        var port = 8080;
+        var port = 0;
 
         server.run(port);
 
