@@ -9,9 +9,9 @@ public class Repl {
 
     private final ChessClient client;
 
-    public Repl(){
+    public Repl(String serverURL){
 
-        client = new ChessClient();
+        client = new ChessClient(serverURL);
 
     }
 
@@ -22,14 +22,14 @@ public class Repl {
         Scanner readInput = new Scanner(System.in);
         String previousInput = "";
 
-        while(previousInput != "quit"){
+        while(!previousInput.equals("quit")){
 
             printPrettySideThing();
             String inputLine = readInput.nextLine();
 
             try{
 
-                String[] inputTokens = inputLine.split(" ");
+                String[] inputTokens = inputLine.trim().split(" ");
 
                 // if inputTokens.length is 0, print that no command was received and then print the help section.
 
@@ -45,7 +45,7 @@ public class Repl {
 
                 }
 
-
+                // for some reason it won't exit the 'while' loop here
                 previousInput = inputTokens[0];
 
             }

@@ -150,23 +150,6 @@ public class Service {
     }
 
 
-    // This was added in project 5, so make sure that it doesn't break anything
-    // Also, does this work properly if there is no game found?
-    public GameData observeGame(String authToken, int gameID) throws DataAccessException{
-
-        AuthData checkLogin = dataAccess.getAuthData(authToken);
-
-        if (gameID < 0){
-
-            throw new DataAccessException(400, "Error: Input an invalid gameID");
-
-        }
-
-        return dataAccess.getGameData(gameID);
-
-    }
-
-
     public void clearAllDatabases() throws DataAccessException{
 
         dataAccess.deleteAllData();

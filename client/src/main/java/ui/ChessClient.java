@@ -6,6 +6,7 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 import chess.model.AuthData;
 import chess.model.GameData;
+import server.GameList;
 import server.ServerFacade;
 
 import static chess.ChessGame.TeamColor.*;
@@ -36,7 +37,7 @@ public class ChessClient {
 
     public String determineTakenAction(String inputCommand) throws Exception{
 
-        determineTakenAction(inputCommand, null);
+        return determineTakenAction(inputCommand, null);
 
     }
 
@@ -50,7 +51,7 @@ public class ChessClient {
 
                 // create an exception case for extra arguments
 
-                if (otherTokens.length != 0 || otherTokens != null){
+                if (otherTokens != null){
 
                     throw new Exception("Error: 'help' doesn't accept any additional inputs. Please try again.");
 
@@ -70,7 +71,7 @@ public class ChessClient {
 
                 // create an exception case for extra arguments
 
-                if (otherTokens.length != 0 || otherTokens != null){
+                if (otherTokens != null){
 
                     throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
 
@@ -92,7 +93,7 @@ public class ChessClient {
 
                 if (otherTokens.length != 2){
 
-                    throw new Exception("Error: 'login'only accepts exactly 2 inputs. Please try again.");
+                    throw new Exception("Error: 'login' only accepts exactly 2 inputs. Please try again.");
 
                 }
 
@@ -133,7 +134,7 @@ public class ChessClient {
 
             case "logout":
 
-                if (otherTokens.length != 0 || otherTokens != null){
+                if (otherTokens != null){
 
                     throw new Exception("Error: 'logout' doesn't accept any additional inputs. Please try again.");
 
@@ -198,7 +199,7 @@ public class ChessClient {
                 // remember you'll need to pass in a game name and the user's AuthData for this one
                 serverFacade.createGame(otherTokens, clientAuthData);
 
-                return "Created the game " + otherTokens[1] + ".";
+                return "Created the game " + otherTokens[0] + ".";
 
             case "join":
 
@@ -230,7 +231,7 @@ public class ChessClient {
 
                 try{
 
-                    Integer.parseInt(otherTokens[1]);
+                    Integer.parseInt(otherTokens[0]);
 
                 }
 
@@ -242,7 +243,7 @@ public class ChessClient {
 
                 // Create an exception case for if the playerColor section isn't a teamColor
 
-                if (otherTokens[2].toUpperCase() != "WHITE" && otherTokens[2].toUpperCase() != "BLACK"){
+                if (!otherTokens[1].toUpperCase().equals("WHITE") && !otherTokens[1].toUpperCase().equals("BLACK")){
 
                     throw new Exception("Error: Can't join game without a valid team color. Please try again.");
 
@@ -260,7 +261,7 @@ public class ChessClient {
                 currentState = INGAME;
 
                 // I could see this panicking, so make sure it works as expected and doesn't break
-                return displayBoard(returnGame.game().getBoard(), ChessGame.TeamColor.valueOf(otherTokens[2]));
+                return displayBoard(returnGame.game().getBoard(), ChessGame.TeamColor.valueOf(otherTokens[1].toUpperCase()));
 
             case "observe":
 
@@ -333,12 +334,12 @@ public class ChessClient {
                 // run listGames on the serverFacade
 
                 // remember that you'll also need to pass in the user authData
-                GameData[] returnedList = serverFacade.listGames(clientAuthData);
+                GameList returnedList = serverFacade.listGames(clientAuthData);
 
                 String listOfGames = "Here is a list of the games. They will be formatted as follows:\n" +
                                      "Game ID - Game Name - White Player - Black Player \n\n";
 
-                for (GameData currentGame : returnedList){
+                for (GameData currentGame : returnedList.games()){
 
                     listOfGames = listOfGames + currentGame.gameID() + " - " + currentGame.gameName() + " - " + currentGame.whiteUsername() + " - " + currentGame.blackUsername() + "\n";
 
@@ -348,7 +349,7 @@ public class ChessClient {
 
         }
 
-        return "Error: Unexpected input received. Please try again.";
+        return "Error: Unexpected input received, please try again. Type 'help' for a list of commands";
 
     }
 

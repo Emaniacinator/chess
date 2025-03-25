@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessGame;
 import chess.model.AuthData;
 import chess.model.GameData;
 import chess.model.UserData;
@@ -47,7 +48,7 @@ public class ServerFacade {
         UserData newUser = new UserData(receivedTokens[0], receivedTokens[1], receivedTokens[2]);
 
         // Make sure that passing in new UserData for user is actually what's needed here
-        return this.sendRequest("POST", "/user", null, AuthData.class, null);
+        return this.sendRequest("POST", "/user", newUser, AuthData.class, null);
 
     }
 
@@ -65,7 +66,8 @@ public class ServerFacade {
     public void createGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
 
         // using receivedTokens[0] as the input might not work, be aware of this possiblity
-        this.sendRequest("POST", "/game", receivedTokens[0], null, clientAuthData);
+        CreateGameRequest wrapper = new CreateGameRequest(receivedTokens[0]);
+        this.sendRequest("POST", "/game", wrapper, null, clientAuthData);
 
     }
 
@@ -73,7 +75,23 @@ public class ServerFacade {
     public GameData joinGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
 
         // passing in the recievedTokens might format this wrong for the server, we'll have to find out.
-        return this.sendRequest("PUT", "/game", receivedTokens, GameData.class, clientAuthData);
+
+        ChessGame.TeamColor fillerColor;
+
+        if (receivedTokens[1].toUpperCase().equals("WHITE")){
+
+            fillerColor = ChessGame.TeamColor.WHITE;
+
+        }
+
+        else{
+
+            fillerColor = ChessGame.TeamColor.BLACK;
+
+        }
+        JoinGameRequest wrapper = new JoinGameRequest(fillerColor, Integer.parseInt(receivedTokens[0]));
+
+        return this.sendRequest("PUT", "/game", wrapper, GameData.class, clientAuthData);
 
     }
 
@@ -94,9 +112,9 @@ public class ServerFacade {
         boolean foundGame = false;
 
         // It might not like how I've converted this object, but we'll find out
-        GameData[] gameList = this.sendRequest("GET", "/game", null, GameData[].class, clientAuthData);
+        GameList gameList = this.sendRequest("GET", "/game", null, GameList.class, clientAuthData);
 
-        for (GameData currentData : gameList){
+        for (GameData currentData : gameList.games()){
 
             if (currentData.gameID() == Integer.parseInt(receivedTokens[0])){
 
@@ -120,10 +138,10 @@ public class ServerFacade {
 
     // NOT FULLY IMPLEMENTED
     // Actually maybe have this return a string since it's just info and doesn't actually need to display any specific game
-    public GameData[] listGames(AuthData clientAuthData) throws Exception{
+    public GameList listGames(AuthData clientAuthData) throws Exception{
 
         // It might not like how I've converted this object, but we'll find out
-        return this.sendRequest("GET", "/game", null, GameData[].class, clientAuthData);
+        return this.sendRequest("GET", "/game", null, GameList.class, clientAuthData);
 
     }
 
@@ -141,7 +159,11 @@ public class ServerFacade {
 
             http.setDoOutput(true);
 
-            http.setRequestProperty("authorization", clientAuthData.authToken());
+            if (clientAuthData != null) {
+
+                http.setRequestProperty("authorization", clientAuthData.authToken());
+
+            }
 
             formatRequest(neededDataForRequest, http);
 

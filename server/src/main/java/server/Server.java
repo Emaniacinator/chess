@@ -146,20 +146,6 @@ public class Server {
     }
 
 
-    // This was added in project 5, so make sure it didn't break anything
-    public Object observeGameHandler(Request request, Response response) throws DataAccessException{
-
-        String authToken = request.headers("authorization");
-
-        GameID requestedGameID = new Gson().fromJson(request.body(), GameID.class);
-
-        GameData observedGame = services.observeGame(authToken, requestedGameID.gameID());
-
-        return new Gson().toJson(observedGame);
-
-    }
-
-
     public Object clearAllDatabases(Request request, Response response) throws DataAccessException{
 
         services.clearAllDatabases();
@@ -171,29 +157,3 @@ public class Server {
 }
 
 
-record GameID(int gameID){
-
-
-
-}
-
-
-record GameList(GameData[] games){
-
-
-
-}
-
-
-record JoinGameRequest(ChessGame.TeamColor playerColor, int gameID){
-
-
-
-}
-
-
-record CreateGameRequest(String gameName){
-
-
-
-}
