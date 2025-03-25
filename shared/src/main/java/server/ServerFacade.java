@@ -147,7 +147,7 @@ public class ServerFacade {
 
 
     // THIS IS NOT YET IMPLEMENTED
-    public <T> T sendRequest(String method, String path, Object neededDataForRequest , Class<T> returnClass, AuthData clientAuthData) throws Exception {
+    public <T> T sendRequest(String method, String path, Object neededDataForRequest, Class<T> returnClass, AuthData clientAuthData) throws Exception{
 
         try{
 

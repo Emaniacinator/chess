@@ -49,302 +49,136 @@ public class ChessClient {
 
             case "help":
 
-                // create an exception case for extra arguments
-
                 if (otherTokens != null){
-
                     throw new Exception("Error: 'help' doesn't accept any additional inputs. Please try again.");
-
                 }
-
                 return getHelpMenu();
 
             case "quit":
 
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDOUT){
-
                     throw new Exception("Error: Please log out before attempting to quit the chess client.");
-
                 }
-
-                // create an exception case for extra arguments
-
                 if (otherTokens != null){
-
                     throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
-
                 }
-
                 return "Quitting the program";
 
             case "login":
 
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDOUT){
-
                     throw new Exception("Error: You are already logged in. Type 'help' for a list of commands.");
-
                 }
-
-                // create an exception case for the wrong number of arguments
-
                 if (otherTokens.length != 2){
-
                     throw new Exception("Error: 'login' only accepts exactly 2 inputs. Please try again.");
-
                 }
-
-                // run loginUser on the serverFacade
-
                 clientAuthData = serverFacade.loginUser(otherTokens);
-
                 currentState = LOGGEDIN;
-
                 return "Logged in the user " + clientAuthData.username() + ".";
 
-            // Not yet tested
             case "register":
 
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDOUT){
-
                     throw new Exception("Error: Already logged in, can't register a new user. Type 'help' for a list of commands.");
-
                 }
-
-                // create an exception case for the wrong number of arguments
-
                 if (otherTokens.length != 3){
-
                     throw new Exception("Error: 'register' only accepts exactly 3 inputs. Please try again.");
-
                 }
-
-                // run registerUser on the serverFacade
 
                 clientAuthData = serverFacade.registerUser(otherTokens);
-
                 currentState = LOGGEDIN;
-
                 return "Registered and logged in the new user " + clientAuthData.username() + ".";
 
             case "logout":
 
                 if (otherTokens != null){
-
                     throw new Exception("Error: 'logout' doesn't accept any additional inputs. Please try again.");
-
                 }
-
-                // check that the program is in the right state
-
                 if (currentState == LOGGEDOUT){
-
                     throw new Exception("Error: You are already logged out. Type 'help' for a list of commands.");
-
                 }
-
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDIN){
-
                     throw new Exception("Error: Please leave the game before attempting to log out. Type 'help' for a list of commands.");
-
                 }
-
-                // run logoutUser on the serverFacade
-
                 serverFacade.logoutUser(clientAuthData);
-
                 String loggedOutUser = clientAuthData.username();
-
                 currentState = LOGGEDOUT;
-
                 clientAuthData = null;
-
                 return "Logged out the user " + loggedOutUser + ".";
 
             case "create":
 
-                // check that the program is in the right state
-
                 if (currentState == LOGGEDOUT){
-
                     throw new Exception("Error: Not logged in, can't create game. Type 'help' for a list of commands.");
-
                 }
-
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDIN){
-
                     throw new Exception("Error: Please leave the game before making a new one. Type 'help' for a list of commands.");
-
                 }
-
-                // Create an exception case for the wrong number of arguments
-
                 if (otherTokens.length != 1){
-
                     throw new Exception("Error: 'create' only accepts exactly 1 input. Please try again.");
-
                 }
-
-                // run createGame on the serverFacade
-
-                // remember you'll need to pass in a game name and the user's AuthData for this one
                 serverFacade.createGame(otherTokens, clientAuthData);
-
                 return "Created the game " + otherTokens[0] + ".";
 
             case "join":
 
-                // check that the program is in the right state
-
                 if (currentState == LOGGEDOUT){
-
                     throw new Exception("Error: Not logged in, can't join game. Type 'help' for a list of commands.");
-
                 }
-
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDIN){
-
                     throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing. Type 'help' for a list of commands.");
-
                 }
-
-                // Create an exception case for the wrong number of arguments
-
                 if (otherTokens.length != 2){
-
                     throw new Exception("Error: 'join' only accepts exactly 2 inputs. Please try again.");
-
                 }
-
-                // Create an exception case for if the GameID section isn't an integer
-
                 try{
-
                     Integer.parseInt(otherTokens[0]);
-
                 }
-
                 catch(Exception exception){
-
                     throw new Exception("Error: input gameID value is not a valid number. Please try again.");
-
                 }
-
-                // Create an exception case for if the playerColor section isn't a teamColor
-
                 if (!otherTokens[1].toUpperCase().equals("WHITE") && !otherTokens[1].toUpperCase().equals("BLACK")){
-
                     throw new Exception("Error: Can't join game without a valid team color. Please try again.");
-
                 }
-
-                // run joinGame on the serverFacade
-
-                // remember that you'll need to return the joined game to the user and get it to display at this point.
-                // also remember that you'll need to pass the user's AuthData in here.
-                // maybe add an ingame section to the run method so that it loops that part.
-
-                // Make sure that this returns the game to the REPL so that it can display it for the user
                 GameData returnGame = serverFacade.joinGame(otherTokens, clientAuthData);
-
                 currentState = INGAME;
-
-                // I could see this panicking, so make sure it works as expected and doesn't break
                 return displayBoard(returnGame.game().getBoard(), ChessGame.TeamColor.valueOf(otherTokens[1].toUpperCase()));
 
             case "observe":
 
-                // check that the program is in the right state
-
                 if (currentState == LOGGEDOUT){
-
                     throw new Exception("Error: Not logged in, can't observe game. Type 'help' for a list of commands.");
-
                 }
-
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDIN){
-
                     throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing. Type 'help' for a list of commands.");
-
                 }
-
-                // Create an exception case for the wrong number of arguments
-
                 if (otherTokens.length != 1){
-
                     throw new Exception("Error: 'observe' only accepts exactly 1 input. Please try again.");
-
                 }
-
-                // Create an exception for if the gameID is not an integer
-
                 try{
-
                     Integer.parseInt(otherTokens[0]);
-
                 }
-
                 catch(Exception exception){
-
                     throw new Exception("Error: input gameID value is not a valid number. Please try again.");
-
                 }
-
-                // run observeGame on the serverFacade
-
-                // remember that you'll also need to pass in the user's authData
                 GameData returnData = serverFacade.observeGame(otherTokens, clientAuthData);
-
                 currentState = OBSERVINGGAME;
-
-                // There's a lot of new stuff going on here so something weird definitely could have happened
                 return displayBoard(returnData.game().getBoard(), ChessGame.TeamColor.WHITE);
 
             case "list":
 
-                // check that the program is in the right state
-
                 if (currentState == LOGGEDOUT){
-
                     throw new Exception("Error: Not logged in, can't list games. Type 'help' for a list of commands.");
-
                 }
-
-                // check that the program is in the right state
-
                 if (currentState != LOGGEDIN){
-
                     throw new Exception("Error: Can't list games while in a game. Please leave current game before continuing. Type 'help' for a list of commands.");
-
                 }
-
-                // run listGames on the serverFacade
-
-                // remember that you'll also need to pass in the user authData
                 GameList returnedList = serverFacade.listGames(clientAuthData);
-
                 String listOfGames = "Here is a list of the games. They will be formatted as follows:\n" +
                                      "Game ID - Game Name - White Player - Black Player \n\n";
-
                 for (GameData currentGame : returnedList.games()){
-
                     listOfGames = listOfGames + currentGame.gameID() + " - " + currentGame.gameName() + " - " + currentGame.whiteUsername() + " - " + currentGame.blackUsername() + "\n";
-
                 }
-
                 return listOfGames;
 
         }
