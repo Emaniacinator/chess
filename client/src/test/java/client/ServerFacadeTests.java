@@ -28,13 +28,13 @@ public class ServerFacadeTests {
 
         server = new Server();
 
-        var port = 0;
+        var port = 8080;
 
         server.run(port);
 
         System.out.println("Started test HTTP server on " + port);
 
-        testFacade = new ServerFacade("http://localhost:8080");
+        testFacade = new ServerFacade("http://localhost:" + port);
 
     }
 
