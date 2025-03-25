@@ -48,14 +48,12 @@ public class ChessClient {
         switch (inputCommand.toLowerCase()){
 
             case "help":
-
                 if (otherTokens != null){
                     throw new Exception("Error: 'help' doesn't accept any additional inputs. Please try again.");
                 }
                 return getHelpMenu();
 
             case "quit":
-
                 if (currentState != LOGGEDOUT){
                     throw new Exception("Error: Please log out before attempting to quit the chess client.");
                 }
@@ -65,7 +63,6 @@ public class ChessClient {
                 return "Quitting the program";
 
             case "login":
-
                 if (currentState != LOGGEDOUT){
                     throw new Exception("Error: You are already logged in. Type 'help' for a list of commands.");
                 }
@@ -77,20 +74,17 @@ public class ChessClient {
                 return "Logged in the user " + clientAuthData.username() + ".";
 
             case "register":
-
                 if (currentState != LOGGEDOUT){
                     throw new Exception("Error: Already logged in, can't register a new user. Type 'help' for a list of commands.");
                 }
                 if (otherTokens.length != 3){
                     throw new Exception("Error: 'register' only accepts exactly 3 inputs. Please try again.");
                 }
-
                 clientAuthData = serverFacade.registerUser(otherTokens);
                 currentState = LOGGEDIN;
                 return "Registered and logged in the new user " + clientAuthData.username() + ".";
 
             case "logout":
-
                 if (otherTokens != null){
                     throw new Exception("Error: 'logout' doesn't accept any additional inputs. Please try again.");
                 }
@@ -107,7 +101,6 @@ public class ChessClient {
                 return "Logged out the user " + loggedOutUser + ".";
 
             case "create":
-
                 if (currentState == LOGGEDOUT){
                     throw new Exception("Error: Not logged in, can't create game. Type 'help' for a list of commands.");
                 }
@@ -121,12 +114,11 @@ public class ChessClient {
                 return "Created the game " + otherTokens[0] + ".";
 
             case "join":
-
                 if (currentState == LOGGEDOUT){
                     throw new Exception("Error: Not logged in, can't join game. Type 'help' for a list of commands.");
                 }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing. Type 'help' for a list of commands.");
+                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing.");
                 }
                 if (otherTokens.length != 2){
                     throw new Exception("Error: 'join' only accepts exactly 2 inputs. Please try again.");
@@ -145,12 +137,11 @@ public class ChessClient {
                 return displayBoard(returnGame.game().getBoard(), ChessGame.TeamColor.valueOf(otherTokens[1].toUpperCase()));
 
             case "observe":
-
                 if (currentState == LOGGEDOUT){
                     throw new Exception("Error: Not logged in, can't observe game. Type 'help' for a list of commands.");
                 }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing. Type 'help' for a list of commands.");
+                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing.");
                 }
                 if (otherTokens.length != 1){
                     throw new Exception("Error: 'observe' only accepts exactly 1 input. Please try again.");
@@ -166,25 +157,22 @@ public class ChessClient {
                 return displayBoard(returnData.game().getBoard(), ChessGame.TeamColor.WHITE);
 
             case "list":
-
                 if (currentState == LOGGEDOUT){
                     throw new Exception("Error: Not logged in, can't list games. Type 'help' for a list of commands.");
                 }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Can't list games while in a game. Please leave current game before continuing. Type 'help' for a list of commands.");
+                    throw new Exception("Error: Can't list games while in a game. Please leave current game before continuing.");
                 }
                 GameList returnedList = serverFacade.listGames(clientAuthData);
                 String listOfGames = "Here is a list of the games. They will be formatted as follows:\n" +
                                      "Game ID - Game Name - White Player - Black Player \n\n";
                 for (GameData currentGame : returnedList.games()){
-                    listOfGames = listOfGames + currentGame.gameID() + " - " + currentGame.gameName() + " - " + currentGame.whiteUsername() + " - " + currentGame.blackUsername() + "\n";
+                    listOfGames = listOfGames + currentGame.gameID() + " - " + currentGame.gameName() + " - " +
+                            currentGame.whiteUsername() + " - " + currentGame.blackUsername() + "\n";
                 }
                 return listOfGames;
-
         }
-
         return "Error: Unexpected input received, please try again. Type 'help' for a list of commands";
-
     }
 
 
@@ -331,35 +319,25 @@ public class ChessClient {
         String backgroundColor;
 
         if (colorSwitcher == true){
-
             backgroundColor = SET_BG_COLOR_WHITE;
-
         }
 
         else{
-
             backgroundColor = SET_BG_COLOR_DARK_GREEN;
-
         }
 
         if (currentPiece == null){
-
             return backgroundColor + EMPTY;
-
         }
 
         String pieceColor;
 
         if (currentTeam == WHITE){
-
             pieceColor = SET_TEXT_COLOR_BLUE;
-
         }
 
         else{
-
             pieceColor = SET_TEXT_COLOR_BLACK;
-
         }
 
         switch(currentPiece.getPieceType()) {
@@ -367,85 +345,61 @@ public class ChessClient {
             case KING:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_KING;
-
                 }
 
                 else{
-
                     return backgroundColor + pieceColor + BLACK_KING;
-
                 }
 
             case QUEEN:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_QUEEN;
-
                 }
 
                 else{
-
                     return backgroundColor + pieceColor + BLACK_QUEEN;
-
                 }
 
             case BISHOP:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_BISHOP;
-
                 }
 
                 else{
-
                     return backgroundColor + pieceColor + BLACK_BISHOP;
-
                 }
 
             case KNIGHT:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_KNIGHT;
-
                 }
 
                 else{
-
                     return backgroundColor + pieceColor + BLACK_KNIGHT;
-
                 }
 
             case ROOK:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_ROOK;
-
                 }
 
                 else{
-
                     return backgroundColor + pieceColor + BLACK_ROOK;
-
                 }
 
             case PAWN:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_PAWN;
-
                 }
 
                 else{
-
                     return backgroundColor + pieceColor + BLACK_PAWN;
-
                 }
 
         }
