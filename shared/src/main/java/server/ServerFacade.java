@@ -63,11 +63,11 @@ public class ServerFacade {
 
 
 
-    public void createGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
+    public GameID createGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
 
         // using receivedTokens[0] as the input might not work, be aware of this possiblity
         CreateGameRequest wrapper = new CreateGameRequest(receivedTokens[0]);
-        this.sendRequest("POST", "/game", wrapper, null, clientAuthData);
+        return this.sendRequest("POST", "/game", wrapper, GameID.class, clientAuthData);
 
     }
 
@@ -84,11 +84,18 @@ public class ServerFacade {
 
         }
 
-        else{
+        else if (receivedTokens[1].toUpperCase().equals("BLACK")){
 
             fillerColor = ChessGame.TeamColor.BLACK;
 
         }
+
+        else {
+
+            throw new Exception("Error: " + receivedTokens[1] + " is not a valid team color. Please try again.");
+
+        }
+
         JoinGameRequest wrapper = new JoinGameRequest(fillerColor, Integer.parseInt(receivedTokens[0]));
 
         return this.sendRequest("PUT", "/game", wrapper, GameData.class, clientAuthData);
@@ -146,8 +153,7 @@ public class ServerFacade {
     }
 
 
-    // THIS IS NOT YET IMPLEMENTED
-    public <T> T sendRequest(String method, String path, Object neededDataForRequest, Class<T> returnClass, AuthData clientAuthData) throws Exception{
+    private <T> T sendRequest(String method, String path, Object neededDataForRequest, Class<T> returnClass, AuthData clientAuthData) throws Exception{
 
         try{
 
