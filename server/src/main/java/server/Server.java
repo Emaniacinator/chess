@@ -154,6 +154,13 @@ public class Server {
 
     }
 
+
+    public void helperClearDatabases() throws DataAccessException {
+
+        services.clearAllDatabases();
+
+    }
+
 }
 
 
