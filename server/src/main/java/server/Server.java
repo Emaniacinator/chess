@@ -97,7 +97,7 @@ public class Server {
 
     public Object logoutHandler(Request request, Response response) throws DataAccessException{
 
-        String authToken = request.headers("authorization"); // Uhhh... you might need to from Json this for it to work right. But only maybe
+        String authToken = request.headers("authorization");
 
         services.logoutUser(authToken);
 
@@ -138,9 +138,24 @@ public class Server {
 
         JoinGameRequest values = new Gson().fromJson(request.body(), JoinGameRequest.class);
 
-        services.joinGame(authToken, values.playerColor(), values.gameID());
+        GameData joinedGame = services.joinGame(authToken, values.playerColor(), values.gameID());
 
-        return new Gson().toJson(null);
+        // You updated this in project 5, make sure it didn't accidentally break anything
+        return new Gson().toJson(joinedGame);
+
+    }
+
+
+    // This was added in project 5, so make sure it didn't break anything
+    public Object observeGameHandler(Request request, Response response) throws DataAccessException{
+
+        String authToken = request.headers("authorization");
+
+        GameID requestedGameID = new Gson().fromJson(request.body(), GameID.class);
+
+        GameData observedGame = services.observeGame(authToken, requestedGameID.gameID());
+
+        return new Gson().toJson(observedGame);
 
     }
 

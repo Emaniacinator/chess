@@ -29,19 +29,19 @@ public class Repl {
 
             try{
 
-                String inputTokens[] = inputLine.split(" ");
+                String[] inputTokens = inputLine.split(" ");
 
                 // if inputTokens.length is 0, print that no command was received and then print the help section.
 
                 if (inputTokens.length == 1){
 
-                    client.determineTakenAction(inputTokens[0]);
+                    System.out.println(client.determineTakenAction(inputTokens[0]));
 
                 }
 
                 else if (inputTokens.length > 1) {
 
-                    client.determineTakenAction(inputTokens[0], Arrays.copyOfRange(inputTokens, 1, inputTokens.length));
+                    System.out.println(client.determineTakenAction(inputTokens[0], Arrays.copyOfRange(inputTokens, 1, inputTokens.length)));
 
                 }
 

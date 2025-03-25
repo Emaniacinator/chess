@@ -32,43 +32,48 @@ public class ServerFacade {
     // get, so you'll need a function to parse that data back into a class.
 
 
-    // NOT FULLY IMPLEMENTED
-    public AuthData loginUser() throws Exception {
+    public AuthData loginUser(String[] receivedTokens) throws Exception {
 
-        return this.sendRequest("POST", "/session", null, AuthData.class);
+        UserData loginData = new UserData(receivedTokens[0], receivedTokens[1], null);
 
-    }
-
-
-    // NOT FULLY IMPLEMENTED
-    public AuthData registerUser() throws Exception {
-
-        return this.sendRequest("POST", "/user", null, AuthData.class);
+        // Make sure that passing in the loginData UserData is actually what's needed here
+        return this.sendRequest("POST", "/session", loginData, AuthData.class, null);
 
     }
 
 
-    // NOT FULLY IMPLEMENTED
-    public void logoutUser() throws Exception {
+    public AuthData registerUser(String[] receivedTokens) throws Exception {
+
+        UserData newUser = new UserData(receivedTokens[0], receivedTokens[1], receivedTokens[2]);
+
+        // Make sure that passing in new UserData for user is actually what's needed here
+        return this.sendRequest("POST", "/user", null, AuthData.class, null);
+
+    }
+
+
+    public void logoutUser(AuthData clientAuthData) throws Exception {
 
         // Does this need the %s to find what session to delete?
-        this.sendRequest("DELETE", "/session", null, null);
+        // Also, this might be fine? Is the AuthData automatically included, or does it need to be removed?
+        this.sendRequest("DELETE", "/session", null, null, clientAuthData);
 
     }
 
 
-    // NOT FULLY IMPLEMENTED
-    public void createGame() throws Exception {
 
-        this.sendRequest("POST", "/game", null, null);
+    public void createGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
+
+        // using receivedTokens[0] as the input might not work, be aware of this possiblity
+        this.sendRequest("POST", "/game", receivedTokens[0], null, clientAuthData);
 
     }
 
 
-    // NOT FULLY IMPLEMENTED
-    public GameData joinGame() throws Exception {
+    public GameData joinGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
 
-        return this.sendRequest("PUT", "/game", null, GameData.class);
+        // passing in the recievedTokens might format this wrong for the server, we'll have to find out.
+        return this.sendRequest("PUT", "/game", receivedTokens, GameData.class, clientAuthData);
 
     }
 
@@ -80,23 +85,51 @@ public class ServerFacade {
     //
     // You may also need to add a new command to the Server file to get this to work as expected, or
     // maybe at least parse a list of returned games for the desired one.
-    public GameData observeGame() throws Exception {
+    public GameData observeGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
 
-        return this.sendRequest("GET", "/game", null, GameData.class);
+        // passing in the recievedTokens might format this wrong for the server, we'll have to find out.
+
+        GameData selectedGame = null;
+
+        boolean foundGame = false;
+
+        // It might not like how I've converted this object, but we'll find out
+        GameData[] gameList = this.sendRequest("GET", "/game", null, GameData[].class, clientAuthData);
+
+        for (GameData currentData : gameList){
+
+            if (currentData.gameID() == Integer.parseInt(receivedTokens[0])){
+
+                selectedGame = currentData;
+                foundGame = true;
+
+            }
+
+        }
+
+        if (selectedGame == null || foundGame != true){
+
+            throw new Exception("Error: The gameID you requested doesn't exist in the database. Please try again.");
+
+        }
+
+        return selectedGame;
 
     }
 
 
     // NOT FULLY IMPLEMENTED
-    public GameData[] listGames(){
+    // Actually maybe have this return a string since it's just info and doesn't actually need to display any specific game
+    public GameData[] listGames(AuthData clientAuthData) throws Exception{
 
-        return null;
+        // It might not like how I've converted this object, but we'll find out
+        return this.sendRequest("GET", "/game", null, GameData[].class, clientAuthData);
 
     }
 
 
     // THIS IS NOT YET IMPLEMENTED
-    public <T> T sendRequest(String method, String path, Object neededDataForRequest , Class<T> returnClass) throws Exception {
+    public <T> T sendRequest(String method, String path, Object neededDataForRequest , Class<T> returnClass, AuthData clientAuthData) throws Exception {
 
         try{
 
@@ -107,6 +140,8 @@ public class ServerFacade {
             http.setRequestMethod(method);
 
             http.setDoOutput(true);
+
+            http.setRequestProperty("authorization", clientAuthData.authToken());
 
             formatRequest(neededDataForRequest, http);
 

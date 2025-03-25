@@ -113,7 +113,7 @@ public class Service {
 
     // I really dislike this implementation of updating the usernames, but I'll have to get back to it tomorrow.
     // Also it's not finished hahaha
-    public void joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException{
+    public GameData joinGame(String authToken, ChessGame.TeamColor playerColor, int gameID) throws DataAccessException{
 
         AuthData checkLogin = dataAccess.getAuthData(authToken);
 
@@ -144,6 +144,25 @@ public class Service {
             throw new DataAccessException(403, "Error: There is already a user in that game for the " + playerColor + " team");
 
         }
+
+        return dataAccess.getGameData(gameID);
+
+    }
+
+
+    // This was added in project 5, so make sure that it doesn't break anything
+    // Also, does this work properly if there is no game found?
+    public GameData observeGame(String authToken, int gameID) throws DataAccessException{
+
+        AuthData checkLogin = dataAccess.getAuthData(authToken);
+
+        if (gameID < 0){
+
+            throw new DataAccessException(400, "Error: Input an invalid gameID");
+
+        }
+
+        return dataAccess.getGameData(gameID);
 
     }
 

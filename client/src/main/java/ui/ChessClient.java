@@ -4,6 +4,8 @@ import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
+import chess.model.AuthData;
+import chess.model.GameData;
 import server.ServerFacade;
 
 import static chess.ChessGame.TeamColor.*;
@@ -15,7 +17,7 @@ public class ChessClient {
     private ClientState currentState = LOGGEDOUT;
     private final String serverURL;
     private final ServerFacade serverFacade;
-
+    private AuthData clientAuthData = null;
 
     public ChessClient(String serverURL){
 
@@ -32,7 +34,7 @@ public class ChessClient {
     }
 
 
-    public void determineTakenAction(String inputCommand) throws Exception{
+    public String determineTakenAction(String inputCommand) throws Exception{
 
         determineTakenAction(inputCommand, null);
 
@@ -40,7 +42,7 @@ public class ChessClient {
 
 
     // You may need to force inputCommand to lowercase for this all to work.
-    public void determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
+    public String determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
 
         switch (inputCommand.toLowerCase()){
 
@@ -54,9 +56,7 @@ public class ChessClient {
 
                 }
 
-                System.out.println(getHelpMenu());
-
-                break;
+                return getHelpMenu();
 
             case "quit":
 
@@ -76,9 +76,7 @@ public class ChessClient {
 
                 }
 
-                System.out.println("Quitting the program");
-
-                break;
+                return "Quitting the program";
 
             case "login":
 
@@ -100,15 +98,13 @@ public class ChessClient {
 
                 // run loginUser on the serverFacade
 
-                // You'll need to convert the args to the proper formatting and stuff first in the loginUser method probably
-                // Or I guess you could do it before passing it in too but that seems weird for some reason
-                // Actually, do you have a function for that in the Client?
-                serverFacade.loginUser();
+                clientAuthData = serverFacade.loginUser(otherTokens);
 
                 currentState = LOGGEDIN;
 
-                break;
+                return "Logged in the user " + clientAuthData.username() + ".";
 
+            // Not yet tested
             case "register":
 
                 // check that the program is in the right state
@@ -129,11 +125,11 @@ public class ChessClient {
 
                 // run registerUser on the serverFacade
 
-                serverFacade.registerUser();
+                clientAuthData = serverFacade.registerUser(otherTokens);
 
                 currentState = LOGGEDIN;
 
-                break;
+                return "Registered and logged in the new user " + clientAuthData.username() + ".";
 
             case "logout":
 
@@ -161,12 +157,15 @@ public class ChessClient {
 
                 // run logoutUser on the serverFacade
 
-                // remember that you'll need to pass in the user's authData when you finish this part.
-                serverFacade.logoutUser();
+                serverFacade.logoutUser(clientAuthData);
+
+                String loggedOutUser = clientAuthData.username();
 
                 currentState = LOGGEDOUT;
 
-                break;
+                clientAuthData = null;
+
+                return "Logged out the user " + loggedOutUser + ".";
 
             case "create":
 
@@ -197,9 +196,9 @@ public class ChessClient {
                 // run createGame on the serverFacade
 
                 // remember you'll need to pass in a game name and the user's AuthData for this one
-                serverFacade.createGame();
+                serverFacade.createGame(otherTokens, clientAuthData);
 
-                break;
+                return "Created the game " + otherTokens[1] + ".";
 
             case "join":
 
@@ -254,11 +253,14 @@ public class ChessClient {
                 // remember that you'll need to return the joined game to the user and get it to display at this point.
                 // also remember that you'll need to pass the user's AuthData in here.
                 // maybe add an ingame section to the run method so that it loops that part.
-                serverFacade.joinGame();
+
+                // Make sure that this returns the game to the REPL so that it can display it for the user
+                GameData returnGame = serverFacade.joinGame(otherTokens, clientAuthData);
 
                 currentState = INGAME;
 
-                break;
+                // I could see this panicking, so make sure it works as expected and doesn't break
+                return displayBoard(returnGame.game().getBoard(), ChessGame.TeamColor.valueOf(otherTokens[2]));
 
             case "observe":
 
@@ -280,7 +282,7 @@ public class ChessClient {
 
                 // Create an exception case for the wrong number of arguments
 
-                if (otherTokens.length != 2){
+                if (otherTokens.length != 1){
 
                     throw new Exception("Error: 'observe' only accepts exactly 1 input. Please try again.");
 
@@ -290,7 +292,7 @@ public class ChessClient {
 
                 try{
 
-                    Integer.parseInt(otherTokens[1]);
+                    Integer.parseInt(otherTokens[0]);
 
                 }
 
@@ -303,11 +305,12 @@ public class ChessClient {
                 // run observeGame on the serverFacade
 
                 // remember that you'll also need to pass in the user's authData
-                serverFacade.observeGame();
+                GameData returnData = serverFacade.observeGame(otherTokens, clientAuthData);
 
                 currentState = OBSERVINGGAME;
 
-                break;
+                // There's a lot of new stuff going on here so something weird definitely could have happened
+                return displayBoard(returnData.game().getBoard(), ChessGame.TeamColor.WHITE);
 
             case "list":
 
@@ -330,11 +333,22 @@ public class ChessClient {
                 // run listGames on the serverFacade
 
                 // remember that you'll also need to pass in the user authData
-                serverFacade.listGames();
+                GameData[] returnedList = serverFacade.listGames(clientAuthData);
 
-                break;
+                String listOfGames = "Here is a list of the games. They will be formatted as follows:\n" +
+                                     "Game ID - Game Name - White Player - Black Player \n\n";
+
+                for (GameData currentGame : returnedList){
+
+                    listOfGames = listOfGames + currentGame.gameID() + " - " + currentGame.gameName() + " - " + currentGame.whiteUsername() + " - " + currentGame.blackUsername() + "\n";
+
+                }
+
+                return listOfGames;
 
         }
+
+        return "Error: Unexpected input received. Please try again.";
 
     }
 
