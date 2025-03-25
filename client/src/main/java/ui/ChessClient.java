@@ -42,58 +42,46 @@ public class ChessClient {
     }
 
 
-    // You may need to force inputCommand to lowercase for this all to work.
+
     public String determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
-
         switch (inputCommand.toLowerCase()){
-
             case "help":
                 if (otherTokens != null){
-                    throw new Exception("Error: 'help' doesn't accept any additional inputs. Please try again.");
-                }
+                    throw new Exception("Error: 'help' doesn't accept any additional inputs. Please try again."); }
                 return getHelpMenu();
 
             case "quit":
                 if (currentState != LOGGEDOUT){
-                    throw new Exception("Error: Please log out before attempting to quit the chess client.");
-                }
+                    throw new Exception("Error: Please log out before attempting to quit the chess client."); }
                 if (otherTokens != null){
-                    throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again.");
-                }
+                    throw new Exception("Error: 'quit' doesn't accept any additional inputs. Please try again."); }
                 return "Quitting the program";
 
             case "login":
                 if (currentState != LOGGEDOUT){
-                    throw new Exception("Error: You are already logged in. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: You are already logged in. Type 'help' for a list of commands."); }
                 if (otherTokens.length != 2){
-                    throw new Exception("Error: 'login' only accepts exactly 2 inputs. Please try again.");
-                }
+                    throw new Exception("Error: 'login' only accepts exactly 2 inputs. Please try again."); }
                 clientAuthData = serverFacade.loginUser(otherTokens);
                 currentState = LOGGEDIN;
                 return "Logged in the user " + clientAuthData.username() + ".";
 
             case "register":
                 if (currentState != LOGGEDOUT){
-                    throw new Exception("Error: Already logged in, can't register a new user. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: Already logged in, can't register a new user. Type 'help' for a list of commands."); }
                 if (otherTokens.length != 3){
-                    throw new Exception("Error: 'register' only accepts exactly 3 inputs. Please try again.");
-                }
+                    throw new Exception("Error: 'register' only accepts exactly 3 inputs. Please try again."); }
                 clientAuthData = serverFacade.registerUser(otherTokens);
                 currentState = LOGGEDIN;
                 return "Registered and logged in the new user " + clientAuthData.username() + ".";
 
             case "logout":
                 if (otherTokens != null){
-                    throw new Exception("Error: 'logout' doesn't accept any additional inputs. Please try again.");
-                }
+                    throw new Exception("Error: 'logout' doesn't accept any additional inputs. Please try again."); }
                 if (currentState == LOGGEDOUT){
-                    throw new Exception("Error: You are already logged out. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: You are already logged out. Type 'help' for a list of commands."); }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Please leave the game before attempting to log out. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: Please leave the game before attempting to log out. Type 'help' for a list of commands."); }
                 serverFacade.logoutUser(clientAuthData);
                 String loggedOutUser = clientAuthData.username();
                 currentState = LOGGEDOUT;
@@ -102,74 +90,55 @@ public class ChessClient {
 
             case "create":
                 if (currentState == LOGGEDOUT){
-                    throw new Exception("Error: Not logged in, can't create game. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: Not logged in, can't create game. Type 'help' for a list of commands."); }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Please leave the game before making a new one. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: Please leave the game before making a new one. Type 'help' for a list of commands."); }
                 if (otherTokens.length != 1){
-                    throw new Exception("Error: 'create' only accepts exactly 1 input. Please try again.");
-                }
+                    throw new Exception("Error: 'create' only accepts exactly 1 input. Please try again."); }
                 serverFacade.createGame(otherTokens, clientAuthData);
                 return "Created the game " + otherTokens[0] + ".";
 
             case "join":
                 if (currentState == LOGGEDOUT){
-                    throw new Exception("Error: Not logged in, can't join game. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: Not logged in, can't join game. Type 'help' for a list of commands."); }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing.");
-                }
+                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing."); }
                 if (otherTokens.length != 2){
-                    throw new Exception("Error: 'join' only accepts exactly 2 inputs. Please try again.");
-                }
-                try{
-                    Integer.parseInt(otherTokens[0]);
-                }
+                    throw new Exception("Error: 'join' only accepts exactly 2 inputs. Please try again."); }
+                try{ Integer.parseInt(otherTokens[0]); }
                 catch(Exception exception){
-                    throw new Exception("Error: input gameID value is not a valid number. Please try again.");
-                }
+                    throw new Exception("Error: input gameID value is not a valid number. Please try again."); }
                 if (!otherTokens[1].toUpperCase().equals("WHITE") && !otherTokens[1].toUpperCase().equals("BLACK")){
-                    throw new Exception("Error: Can't join game without a valid team color. Please try again.");
-                }
+                    throw new Exception("Error: Can't join game without a valid team color. Please try again."); }
                 GameData returnGame = serverFacade.joinGame(otherTokens, clientAuthData);
                 currentState = INGAME;
                 return displayBoard(returnGame.game().getBoard(), ChessGame.TeamColor.valueOf(otherTokens[1].toUpperCase()));
 
             case "observe":
                 if (currentState == LOGGEDOUT){
-                    throw new Exception("Error: Not logged in, can't observe game. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: Not logged in, can't observe game. Type 'help' for a list of commands."); }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing.");
-                }
+                    throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing."); }
                 if (otherTokens.length != 1){
-                    throw new Exception("Error: 'observe' only accepts exactly 1 input. Please try again.");
-                }
-                try{
-                    Integer.parseInt(otherTokens[0]);
-                }
+                    throw new Exception("Error: 'observe' only accepts exactly 1 input. Please try again."); }
+                try{ Integer.parseInt(otherTokens[0]); }
                 catch(Exception exception){
-                    throw new Exception("Error: input gameID value is not a valid number. Please try again.");
-                }
+                    throw new Exception("Error: input gameID value is not a valid number. Please try again."); }
                 GameData returnData = serverFacade.observeGame(otherTokens, clientAuthData);
                 currentState = OBSERVINGGAME;
                 return displayBoard(returnData.game().getBoard(), ChessGame.TeamColor.WHITE);
 
             case "list":
                 if (currentState == LOGGEDOUT){
-                    throw new Exception("Error: Not logged in, can't list games. Type 'help' for a list of commands.");
-                }
+                    throw new Exception("Error: Not logged in, can't list games. Type 'help' for a list of commands."); }
                 if (currentState != LOGGEDIN){
-                    throw new Exception("Error: Can't list games while in a game. Please leave current game before continuing.");
-                }
+                    throw new Exception("Error: Can't list games while in a game. Please leave current game before continuing."); }
                 GameList returnedList = serverFacade.listGames(clientAuthData);
                 String listOfGames = "Here is a list of the games. They will be formatted as follows:\n" +
                                      "Game ID - Game Name - White Player - Black Player \n\n";
                 for (GameData currentGame : returnedList.games()){
                     listOfGames = listOfGames + currentGame.gameID() + " - " + currentGame.gameName() + " - " +
-                            currentGame.whiteUsername() + " - " + currentGame.blackUsername() + "\n";
-                }
+                            currentGame.whiteUsername() + " - " + currentGame.blackUsername() + "\n"; }
                 return listOfGames;
         }
         return "Error: Unexpected input received, please try again. Type 'help' for a list of commands";
