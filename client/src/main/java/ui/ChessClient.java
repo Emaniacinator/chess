@@ -85,7 +85,8 @@ public class ChessClient {
 
                 return listCommand(otherTokens);
 
-            // In theory, the 'redraw' case is completed
+            // You may want to make this actually read from the server later in case the local board
+            // is not being effectively updated by the Websocket, actually.
             case "redraw":
 
                 if (currentState == INGAME){
@@ -386,6 +387,8 @@ public class ChessClient {
 
     public String redrawCommand(String[] otherTokens) throws Exception{
 
+        // Create an error for the wrong number of inputs
+
         if (currentState == LOGGEDOUT){
 
             return "Error: Please log in and join a game before attempting to redraw the board. Type 'help' for a list of commands.";
@@ -405,7 +408,27 @@ public class ChessClient {
 
     public String redrawCommand(String[] otherTokens, ChessGame.TeamColor teamColor) throws Exception{
 
+        // Create an error for the wrong number of inputs
+
         return displayBoard(userSideGameData.game().getBoard(), teamColor);
+
+    }
+
+
+    // Put the makeMovesCommand here later instead of at the bottom so that you don't go crazy and your
+    // organization keeps working as expected.
+
+    // Not yet fully implemented
+    public String highlightMovesCommand(String[] otherTokens){
+
+        // Create an error for the wrong number of inputs
+
+        // turn the otherTokens into a ChessPosition, then see if there is a piece there by making a ChessPiece item.
+        // If there is no piece there, return an error saying that there is no piece there.
+        // Have the ChessPiece return all possible moves that it can make.
+        // If there are no possible moves, just return a note that says "No possible moves for that piece"
+        // Otherwise pass them into the displayBoard method as an override and have it the background color be blue
+        // instead of the usual color if it matches one of the spaces in the list of possible moves for the ChessPiece.
 
     }
 
@@ -415,13 +438,13 @@ public class ChessClient {
         switch(currentState){
 
             case LOGGEDOUT:
-                return "register <USERNAME> <PASSWORD> <EMAIL> - create an account\n" +
+                return  "register <USERNAME> <PASSWORD> <EMAIL> - create an account\n" +
                         "login <USERNAME> <PASSWORD> - log registered user in\n" +
                         "quit - exit the program\n" +
                         "help - display a list of available commands";
 
             case LOGGEDIN:
-                return "create <NAME> - create a new game\n" +
+                return  "create <NAME> - create a new game\n" +
                         "join <gameID> [WHITE|BLACK] - join a game as the specified team\n" +
                         "observe <gameID> - watch a game in progress\n" +
                         "list - display a list of chess games\n" +
@@ -430,16 +453,18 @@ public class ChessClient {
 
             case INGAME:
 
-                return "redraw - redraws the chess board\n" + // This function will make the LOAD_GAME websocket (html? SQL?) call, then display the board
-                        "make_move <START POSITION, END POSITION> - move a piece from the starting position to the ending position if the move is valid\n" +
+                return  "redraw - redraws the chess board\n" + // This function will make the LOAD_GAME websocket (html? SQL?) call, then display the board
+                        "make_move <START POSITION> <END POSITION> - move a piece from the starting position to the ending position if the move is valid\n" +
                         "highlight_moves <PIECE POSITION> - Highlights all the legal spaces that a specific piece can move to\n" +
                         "leave - leaves the current chess game\n" +
                         "resign - forfeits the game, but does not leave the game\n" +
-                        "help - display a list of available commands";
+                        "help - display a list of available commands\n\n" +
+                        "Please note that for any piece position, you will need to format it as follows: <LETTER> <NUMBER>\n" +
+                        "For example:  'make_move A 2 A 3' will move the piece at A, 2 to the space at A, 3.";
 
             case OBSERVINGGAME:
 
-                return "redraw - redraws the chess board\n" +
+                return  "redraw - redraws the chess board\n" +
                         "highlight_moves <PIECE POSITION> - Highlights all the legal spaces that a specific piece can move to\n" +
                         "leave - stop observing the current chess game\n" +
                         "help - display a list of available commands";
@@ -457,6 +482,7 @@ public class ChessClient {
         int incrementer;
         int initialRow;
         int initialColumn;
+
         if (displaySide == WHITE){
 
             // In this case, you start with black at the top, resulting in incrementing numerically downwards for the row.
@@ -494,6 +520,7 @@ public class ChessClient {
 
                 }
 
+                // This is probably where the weird board spacing is coming in
                 else{
 
                     entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide);
@@ -561,25 +588,36 @@ public class ChessClient {
         String backgroundColor;
 
         if (colorSwitcher == true){
+
             backgroundColor = SET_BG_COLOR_WHITE;
+
         }
 
         else{
+
             backgroundColor = SET_BG_COLOR_DARK_GREEN;
+
         }
 
         if (currentPiece == null){
+
+            // This is where it's returning the space that's too small, I suspect
             return backgroundColor + EMPTY;
+
         }
 
         String pieceColor;
 
         if (currentTeam == WHITE){
+
             pieceColor = SET_TEXT_COLOR_BLUE;
+
         }
 
         else{
+
             pieceColor = SET_TEXT_COLOR_BLACK;
+
         }
 
         switch(currentPiece.getPieceType()) {
@@ -587,61 +625,85 @@ public class ChessClient {
             case KING:
 
                 if (currentTeam == WHITE){
+
                     return backgroundColor + pieceColor + WHITE_KING;
+
                 }
 
                 else{
+
                     return backgroundColor + pieceColor + BLACK_KING;
+
                 }
 
             case QUEEN:
 
                 if (currentTeam == WHITE){
+
                     return backgroundColor + pieceColor + WHITE_QUEEN;
+
                 }
 
                 else{
+
                     return backgroundColor + pieceColor + BLACK_QUEEN;
+
                 }
 
             case BISHOP:
 
                 if (currentTeam == WHITE){
+
                     return backgroundColor + pieceColor + WHITE_BISHOP;
+
                 }
 
                 else{
+
                     return backgroundColor + pieceColor + BLACK_BISHOP;
+
                 }
 
             case KNIGHT:
 
                 if (currentTeam == WHITE){
+
                     return backgroundColor + pieceColor + WHITE_KNIGHT;
+
                 }
 
                 else{
+
                     return backgroundColor + pieceColor + BLACK_KNIGHT;
+
                 }
 
             case ROOK:
 
                 if (currentTeam == WHITE){
+
                     return backgroundColor + pieceColor + WHITE_ROOK;
+
                 }
 
                 else{
+
                     return backgroundColor + pieceColor + BLACK_ROOK;
+
                 }
 
             case PAWN:
 
                 if (currentTeam == WHITE){
+
                     return backgroundColor + pieceColor + WHITE_PAWN;
+
                 }
 
                 else{
+
                     return backgroundColor + pieceColor + BLACK_PAWN;
+
                 }
 
         }
@@ -659,38 +721,55 @@ public class ChessClient {
         switch(input){
 
             case 8:
+
                 letter = 'A';
+
                 break;
 
             case 7:
+
                 letter = 'B';
+
                 break;
 
             case 6:
+
                 letter = 'C';
+
                 break;
 
             case 5:
+
                 letter = 'D';
+
                 break;
 
             case 4:
+
                 letter = 'E';
+
                 break;
 
             case 3:
+
                 letter = 'F';
+
                 break;
 
             case 2:
+
                 letter = 'G';
+
                 break;
 
             case 1:
+
                 letter = 'H';
+
                 break;
 
             default:
+
                 return EMPTY;
 
         }
@@ -700,7 +779,6 @@ public class ChessClient {
     }
 
 
-    // Get the proper spacing for a character to label rows and columns on the board.
     public String getCharacterSpacing(char input){
 
         return SET_BG_COLOR_LIGHT_GREY + SET_TEXT_COLOR_BLACK + PERIOD_SPACE + WEIRD_SPACE + input + WEIRD_SPACE + PERIOD_SPACE;
