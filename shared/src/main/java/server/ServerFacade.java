@@ -62,7 +62,6 @@ public class ServerFacade {
     }
 
 
-
     public GameID createGame(String[] receivedTokens, AuthData clientAuthData) throws Exception {
 
         // using receivedTokens[0] as the input might not work, be aware of this possiblity

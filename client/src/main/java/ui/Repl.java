@@ -1,13 +1,25 @@
 package ui;
 
+import websocket.commands.UserGameCommand;
+
 import java.util.Scanner;
 import java.util.Arrays;
 
+import static ui.ClientState.INGAME;
+import static ui.ClientState.OBSERVINGGAME;
 import static ui.EscapeSequences.*;
 
 public class Repl {
 
+
     private final ChessClient client;
+
+
+    public String makeErrorLineAppearOnPurposeSoYouRememberThisComment();
+    // OH! The repl should feed the info to the ChessClient, which is then supposed to determine the command and the state.
+    // That will then send a request to the ServerFacade? This will then make an instance of UserGameCommand to run game
+    // commands through the websocket? While a separate instance of the websocket stays open to return and siplay updates?
+
 
     public Repl(String serverURL){
 
@@ -15,6 +27,10 @@ public class Repl {
 
     }
 
+
+    // This should be different and shouldn't call UserGameCommand at all
+    // Will I need a separate ClientOnlyCommands class to make sure that all the needed features fit into ChessClient
+    // with the weird line limitations?
     public void run(){
 
         System.out.println("Welcome to the chess client. Please sign in or type 'help' to get started.");
@@ -31,21 +47,46 @@ public class Repl {
 
                 String[] inputTokens = inputLine.trim().split(" ");
 
-                // if inputTokens.length is 0, print that no command was received and then print the help section.
+                ClientState currentState = client.returnState();
 
-                if (inputTokens.length == 1){
+                if (currentState == INGAME || currentState == OBSERVINGGAME){
 
-                    System.out.println(client.determineTakenAction(inputTokens[0]));
+                    // if inputTokens.length is 0, print that no command was received and then print the help section.
+
+                    String passedStateValue;
+
+                    if (currentState == INGAME){
+
+                        passedStateValue = "in game";
+
+                    }
+
+                    else{
+
+                        passedStateValue = "observing game";
+
+                    }
 
                 }
 
-                else if (inputTokens.length > 1) {
+                else{
 
-                    System.out.println(client.determineTakenAction(inputTokens[0], Arrays.copyOfRange(inputTokens, 1, inputTokens.length)));
+                    // if inputTokens.length is 0, print that no command was received and then print the help section.
+
+                    if (inputTokens.length == 1){
+
+                        System.out.println(client.determineTakenAction(inputTokens[0]));
+
+                    }
+
+                    else if (inputTokens.length > 1) {
+
+                        System.out.println(client.determineTakenAction(inputTokens[0], Arrays.copyOfRange(inputTokens, 1, inputTokens.length)));
+
+                    }
 
                 }
 
-                // for some reason it won't exit the 'while' loop here
                 previousInput = inputTokens[0];
 
             }
@@ -59,6 +100,7 @@ public class Repl {
         }
 
     }
+
 
     public void printPrettySideThing(){
 
