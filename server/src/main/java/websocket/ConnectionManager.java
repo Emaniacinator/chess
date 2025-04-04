@@ -105,7 +105,9 @@ public class ConnectionManager {
 
 
     // If the same user is connected more than once, this may send duplicate messages. You need to be aware of that.
-    public void broadcastMessage(Integer gameID, String senderUsername) throws Exception{
+    // Also, is it worth making this a try with resources block just in case? I don't think it will be an issue, but
+    // it's worth investigating since the IDE is saying that it *could* be an issue
+    public void broadcastMessageToGame(Integer gameID, String senderUsername) throws Exception{
 
         ConnectionArray gameToBroadcastTo = activeConnections.get(gameID);
 
@@ -118,6 +120,36 @@ public class ConnectionManager {
                     userToSendTo.session().getRemote().sendString("You didn't fix this to send the right thing yet :(");
 
                 }
+
+            }
+
+            // If their connection isn't open, this will now close it. Maybe program this to send another message though?
+            // Also maybe implement something such that if this happens it removes their authData from the active authData
+            // set to prevent shennanigans?
+            else {
+
+                removeConnection(gameID, userToSendTo.username());
+
+            }
+
+        }
+
+    }
+
+
+    // This might be a flawed approach. Note that the senderUsername also represents who the message is being sent to.
+    // This will also have most of if not all the issues that broadcastMessageToGame has, if it has any.
+    public void broadcastMessageToSingleUser(Integer gameID, String senderUsername) throws Exception{
+
+        ConnectionArray gameToBroadcastTo = activeConnections.get(gameID);
+
+        for (Connection userToSendTo : gameToBroadcastTo.allConnections){
+
+            if (userToSendTo.session().isOpen() && Objects.equals(userToSendTo.username(), senderUsername)){
+
+                userToSendTo.session().getRemote().sendString("You didn't fix this to send the right thing yet :(");
+
+                break;
 
             }
 
