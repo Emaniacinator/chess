@@ -1,13 +1,13 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 import chess.model.AuthData;
 import chess.model.GameData;
 import server.GameList;
 import server.ServerFacade;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import static chess.ChessGame.TeamColor.*;
 import static ui.ClientState.*;
@@ -21,6 +21,10 @@ public class ChessClient {
     private AuthData clientAuthData = null;
     private GameData userSideGameData;
     private ChessGame.TeamColor userSideTeamColor;
+
+    error make an eror here so you look
+    // You need to make sure that the userSideGameData gets updated EVERY time new data is received or sent
+    // You haven't yet implemented this part into everything you already wrote yet
 
     public ChessClient(String serverURL){
 
@@ -87,6 +91,7 @@ public class ChessClient {
 
             // You may want to make this actually read from the server later in case the local board
             // is not being effectively updated by the Websocket, actually.
+            // Or just have the ChessClient update the board every time a new websocket board state is received lol
             case "redraw":
 
                 if (currentState == INGAME){
@@ -105,9 +110,10 @@ public class ChessClient {
 
                 return makeMoveCommand();
 
+            // In theory, this is fully implemented. But there's a lot going on so something DEFINITELY could have broken
             case "highlight_moves":
 
-                return highlightMovesCommand();
+                return highlightMovesCommand(otherTokens);
 
             case "leave":
 
@@ -418,17 +424,146 @@ public class ChessClient {
     // Put the makeMovesCommand here later instead of at the bottom so that you don't go crazy and your
     // organization keeps working as expected.
 
-    // Not yet fully implemented
-    public String highlightMovesCommand(String[] otherTokens){
+    // Okay, there's a lot here so it totally could have broken something :(
+    public String highlightMovesCommand(String[] otherTokens) throws Exception{
 
         // Create an error for the wrong number of inputs
 
-        // turn the otherTokens into a ChessPosition, then see if there is a piece there by making a ChessPiece item.
+        if (otherTokens.length != 2){
+
+            throw new Exception ("Error: 'highlight_moves' only accepts exactly 2 inputs. Please try again.");
+
+        }
+
+        // turn the otherTokens into a ChessPosition
+
+        int columnPosition = makeColumnLetterANumber(otherTokens[0]);
+
+        int rowPosition = makeRowPositionANumber(otherTokens[1]);
+
+        ChessPosition highlightedPiecePosition = new ChessPosition(rowPosition, columnPosition);
+
+        // See if there is a piece there by making a ChessPiece item.
+
+        ChessBoard currentBoard = userSideGameData.game().getBoard();
+
+        if (currentBoard == null){
+
+            throw new Exception("Error: How the heck did you get here? Anyways, there is no chess board *shrug emoji*");
+
+        }
+
+        ChessPiece highlightedPiece = currentBoard.getPiece(highlightedPiecePosition);
+
         // If there is no piece there, return an error saying that there is no piece there.
+
+        if (highlightedPiece == null){
+
+            throw new Exception("Error: No piece at the designated location. Please try again.");
+
+        }
+
         // Have the ChessPiece return all possible moves that it can make.
+
+        Collection<ChessMove> possiblePieceMoves = highlightedPiece.pieceMoves(currentBoard, highlightedPiecePosition);
+
         // If there are no possible moves, just return a note that says "No possible moves for that piece"
-        // Otherwise pass them into the displayBoard method as an override and have it the background color be blue
+
+        if (possiblePieceMoves.isEmpty()){
+
+            return "There are no possible moves for that piece.";
+
+        }
+
+        // Then convert the collection into an array of ending ChessPositions for simplicity here
+
+        ChessPosition[] highlightedPositions = new ChessPosition[possiblePieceMoves.size() + 1];
+
+        highlightedPositions[0] = highlightedPiecePosition;
+
+        int positionHelper = 1;
+
+        for (ChessMove convertToPosition : possiblePieceMoves){
+
+            highlightedPositions[positionHelper] = convertToPosition.getEndPosition();
+            positionHelper++;
+
+        }
+
+        // Otherwise pass them into the displayBoard method as an override and have it the background color be shades of red.
         // instead of the usual color if it matches one of the spaces in the list of possible moves for the ChessPiece.
+
+        return displayBoard(currentBoard, userSideTeamColor, highlightedPositions);
+
+    }
+
+
+    private int makeRowPositionANumber(String rowPosition) throws Exception{
+
+        try{
+
+            int positionAsNumber = Integer.parseInt(rowPosition);
+
+            if (positionAsNumber > 8 || positionAsNumber < 1){
+
+                throw new Exception("Error: Did not input a valid number for the desired piece's row");
+
+            }
+
+            return positionAsNumber;
+
+        }
+
+        catch (Exception exception){
+
+            throw new Exception("Error: Did not input a valid number for the desired piece's row");
+
+        }
+
+    }
+
+
+    private int makeColumnLetterANumber(String letter) throws Exception{
+
+        switch(letter.toLowerCase()){
+
+            case "a":
+
+                return 1;
+
+            case "b":
+
+                return 2;
+
+            case "c":
+
+                return 3;
+
+            case "d":
+
+                return 4;
+
+            case "e":
+
+                return 5;
+
+            case "f":
+
+                return 6;
+
+            case "g":
+
+                return 7;
+
+            case "h":
+
+                return 8;
+
+            default:
+
+                throw new Exception("Error: Did not input a valid letter for the desired piece's column");
+
+        }
 
     }
 
@@ -476,7 +611,15 @@ public class ChessClient {
     }
 
 
+    // It's very possible that this ends up throwing a null exception error right here due to null not being empty, depending on how the isEmpty function works
     public String displayBoard(ChessBoard displayedBoard, ChessGame.TeamColor displaySide){
+
+        return displayBoard(displayedBoard, displaySide, null);
+
+    }
+
+
+    public String displayBoard(ChessBoard displayedBoard, ChessGame.TeamColor displaySide, ChessPosition[] locationsToHighlight){
 
         boolean colorSwitcher = true;
         int incrementer;
@@ -516,14 +659,34 @@ public class ChessClient {
 
                 if (currentPiece != null){
 
-                    entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor());
+                    if (Arrays.asList(locationsToHighlight).isEmpty() == false && Arrays.asList(locationsToHighlight).contains(specificPiece)){
+
+                        entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor(), true);
+
+                    }
+
+                    else{
+
+                        entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor(), false);
+
+                    }
 
                 }
 
-                // This is probably where the weird board spacing is coming in
+                // This might be where the weird board spacing is coming in
                 else{
 
-                    entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide);
+                    if (Arrays.asList(locationsToHighlight).isEmpty() == false && Arrays.asList(locationsToHighlight).contains(specificPiece)){
+
+                        entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide, true);
+
+                    }
+
+                    else{
+
+                        entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide, false);
+
+                    }
 
                 }
 
@@ -583,19 +746,40 @@ public class ChessClient {
 
 
     // Gets the proper background color, piece icon, and piece icon, and piece coloration for a specific space
-    public String getPieceIcon(ChessPiece currentPiece, boolean colorSwitcher, ChessGame.TeamColor currentTeam){
+    public String getPieceIcon(ChessPiece currentPiece, boolean colorSwitcher, ChessGame.TeamColor currentTeam, boolean isHighlighted){
 
         String backgroundColor;
 
         if (colorSwitcher == true){
 
-            backgroundColor = SET_BG_COLOR_WHITE;
+            if (isHighlighted == false){
+
+                backgroundColor = SET_BG_COLOR_WHITE;
+
+            }
+
+            else{
+
+                backgroundColor = SET_BG_COLOR_LIGHT_RED;
+
+            }
+
 
         }
 
         else{
 
-            backgroundColor = SET_BG_COLOR_DARK_GREEN;
+            if (isHighlighted == false){
+
+                backgroundColor = SET_BG_COLOR_DARK_GREEN;
+
+            }
+
+            else{
+
+                backgroundColor = SET_BG_COLOR_DARK_RED;
+
+            }
 
         }
 
