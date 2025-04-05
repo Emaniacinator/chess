@@ -106,6 +106,9 @@ public class ChessClient {
 
                 }
 
+            // Make sure that this checks that the user is only able to move if it's thier turn FIRST.
+            // Similarly, make sure that the user can't call this function unless they are actually in the game and NOT AN OBSERVER
+            // After both of those, check to make sure that the right number of inputs are being read.
             case "make_move":
 
                 return makeMoveCommand();

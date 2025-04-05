@@ -31,6 +31,9 @@ public class Repl {
     // This should be different and shouldn't call UserGameCommand at all
     // Will I need a separate ClientOnlyCommands class to make sure that all the needed features fit into ChessClient
     // with the weird line limitations?
+
+    // Probably make it so that this calls a function in ChessClient to update the game when it gets a
+    // websocket message that causes the game to be different.
     public void run(){
 
         System.out.println("Welcome to the chess client. Please sign in or type 'help' to get started.");

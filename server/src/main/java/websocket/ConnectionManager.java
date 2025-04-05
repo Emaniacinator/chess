@@ -6,6 +6,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import chess.ChessGame;
 import org.eclipse.jetty.websocket.api.Session;
+import websocket.messages.ServerMessage;
 
 public class ConnectionManager {
 
@@ -107,7 +108,7 @@ public class ConnectionManager {
     // If the same user is connected more than once, this may send duplicate messages. You need to be aware of that.
     // Also, is it worth making this a try with resources block just in case? I don't think it will be an issue, but
     // it's worth investigating since the IDE is saying that it *could* be an issue
-    public void broadcastMessageToGame(Integer gameID, String senderUsername) throws Exception{
+    public void broadcastMessageToGame(Integer gameID, String senderUsername, ServerMessage messageToSend) throws Exception{
 
         ConnectionArray gameToBroadcastTo = activeConnections.get(gameID);
 
@@ -117,7 +118,7 @@ public class ConnectionManager {
 
                 if (userToSendTo.username() != senderUsername){
 
-                    userToSendTo.session().getRemote().sendString("You didn't fix this to send the right thing yet :(");
+                    userToSendTo.session().getRemote().sendString(messageToSend.toString());
 
                 }
 
@@ -139,7 +140,7 @@ public class ConnectionManager {
 
     // This might be a flawed approach. Note that the senderUsername also represents who the message is being sent to.
     // This will also have most of if not all the issues that broadcastMessageToGame has, if it has any.
-    public void broadcastMessageToSingleUser(Integer gameID, String senderUsername) throws Exception{
+    public void broadcastMessageToSingleUser(Integer gameID, String senderUsername, ServerMessage messageToSend) throws Exception{
 
         ConnectionArray gameToBroadcastTo = activeConnections.get(gameID);
 
@@ -147,7 +148,7 @@ public class ConnectionManager {
 
             if (userToSendTo.session().isOpen() && Objects.equals(userToSendTo.username(), senderUsername)){
 
-                userToSendTo.session().getRemote().sendString("You didn't fix this to send the right thing yet :(");
+                userToSendTo.session().getRemote().sendString(messageToSend.toString());
 
                 break;
 
