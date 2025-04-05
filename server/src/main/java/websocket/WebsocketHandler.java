@@ -1,6 +1,7 @@
 package websocket;
 
 import chess.ChessGame;
+import chess.ChessMove;
 import chess.model.GameData;
 import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
@@ -11,6 +12,13 @@ import websocket.messages.ServerMessage;
 
 @WebSocket
 public class WebsocketHandler {
+
+    make another error appear for remembering things :(.
+    // You will need to create a broadcast that returns a message for exception cases. It will only return
+    // exceptions to the user who sent the bad request though. BUT MAKE THE CASE.
+
+
+
 
     // Note that the ServerMessage is just about the types of data that will be returned to the user.
     // Similarly, the UserGameCommand is just about the types of actions that the user can take.
@@ -51,6 +59,8 @@ public class WebsocketHandler {
     }
 
 
+    Make another error show up here
+    // You forgot to send a load_game notification to user who joined to display the board.
     private void connectPlayer(int gameID, String username, Session session, ChessGame.TeamColor userColor) throws Exception{
 
         connectionManager.addPlayer(gameID, username, session, userColor);
@@ -76,9 +86,14 @@ public class WebsocketHandler {
     // Also, you'll need to have the game grabbed, call the movePiece function inside of the game,
     // then update the game on the server's end, then send out the udpate to all the players and viewers.
     // You might need to implement a new function inside of the Server and ServerFacade to do this maybe?
-    private void makeMove(int gameID, String username, Session session, GameData inputGame){
 
+    make an error here because its not yet fully implemented!
 
+    private void makeMove(int gameID, String username, Session session, GameData inputGameData, ChessMove moveToMake) throws Exception {
+
+        ChessGame manipulatedGame = inputGameData.game();
+
+        manipulatedGame.makeMove(moveToMake);
 
     }
 
