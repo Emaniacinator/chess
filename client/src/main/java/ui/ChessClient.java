@@ -22,6 +22,13 @@ public class ChessClient {
     private GameData userSideGameData;
     private ChessGame.TeamColor userSideTeamColor;
 
+    make another error here so you can see this note for this variable *shrug*
+    // Throw an error if make move is called when this IS NOT null. True = user resigned. False = opponent
+    // resigned. When the error is thrown, say if the user won or not. If it is null, allow the move to
+    // work as usual. Probably have the users enter observer mode after the opponent resigns to help this
+    // to work. Make sure that the error says "you / your opponent has resigned and the game is over".
+    private Boolean didUserResign = null;
+
     error make an eror here so you look
     // You need to make sure that the userSideGameData gets updated EVERY time new data is received or sent
     // You haven't yet implemented this part into everything you already wrote yet
