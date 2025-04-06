@@ -15,7 +15,7 @@ public class Repl {
     private final ChessClient client;
 
 
-    public String makeErrorLineAppearOnPurposeSoYouRememberThisComment();
+    public void makeErrorLineAppearOnPurposeSoYouRememberThisComment(){};
     // OH! The repl should feed the info to the ChessClient, which is then supposed to determine the command and the state.
     // That will then send a request to the ServerFacade? This will then make an instance of UserGameCommand to run game
     // commands through the websocket? While a separate instance of the websocket stays open to return and siplay updates?

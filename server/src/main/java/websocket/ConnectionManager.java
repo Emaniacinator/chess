@@ -106,8 +106,8 @@ public class ConnectionManager {
 
 
     // If the same user is connected more than once, this may send duplicate messages. You need to be aware of that.
-    // Also, is it worth making this a try with resources block just in case? I don't think it will be an issue, but
-    // it's worth investigating since the IDE is saying that it *could* be an issue
+    // It's worth noting that in the case of a load game call, this may not work because it is sending all the messages
+    // exclusively as a string. Unless I'm mistaken, which I could be.
     public void broadcastMessageToGame(Integer gameID, String senderUsername, ServerMessage messageToSend) throws Exception{
 
         ConnectionArray gameToBroadcastTo = activeConnections.get(gameID);
@@ -116,7 +116,7 @@ public class ConnectionManager {
 
             if (userToSendTo.session().isOpen()){
 
-                if (userToSendTo.username() != senderUsername){
+                if (!Objects.equals(userToSendTo.username(), senderUsername)){
 
                     userToSendTo.session().getRemote().sendString(messageToSend.toString());
 
@@ -146,11 +146,15 @@ public class ConnectionManager {
 
         for (Connection userToSendTo : gameToBroadcastTo.allConnections){
 
-            if (userToSendTo.session().isOpen() && Objects.equals(userToSendTo.username(), senderUsername)){
+            if (userToSendTo.session().isOpen()){
 
-                userToSendTo.session().getRemote().sendString(messageToSend.toString());
+                if (Objects.equals(userToSendTo.username(), senderUsername)){
 
-                break;
+                    userToSendTo.session().getRemote().sendString(messageToSend.toString());
+
+                    break;
+
+                }
 
             }
 

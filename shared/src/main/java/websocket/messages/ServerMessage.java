@@ -1,5 +1,7 @@
 package websocket.messages;
 
+import chess.ChessGame;
+import chess.model.GameData;
 import com.google.gson.Gson;
 
 import java.util.Objects;
@@ -14,7 +16,9 @@ public class ServerMessage {
 
     ServerMessageType serverMessageType;
 
-    String messageString;
+    ChessGame game;
+
+    String message;
 
 
     public enum ServerMessageType {
@@ -29,15 +33,26 @@ public class ServerMessage {
     public ServerMessage(ServerMessageType type) {
 
         this.serverMessageType = type;
-        this.messageString = null;
+        this.message = null;
+        this.game = null;
 
     }
 
 
-    public ServerMessage(ServerMessageType type, String messageString) {
+    public ServerMessage(ServerMessageType type, String message) {
 
         this.serverMessageType = type;
-        this.messageString = messageString;
+        this.message = message;
+        this.game = null;
+
+    }
+
+
+    public ServerMessage(ServerMessageType type, ChessGame game){
+
+        this.serverMessageType = type;
+        this.message = null;
+        this.game = game;
 
     }
 
@@ -51,6 +66,18 @@ public class ServerMessage {
 
     // We'll see how this looks. I might not like it and as a result might have to change it.
     public String toString(){
+
+        if (this.serverMessageType == ServerMessageType.LOAD_GAME){
+
+            record LoadGameNotification(ServerMessageType serverMessageType, ChessGame game){
+
+            }
+
+            LoadGameNotification returnNotification = new LoadGameNotification(this.serverMessageType, this.game);
+
+            return new Gson().toJson(returnNotification);
+
+        }
 
         return new Gson().toJson(this);
 

@@ -5,26 +5,42 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.model.GameData;
 import com.google.gson.Gson;
+import dataaccess.DataAccessFramework;
 import org.eclipse.jetty.websocket.api.Session;
+import org.eclipse.jetty.websocket.api.annotations.OnWebSocketError;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+import services.Service;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
+
+import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 @WebSocket
 public class WebsocketHandler {
 
-    // You probably need to get the serverURL as a parameter for this so that it can pull data from the server as needed.
 
-    private final String serverURL;
+    private final DataAccessFramework dataAccess;
 
-    public WebsocketHandler(String serverURL){
+    private int mostRecentGameID;
 
-        this.serverURL = serverURL;
+    private String mostRecentUsername;
+
+
+    public WebsocketHandler(Service services){
+
+        this.dataAccess = services.getDataAccess();
 
     }
 
-    make another error appear for remembering things :(.
+
+    public Boolean didYouReadTheNoteRightBelowThis = false;
+    // You may not need to broadcast the user's own actions back to them since you *can*
+    // just return a string to their REPL as an output (UNLESS IT'S A LOAD GAME NOTIFICATION,
+    // SINCE THAT AFFECTS MORE VARIABLES SUCH AS THE USER SIDE GAME DATA). Alternatively, the
+    // client side stuff can return null or "" when the server sends out a notification from
+    // the methods that are used.
+
     // You will need to create a broadcast that returns a message for exception cases. It will only return
     // exceptions to the user who sent the bad request though. BUT MAKE THE CASE.
 
@@ -34,9 +50,37 @@ public class WebsocketHandler {
 
     // NOTE: This class doesn't actually update anything on the server. It just sends out the needed messages
     // to the users. Don't try to have this actually make the move or anything, let the Server and ServerFacade
-    // actually handle that part.
+    // actually handle that part. Ehhhh.... maybe actually have it do the thing, actually? I already had to
+    // integrate the DataAccessFramework shenanigans, so it might make sense.
 
     private final ConnectionManager connectionManager = new ConnectionManager();
+
+
+    @OnWebSocketError
+    public void onError(Throwable exception){
+
+        System.out.println("Thrown Error:\n" + exception.toString());
+
+        ServerMessage errorMessage = new ServerMessage(ERROR, exception.getMessage());
+
+        try{
+
+            connectionManager.broadcastMessageToSingleUser(mostRecentGameID, mostRecentUsername, errorMessage);
+
+        }
+
+        catch (Exception ex){
+
+            System.out.println("Error: Cannot broadcast message to user correctly. Please look at your code.");
+
+            System.out.println("Here is the error message:\n" + ex.toString());
+
+        }
+
+
+
+    }
+
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception{
@@ -47,13 +91,35 @@ public class WebsocketHandler {
 
             case CONNECT:
 
-                connectPlayer(userCommand.getGameID(), userCommand.getUsername(), session, userCommand.getTeamColor());
+                mostRecentGameID = userCommand.getGameID();
+
+                ChessGame testGame = dataAccess.getGameData(userCommand.getGameID()).game();
+
+                String userUsername = dataAccess.getAuthData(userCommand.getAuthToken()).username();
+
+                mostRecentUsername = userUsername;
+
+                connectPlayer(userCommand.getGameID(), userUsername, session, userCommand.getTeamColor(), testGame);
 
                 break;
 
             case MAKE_MOVE:
 
-                makeMove(userCommand.getGameID(), userCommand.getUsername(), session, userCommand.getMoveToMake());
+                ChessGame inputGame = userCommand.getGameData().game();
+
+                if (inputGame != null){
+
+                    makeMove(userCommand.getGameID(), userCommand.getUsername(), session, userCommand.getMoveToMake(), inputGame);
+
+                }
+
+                else {
+
+                    inputGame = dataAccess.getGameData(userCommand.getGameID()).game();
+
+                    makeMove(userCommand.getGameID(), userCommand.getUsername(), session, userCommand.getMoveToMake(), inputGame);
+
+                }
 
                 break;
 
@@ -75,26 +141,28 @@ public class WebsocketHandler {
 
     }
 
-
-    Make another error show up here
     // You need to program a LOAD_GAME case into the REPL or Client so that this displays correctly. Or else it just won't.
-    private void connectPlayer(int gameID, String username, Session session, ChessGame.TeamColor userColor) throws Exception{
+    private void connectPlayer(int gameID, String username, Session session, ChessGame.TeamColor userColor, ChessGame updatedGame) throws Exception{
 
         connectionManager.addPlayer(gameID, username, session, userColor);
 
-        String messageStringToGame = String.format("%s has just joined the game one the %s team", username, userColor);
+        String messageStringToGame = String.format("%s has just joined the game on the %s team", username, userColor);
 
-        ServerMessage outputMessageToGame = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, messageStringToGame);
+        ServerMessage outputMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
 
         String messageStringToUser = String.format("Successfully connected to game at the ID %s", gameID);
 
         // Note that when it does the load game message, it will display the message that I choose, update the client
         // side game board, and then draw the game board as a part of receiving a message with the load game type.
-        ServerMessage outputMessageToUser = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, messageStringToUser);
+        ServerMessage outputMessageToUser = new ServerMessage(LOAD_GAME, updatedGame);
+
+        ServerMessage outputMessageToUserTest = new ServerMessage(NOTIFICATION, messageStringToUser);
 
         connectionManager.broadcastMessageToGame(gameID, username, outputMessageToGame);
 
         connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
+
+        // connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUserTest);
 
     }
 
@@ -106,17 +174,18 @@ public class WebsocketHandler {
     // then update the game on the server's end, then send out the udpate to all the players and viewers.
     // You might need to implement a new function inside of the Server and ServerFacade to do this maybe?
 
-    make an error here because its not yet fully implemented!
-
     // Do I actually need to pass the session into this, or is that redundant? It feels useless right now, TBH.
 
     // Note that the actual game updating will happen through the serverFacade / Server that calls this, not actually through
     // the methods that I am writing right here.
-    private void makeMove(int gameID, String username, Session session, ChessMove moveToMake) throws Exception {
+
+    // Do I need to pass in an updated game in this manner? It seems like they want something really specific but did a
+    // TERRIBLE job of explaining it and it's kind of pissing me off, honestly.
+    private void makeMove(int gameID, String username, Session session, ChessMove moveToMake, ChessGame updatedGame) throws Exception {
 
         String messageStringToGame = String.format("%s moved a piece from %s to %s", username, moveToMake.getStartPosition().toString(), moveToMake.getEndPosition().toString());
 
-        ServerMessage outputMessageToGame = new ServerMessage(ServerMessage.ServerMessageType.LOAD_GAME, messageStringToGame);
+        ServerMessage outputMessageToGame = new ServerMessage(LOAD_GAME, updatedGame);
 
         connectionManager.broadcastMessageToGame(gameID, username, outputMessageToGame);
 
@@ -151,7 +220,7 @@ public class WebsocketHandler {
 
         }
 
-        ServerMessage outputMessageToGame = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, messageStringToGame);
+        ServerMessage outputMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
 
         connectionManager.broadcastMessageToGame(gameID, username, outputMessageToGame);
 

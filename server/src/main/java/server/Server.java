@@ -9,6 +9,7 @@ import spark.*;
 import com.google.gson.*;
 import services.Service;
 import chess.model.AuthData;
+import websocket.WebsocketHandler;
 
 import java.util.Map;
 
@@ -16,6 +17,7 @@ public class Server {
 
 
     private final Service services = new Service();
+    private final WebsocketHandler websocketHandler = new WebsocketHandler(services);
 
 
     public Server(){
@@ -34,6 +36,8 @@ public class Server {
         // Register your endpoints and handle exceptions here.
 
         //This line initializes the server and can be removed once you have a functioning endpoint
+
+        Spark.webSocket("/ws", websocketHandler);
 
         Spark.post("/user", this::registerUserHandler);
         Spark.post("/session", this::loginHandler);

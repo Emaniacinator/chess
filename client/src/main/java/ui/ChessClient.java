@@ -22,14 +22,13 @@ public class ChessClient {
     private GameData userSideGameData;
     private ChessGame.TeamColor userSideTeamColor;
 
-    make another error here so you can see this note for this variable *shrug*
     // Throw an error if make move is called when this IS NOT null. True = user resigned. False = opponent
     // resigned. When the error is thrown, say if the user won or not. If it is null, allow the move to
     // work as usual. Probably have the users enter observer mode after the opponent resigns to help this
     // to work. Make sure that the error says "you / your opponent has resigned and the game is over".
     private Boolean didUserResign = null;
 
-    error make an eror here so you look
+    private Boolean didYouReadTheNoteBelowThis = false;
     // You need to make sure that the userSideGameData gets updated EVERY time new data is received or sent
     // You haven't yet implemented this part into everything you already wrote yet
 
@@ -116,22 +115,26 @@ public class ChessClient {
             // Make sure that this checks that the user is only able to move if it's thier turn FIRST.
             // Similarly, make sure that the user can't call this function unless they are actually in the game and NOT AN OBSERVER
             // After both of those, check to make sure that the right number of inputs are being read.
+
+            // Not yet implemented fully
             case "make_move":
 
-                return makeMoveCommand();
+                return null; //makeMoveCommand();
 
             // In theory, this is fully implemented. But there's a lot going on so something DEFINITELY could have broken
             case "highlight_moves":
 
                 return highlightMovesCommand(otherTokens);
 
+            // Not yet implemented fully
             case "leave":
 
-                return leaveCommand();
+                return null; //leaveCommand();
 
+            // Not yet implemented fully
             case "resign":
 
-                return resignCommand();
+                return null; //resignCommand();
 
         }
 

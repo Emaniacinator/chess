@@ -156,4 +156,12 @@ public class Service {
 
     }
 
+
+    // If it makes me write a test case for this one I'm going to cry
+    public DataAccessFramework getDataAccess(){
+
+        return dataAccess;
+
+    }
+
 }
