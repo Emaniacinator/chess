@@ -22,7 +22,7 @@ public class WebsocketHandler {
 
     private final DataAccessFramework dataAccess;
 
-    private int mostRecentGameID;
+    private int mostRecentGameID = -99;
 
     private String mostRecentUsername;
 
@@ -91,15 +91,37 @@ public class WebsocketHandler {
 
             case CONNECT:
 
-                mostRecentGameID = userCommand.getGameID();
+                ChessGame testGame = null;
 
-                ChessGame testGame = dataAccess.getGameData(userCommand.getGameID()).game();
+                try{
 
-                String userUsername = dataAccess.getAuthData(userCommand.getAuthToken()).username();
+                    mostRecentUsername = dataAccess.getAuthData(userCommand.getAuthToken()).username();
 
-                mostRecentUsername = userUsername;
+                    if (userCommand.getGameID() != null){
 
-                connectPlayer(userCommand.getGameID(), userUsername, session, userCommand.getTeamColor(), testGame);
+                        mostRecentGameID = userCommand.getGameID();
+
+                    }
+
+                    else{
+
+                        throw new Exception("Error: Did not input a game id to connect to. Please try again");
+
+                    }
+
+                    testGame = dataAccess.getGameData(userCommand.getGameID()).game();
+
+                    String userUsername = dataAccess.getAuthData(userCommand.getAuthToken()).username();
+
+                    connectPlayer(mostRecentGameID, mostRecentUsername, session, userCommand.getTeamColor(), testGame);
+
+                }
+
+                catch(Exception missingField){
+
+                    connectForMissingFieldOutput(-99, mostRecentUsername, session);
+
+                }
 
                 break;
 
@@ -141,6 +163,32 @@ public class WebsocketHandler {
 
     }
 
+
+    private void connectForMissingFieldOutput(int errorGameID, String username, Session session){
+
+        connectionManager.addPlayer(errorGameID, username, session, null);
+
+        String messageStringToUser = "Error: Did not input a valid gameID or had a bad authentication token. Please try again.";
+
+        ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, messageStringToUser);
+
+        try{
+
+            connectionManager.broadcastMessageToSingleUser(-99, username, outputMessageToUser);
+
+        }
+
+        catch (Exception unknownError){
+
+            System.out.println("How did you get here? Look at the connectForMissinFieldOutput in WebsocketHandler for troubleshooting.");
+
+        }
+
+        connectionManager.removeConnection(errorGameID, username);
+
+    }
+
+
     // You need to program a LOAD_GAME case into the REPL or Client so that this displays correctly. Or else it just won't.
     private void connectPlayer(int gameID, String username, Session session, ChessGame.TeamColor userColor, ChessGame updatedGame) throws Exception{
 
@@ -181,7 +229,9 @@ public class WebsocketHandler {
 
     // Do I need to pass in an updated game in this manner? It seems like they want something really specific but did a
     // TERRIBLE job of explaining it and it's kind of pissing me off, honestly.
-    private void makeMove(int gameID, String username, Session session, ChessMove moveToMake, ChessGame updatedGame) throws Exception {
+    private void makeMove(int gameID, String username, Session session, ChessMove moveToMake) throws Exception {
+
+
 
         String messageStringToGame = String.format("%s moved a piece from %s to %s", username, moveToMake.getStartPosition().toString(), moveToMake.getEndPosition().toString());
 

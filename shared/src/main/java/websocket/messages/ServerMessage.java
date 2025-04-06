@@ -20,6 +20,10 @@ public class ServerMessage {
 
     String message;
 
+    Boolean isError;
+
+    String errorMessage;
+
 
     public enum ServerMessageType {
 
@@ -35,6 +39,8 @@ public class ServerMessage {
         this.serverMessageType = type;
         this.message = null;
         this.game = null;
+        this.isError = false;
+        this.errorMessage = null;
 
     }
 
@@ -44,6 +50,8 @@ public class ServerMessage {
         this.serverMessageType = type;
         this.message = message;
         this.game = null;
+        this.isError = false;
+        this.errorMessage = null;
 
     }
 
@@ -53,6 +61,19 @@ public class ServerMessage {
         this.serverMessageType = type;
         this.message = null;
         this.game = game;
+        this.isError = false;
+        this.errorMessage = null;
+
+    }
+
+
+    public ServerMessage(ServerMessageType type, Boolean isError, String errorMessage){
+
+        this.serverMessageType = type;
+        this.message = null;
+        this.game = null;
+        this.isError = isError;
+        this.errorMessage = errorMessage;
 
     }
 
