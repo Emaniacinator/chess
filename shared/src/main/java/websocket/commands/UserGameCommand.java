@@ -27,7 +27,7 @@ public class UserGameCommand {
 
     private final GameData gameDataFromUser;
 
-    private final ChessMove moveToMake;
+    private final ChessMove move;
 
 
     // This one is the generic, given constructor that was given
@@ -39,7 +39,7 @@ public class UserGameCommand {
         this.commandForWhichSide = null;
         this.commandFromWhatUser = null;
         this.gameDataFromUser = null;
-        this.moveToMake = null;
+        this.move = null;
 
     }
 
@@ -53,13 +53,13 @@ public class UserGameCommand {
         this.commandForWhichSide = commandForWhichSide;
         this.commandFromWhatUser = commandFromWhatUser;
         this.gameDataFromUser = null;
-        this.moveToMake = null;
+        this.move = null;
 
     }
 
 
     // This one lets the game be passed into the server for an update and tracks what move is being made.
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, GameData gameDataFromUser, ChessMove moveToMake) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, GameData gameDataFromUser, ChessMove move) {
 
         this.commandType = commandType;
         this.authToken = authToken;
@@ -67,7 +67,7 @@ public class UserGameCommand {
         this.commandForWhichSide = null;
         this.commandFromWhatUser = null;
         this.gameDataFromUser = gameDataFromUser;
-        this.moveToMake = moveToMake;
+        this.move = move;
 
     }
 
@@ -127,7 +127,7 @@ public class UserGameCommand {
 
     public ChessMove getMoveToMake() {
 
-        return moveToMake;
+        return move;
 
     }
 

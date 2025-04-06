@@ -185,7 +185,7 @@ public class MySqlDataAccess implements DataAccessFramework{
 
         gameDataIterator++;
 
-        GameData addedGame =  new GameData(gameDataIterator, null, null, gameName, defaultBoard);
+        GameData addedGame =  new GameData(gameDataIterator, null, null, gameName, defaultBoard, false);
 
         String newGameDataString = "INSERT INTO gameDataTable (gameID, whiteUsername, blackUsername, gameName, game, json) VALUES (?, ?, ?, ?, ?, ?)";
 

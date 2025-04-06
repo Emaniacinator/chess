@@ -78,6 +78,17 @@ public class ServerMessage {
     }
 
 
+    public ServerMessage(ServerMessageType type, String message, ChessGame game){
+
+        this.serverMessageType = type;
+        this.message = message;
+        this.game = game;
+        this.isError = false;
+        this.errorMessage = null;
+
+    }
+
+
     public ServerMessageType getServerMessageType() {
 
         return this.serverMessageType;
@@ -90,13 +101,30 @@ public class ServerMessage {
 
         if (this.serverMessageType == ServerMessageType.LOAD_GAME){
 
-            record LoadGameNotification(ServerMessageType serverMessageType, ChessGame game){
+            if (message == null){
+
+                record LoadGameNotification(ServerMessageType serverMessageType, ChessGame game){
+
+                }
+
+                LoadGameNotification returnNotification = new LoadGameNotification(this.serverMessageType, this.game);
+
+                return new Gson().toJson(returnNotification);
 
             }
 
-            LoadGameNotification returnNotification = new LoadGameNotification(this.serverMessageType, this.game);
+            else{
 
-            return new Gson().toJson(returnNotification);
+                record LoadGameWithMessage(ServerMessageType serverMessageType, String message, ChessGame game){
+
+
+                }
+
+                LoadGameWithMessage returnNotificationWithMessage = new LoadGameWithMessage(this.serverMessageType, this.message, this.game);
+
+                return new Gson().toJson(returnNotificationWithMessage);
+
+            }
 
         }
 

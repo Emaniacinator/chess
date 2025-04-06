@@ -141,7 +141,7 @@ public class GeneralDataAccess implements DataAccessFramework{
 
         ChessGame defaultBoard = new ChessGame();
         gameDataIterator++;
-        GameData newGame =  new GameData(gameDataIterator, null, null, gameName, defaultBoard);
+        GameData newGame =  new GameData(gameDataIterator, null, null, gameName, defaultBoard, false);
         gameDataMap.put(gameDataIterator, newGame);
 
         return newGame;

@@ -3,6 +3,7 @@ package websocket;
 import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.model.AuthData;
 import chess.model.GameData;
 import com.google.gson.Gson;
 import dataaccess.DataAccessFramework;
@@ -14,6 +15,8 @@ import services.Service;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
+import static chess.ChessGame.TeamColor.BLACK;
+import static chess.ChessGame.TeamColor.WHITE;
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 @WebSocket
@@ -56,30 +59,28 @@ public class WebsocketHandler {
     private final ConnectionManager connectionManager = new ConnectionManager();
 
 
-    @OnWebSocketError
-    public void onError(Throwable exception){
-
-        System.out.println("Thrown Error:\n" + exception.toString());
-
-        ServerMessage errorMessage = new ServerMessage(ERROR, exception.getMessage());
-
-        try{
-
-            connectionManager.broadcastMessageToSingleUser(mostRecentGameID, mostRecentUsername, errorMessage);
-
-        }
-
-        catch (Exception ex){
-
-            System.out.println("Error: Cannot broadcast message to user correctly. Please look at your code.");
-
-            System.out.println("Here is the error message:\n" + ex.toString());
-
-        }
-
-
-
-    }
+//    @OnWebSocketError
+//    public void onError(Throwable exception){
+//
+//        System.out.println("Thrown Error:\n" + exception.toString());
+//
+//        ServerMessage errorMessage = new ServerMessage(ERROR, exception.getMessage());
+//
+//        try{
+//
+//            connectionManager.broadcastMessageToSingleUser(mostRecentGameID, mostRecentUsername, errorMessage);
+//
+//        }
+//
+//        catch (Exception ex){
+//
+//            System.out.println("Error: Cannot broadcast message to user correctly. Please look at your code.");
+//
+//            System.out.println("Here is the error message:\n" + ex.toString());
+//
+//        }
+//
+//    }
 
 
     @OnWebSocketMessage
@@ -127,19 +128,24 @@ public class WebsocketHandler {
 
             case MAKE_MOVE:
 
-                ChessGame inputGame = userCommand.getGameData().game();
+                // Because of how they set up the tests, you'll probably need to run a check to see if the user matches
+                // the color of piece that's trying to be moved here. Which is frustrating because I had a different
+                // design in mind (and already being built) but they didn't explain this (or the tests) clearly so it's
+                // not going to work anymore.
 
-                if (inputGame != null){
+                GameData inputGameData = userCommand.getGameData();
 
-                    makeMove(userCommand.getGameID(), userCommand.getUsername(), session, userCommand.getMoveToMake(), inputGame);
+                if (inputGameData != null){
+
+                    makeMove(userCommand.getGameID(), userCommand.getAuthToken(), userCommand.getMoveToMake());
 
                 }
 
                 else {
 
-                    inputGame = dataAccess.getGameData(userCommand.getGameID()).game();
+                    ChessGame inputGame = dataAccess.getGameData(userCommand.getGameID()).game();
 
-                    makeMove(userCommand.getGameID(), userCommand.getUsername(), session, userCommand.getMoveToMake(), inputGame);
+                    makeMove(userCommand.getGameID(), userCommand.getAuthToken(), userCommand.getMoveToMake());
 
                 }
 
@@ -229,17 +235,62 @@ public class WebsocketHandler {
 
     // Do I need to pass in an updated game in this manner? It seems like they want something really specific but did a
     // TERRIBLE job of explaining it and it's kind of pissing me off, honestly.
-    private void makeMove(int gameID, String username, Session session, ChessMove moveToMake) throws Exception {
+    private void makeMove(int gameID, String authToken, ChessMove moveToMake) throws Exception {
 
+        AuthData userAuthData = dataAccess.getAuthData(authToken);
 
+        String username = userAuthData.username();
+
+        GameData initialGameData = dataAccess.getGameData(gameID);
+
+        if (initialGameData.isOver() == true){
+
+            System.out.println(username);
+
+            String messageStringToUser = "Error: Tried to make a move in a game that is over. Type 'help' for a list of commands";
+
+            ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, messageStringToUser);
+
+            connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
+
+            throw new Exception ("Error: This exception was already broadcast but I needed a way to break. Come up with something better maybe? lol");
+
+        }
+
+        ChessGame initialGame = initialGameData.game();
+
+        initialGame.makeMove(moveToMake);
+
+        GameData updatedGame;
+
+        if (initialGame.isInCheckmate(WHITE) || initialGame.isInCheckmate(BLACK) || initialGame.isInStalemate(WHITE) || initialGame.isInStalemate(BLACK)){
+
+            updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(), initialGameData.gameName(), initialGame, true);
+            // Broadcast a winner at the end of this entire method. Maybe create a variable to determine if something came of this?
+
+        }
+
+        else{
+
+            updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(), initialGameData.gameName(), initialGame, false);
+
+        }
+
+        dataAccess.updateGameData(gameID, updatedGame);
 
         String messageStringToGame = String.format("%s moved a piece from %s to %s", username, moveToMake.getStartPosition().toString(), moveToMake.getEndPosition().toString());
 
-        ServerMessage outputMessageToGame = new ServerMessage(LOAD_GAME, updatedGame);
+        ServerMessage outputBoardMessageToGame = new ServerMessage(LOAD_GAME, updatedGame.game());
+        // You're probably going to have to redesign your Client Side stuff so that when the user calls draw board it reads
+        // from the server. But we'll see how things actually go.
 
-        connectionManager.broadcastMessageToGame(gameID, username, outputMessageToGame);
+        ServerMessage outputMoveUpdateMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
 
-        connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToGame);
+        connectionManager.broadcastMessageToGame(gameID, username, outputMoveUpdateMessageToGame);
+
+        connectionManager.broadcastMessageToGame(gameID, username, outputBoardMessageToGame);
+
+        connectionManager.broadcastMessageToSingleUser(gameID, username, outputBoardMessageToGame);
 
     }
 

@@ -290,7 +290,7 @@ public class MySqlDataAccessTests {
 
         DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
 
-        GameData testGame = new GameData(-3, null, null, "aName", new ChessGame());
+        GameData testGame = new GameData(-3, null, null, "aName", new ChessGame(), false);
 
         DataAccessException expectedException = assertThrows(DataAccessException.class, () -> dataAccess.updateGameData(-3, testGame));
 
@@ -307,7 +307,7 @@ public class MySqlDataAccessTests {
         DataAccessFramework dataAccess = getDataAccessType(specificDatabase);
 
         GameData originalGame = assertDoesNotThrow(() -> dataAccess.addGameData("aGame"));
-        GameData updatedData = new GameData (originalGame.gameID(), "John", "Lucy", "aGame", originalGame.game());
+        GameData updatedData = new GameData (originalGame.gameID(), "John", "Lucy", "aGame", originalGame.game(), false);
 
         assertDoesNotThrow(() -> dataAccess.updateGameData(originalGame.gameID(), updatedData));
 
