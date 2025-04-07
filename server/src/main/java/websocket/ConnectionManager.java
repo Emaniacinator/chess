@@ -171,4 +171,15 @@ public class ConnectionManager {
 
     }
 
+
+    public void sillyHelperErrorBroadcast(String authToken, Session session, ServerMessage messageToSend) throws Exception{
+
+        addPlayer(-99, authToken, session, null);
+
+        broadcastMessageToSingleUser(-99, authToken, messageToSend);
+
+        removeConnection(-99, authToken);
+
+    }
+
 }

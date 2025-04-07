@@ -15,6 +15,8 @@ import services.Service;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
+import java.util.Objects;
+
 import static chess.ChessGame.TeamColor.BLACK;
 import static chess.ChessGame.TeamColor.WHITE;
 import static websocket.messages.ServerMessage.ServerMessageType.*;
@@ -59,28 +61,28 @@ public class WebsocketHandler {
     private final ConnectionManager connectionManager = new ConnectionManager();
 
 
-//    @OnWebSocketError
-//    public void onError(Throwable exception){
-//
-//        System.out.println("Thrown Error:\n" + exception.toString());
-//
-//        ServerMessage errorMessage = new ServerMessage(ERROR, exception.getMessage());
-//
-//        try{
-//
-//            connectionManager.broadcastMessageToSingleUser(mostRecentGameID, mostRecentUsername, errorMessage);
-//
-//        }
-//
-//        catch (Exception ex){
-//
-//            System.out.println("Error: Cannot broadcast message to user correctly. Please look at your code.");
-//
-//            System.out.println("Here is the error message:\n" + ex.toString());
-//
-//        }
-//
-//    }
+    @OnWebSocketError
+    public void onError(Throwable exception){
+
+        System.out.println("Thrown Error:\n" + exception.toString());
+
+        ServerMessage errorMessage = new ServerMessage(ERROR, exception.getMessage());
+
+        try{
+
+            connectionManager.broadcastMessageToSingleUser(mostRecentGameID, mostRecentUsername, errorMessage);
+
+        }
+
+        catch (Exception ex){
+
+            System.out.println("Error: Cannot broadcast message to user correctly. Please look at your code.");
+
+            System.out.println("Here is the error message:\n" + ex.toString());
+
+        }
+
+    }
 
 
     @OnWebSocketMessage
@@ -120,7 +122,7 @@ public class WebsocketHandler {
 
                 catch(Exception missingField){
 
-                    connectForMissingFieldOutput(-99, mostRecentUsername, session);
+                    connectForMissingFieldOutput(mostRecentUsername, session);
 
                 }
 
@@ -137,7 +139,7 @@ public class WebsocketHandler {
 
                 if (inputGameData != null){
 
-                    makeMove(userCommand.getGameID(), userCommand.getAuthToken(), userCommand.getMoveToMake());
+                    makeMove(userCommand.getGameID(), userCommand.getAuthToken(), userCommand.getMoveToMake(), session);
 
                 }
 
@@ -145,7 +147,7 @@ public class WebsocketHandler {
 
                     ChessGame inputGame = dataAccess.getGameData(userCommand.getGameID()).game();
 
-                    makeMove(userCommand.getGameID(), userCommand.getAuthToken(), userCommand.getMoveToMake());
+                    makeMove(userCommand.getGameID(), userCommand.getAuthToken(), userCommand.getMoveToMake(), session);
 
                 }
 
@@ -170,9 +172,9 @@ public class WebsocketHandler {
     }
 
 
-    private void connectForMissingFieldOutput(int errorGameID, String username, Session session){
+    private void connectForMissingFieldOutput(String username, Session session){
 
-        connectionManager.addPlayer(errorGameID, username, session, null);
+        connectionManager.addPlayer(-99, username, session, null);
 
         String messageStringToUser = "Error: Did not input a valid gameID or had a bad authentication token. Please try again.";
 
@@ -186,11 +188,11 @@ public class WebsocketHandler {
 
         catch (Exception unknownError){
 
-            System.out.println("How did you get here? Look at the connectForMissinFieldOutput in WebsocketHandler for troubleshooting.");
+            System.out.println("How did you get here? Look at the connectForMissingFieldOutput in WebsocketHandler for troubleshooting.");
 
         }
 
-        connectionManager.removeConnection(errorGameID, username);
+        connectionManager.removeConnection(-99, username);
 
     }
 
@@ -204,40 +206,34 @@ public class WebsocketHandler {
 
         ServerMessage outputMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
 
-        String messageStringToUser = String.format("Successfully connected to game at the ID %s", gameID);
-
         // Note that when it does the load game message, it will display the message that I choose, update the client
         // side game board, and then draw the game board as a part of receiving a message with the load game type.
         ServerMessage outputMessageToUser = new ServerMessage(LOAD_GAME, updatedGame);
-
-        ServerMessage outputMessageToUserTest = new ServerMessage(NOTIFICATION, messageStringToUser);
 
         connectionManager.broadcastMessageToGame(gameID, username, outputMessageToGame);
 
         connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
 
-        // connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUserTest);
-
     }
 
 
-    // Is this where I should have it do a quick check of whether or not it's the user's turn?
-    // Wait, actually I should just do that one client-side.
+    private void makeMove(int gameID, String authToken, ChessMove moveToMake, Session session) throws Exception {
 
-    // Also, you'll need to have the game grabbed, call the movePiece function inside of the game,
-    // then update the game on the server's end, then send out the udpate to all the players and viewers.
-    // You might need to implement a new function inside of the Server and ServerFacade to do this maybe?
+        AuthData userAuthData;
 
-    // Do I actually need to pass the session into this, or is that redundant? It feels useless right now, TBH.
+        try{
 
-    // Note that the actual game updating will happen through the serverFacade / Server that calls this, not actually through
-    // the methods that I am writing right here.
+            userAuthData = dataAccess.getAuthData(authToken);
 
-    // Do I need to pass in an updated game in this manner? It seems like they want something really specific but did a
-    // TERRIBLE job of explaining it and it's kind of pissing me off, honestly.
-    private void makeMove(int gameID, String authToken, ChessMove moveToMake) throws Exception {
+        }
 
-        AuthData userAuthData = dataAccess.getAuthData(authToken);
+        catch (Exception invalidAuth){
+
+            connectForMissingFieldOutput(authToken, session);
+
+            return;
+
+        }
 
         String username = userAuthData.username();
 
@@ -253,13 +249,73 @@ public class WebsocketHandler {
 
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
 
-            throw new Exception ("Error: This exception was already broadcast but I needed a way to break. Come up with something better maybe? lol");
+            return;
 
         }
 
         ChessGame initialGame = initialGameData.game();
 
-        initialGame.makeMove(moveToMake);
+        ChessGame.TeamColor currentTurn = initialGame.getTeamTurn();
+
+        if (!Objects.equals(initialGameData.whiteUsername(), username) && !Objects.equals(initialGameData.blackUsername(), username)){
+
+            String wrongTurnObserver = "Error: You are an observer and cannot make a move";
+
+            ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnObserver);
+
+            connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
+
+            return;
+
+        }
+
+        else if (currentTurn == WHITE){
+
+            if(!Objects.equals(initialGameData.whiteUsername(), username)){
+
+                String wrongTurnBlack = "Error: Tried to make a move for your opponenet. Please wait your turn. You are the BLACK team.";
+
+                ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnBlack);
+
+                connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
+
+                return;
+
+            }
+
+        }
+
+        else{
+
+            if(!Objects.equals(initialGameData.blackUsername(), username)){
+
+                String wrongTurnWhite = "Error: Tried to make a move for your opponenet. Please wait your turn. You are the WHITE team.";
+
+                ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnWhite);
+
+                connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
+
+                return;
+
+            }
+
+        }
+
+        try{
+
+            initialGame.makeMove(moveToMake);
+
+        }
+
+        catch(Exception badMove){
+
+            ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, badMove.getMessage());
+
+            connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
+
+            return;
+
+        }
 
         GameData updatedGame;
 
