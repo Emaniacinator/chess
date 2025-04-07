@@ -46,17 +46,8 @@ public class WebsocketHandler {
     // client side stuff can return null or "" when the server sends out a notification from
     // the methods that are used.
 
-    // You will need to create a broadcast that returns a message for exception cases. It will only return
-    // exceptions to the user who sent the bad request though. BUT MAKE THE CASE.
-
     // Note that the ServerMessage is just about the types of data that will be returned to the user.
     // Similarly, the UserGameCommand is just about the types of actions that the user can take.
-
-
-    // NOTE: This class doesn't actually update anything on the server. It just sends out the needed messages
-    // to the users. Don't try to have this actually make the move or anything, let the Server and ServerFacade
-    // actually handle that part. Ehhhh.... maybe actually have it do the thing, actually? I already had to
-    // integrate the DataAccessFramework shenanigans, so it might make sense.
 
     private final ConnectionManager connectionManager = new ConnectionManager();
 
@@ -155,11 +146,13 @@ public class WebsocketHandler {
 
             case LEAVE:
 
-                disconnectUser(userCommand.getGameID(), userCommand.getUsername(), session, userCommand.getTeamColor());
+                disconnectUser(userCommand.getGameID(), userCommand.getAuthToken(), session, userCommand.getTeamColor());
 
                 break;
 
             case RESIGN:
+
+                resign(userCommand.getGameID(), userCommand.getAuthToken(), session);
 
                 break;
 
@@ -359,27 +352,59 @@ public class WebsocketHandler {
     // if they were in the INGAME state when this was called.
 
     // Once again, do I actually need to pass the session into this?
-    private void disconnectUser(int gameID, String username, Session session, ChessGame.TeamColor userColor) throws Exception{
+    private void disconnectUser(int gameID, String authToken, Session session, ChessGame.TeamColor userColor) throws Exception{
 
-        connectionManager.removeConnection(gameID, username);
+        GameData disconnectFrom = dataAccess.getGameData(gameID);
+
+        String username = dataAccess.getAuthData(authToken).username();
 
         String messageStringToGame;
 
-        if (userColor != null){
+        if (Objects.equals(disconnectFrom.whiteUsername(), username) || Objects.equals(disconnectFrom.blackUsername(), username)){
+
+            GameData updatedWithDisconnect;
+
+            if (Objects.equals(disconnectFrom.whiteUsername(), username)){
+
+                updatedWithDisconnect = new GameData(gameID, null, disconnectFrom.blackUsername(), disconnectFrom.gameName(), disconnectFrom.game(), disconnectFrom.isOver());
+
+            }
+
+            else{
+
+                updatedWithDisconnect = new GameData(gameID, disconnectFrom.whiteUsername(), null, disconnectFrom.gameName(), disconnectFrom.game(), disconnectFrom.isOver());
+
+            }
+
+            dataAccess.updateGameData(gameID, updatedWithDisconnect);
 
             messageStringToGame = String.format("The player %s has disconnected from the game", username);
+
+            ServerMessage outputMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
+
+            connectionManager.broadcastMessageToGame(gameID, username, outputMessageToGame);
+
+            connectionManager.removeConnection(gameID, username);
+
+            System.out.println("Player disconnected");
+
 
         }
 
         else{
 
-            messageStringToGame = String.format("%s has stopped observing the game", username);
+            String messageStringToObserver = String.format("%s has stopped observing the game", username);
+
+            ServerMessage outputMessageToObserver = new ServerMessage(NOTIFICATION, messageStringToObserver);
+
+            connectionManager.broadcastMessageToGame(gameID, username, outputMessageToObserver);
+
+            connectionManager.removeConnection(gameID, username);
+
+            System.out.println("Observer disconnected");
+
 
         }
-
-        ServerMessage outputMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
-
-        connectionManager.broadcastMessageToGame(gameID, username, outputMessageToGame);
 
     }
 
@@ -391,9 +416,71 @@ public class WebsocketHandler {
 
     // You will need to have both players update to the OBSERVER state when this happens, so figure out
     // how to implement that in a way you like maybe?
-    private void resign(){
+    private void resign(int gameID, String authToken, Session session) throws Exception{
 
+        AuthData userAuthData;
 
+        try{
+
+            userAuthData = dataAccess.getAuthData(authToken);
+
+        }
+
+        catch (Exception invalidAuth){
+
+            connectForMissingFieldOutput(authToken, session);
+
+            return;
+
+        }
+
+        String resignerUsername = userAuthData.username();
+
+        GameData gameDataToUpdate = dataAccess.getGameData(gameID);
+
+        if (!Objects.equals(gameDataToUpdate.whiteUsername(), resignerUsername) && !Objects.equals(gameDataToUpdate.blackUsername(), resignerUsername)){
+
+            String cantResignObserver = "Error: You are an observer and cannot resign";
+
+            ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, cantResignObserver);
+
+            connectionManager.broadcastMessageToSingleUser(gameID, resignerUsername, outputMessageToUser);
+
+            System.out.println("This should have blocked the observer from making the game end through resignation");
+
+            return;
+
+        }
+
+        if (gameDataToUpdate.isOver() == true){
+
+            String gameAlreadyResigned = "Error: Your opponent has already resigned. Cannot resign.";
+
+            ServerMessage duplicateResign = new ServerMessage(ERROR, true, gameAlreadyResigned);
+
+            connectionManager.broadcastMessageToSingleUser(gameID, resignerUsername, duplicateResign);
+
+            System.out.println("This should only print to the user trying to resign");
+
+        }
+
+        else{
+
+            GameData finalGamestate = gameDataToUpdate.updateToGameOver();
+
+            dataAccess.updateGameData(gameID, finalGamestate);
+
+            String resignMessageToGame = String.format("%s has resigned", resignerUsername);
+
+            ServerMessage resign = new ServerMessage(NOTIFICATION, resignMessageToGame);
+
+            connectionManager.broadcastMessageToSingleUser(gameID, resignerUsername, resign);
+
+            connectionManager.broadcastMessageToGame(gameID, resignerUsername, resign);
+
+            System.out.println("This should have broadcasted to everyone");
+
+        }
 
     }
 
