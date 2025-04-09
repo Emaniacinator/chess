@@ -241,29 +241,24 @@ public class WebsocketHandler {
         GameData initialGameData = dataAccess.getGameData(gameID);
 
         if (initialGameData.isOver() == true){
-
             System.out.println(username);
             String messageStringToUser = "Error: Tried to make a move in a game that is over. Type 'help' for a list of commands";
             ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, messageStringToUser);
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
             return;
-
         }
 
         ChessGame initialGame = initialGameData.game();
         ChessGame.TeamColor currentTurn = initialGame.getTeamTurn();
 
         if (!Objects.equals(initialGameData.whiteUsername(), username) && !Objects.equals(initialGameData.blackUsername(), username)){
-
             String wrongTurnObserver = "Error: You are an observer and cannot make a move";
             ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnObserver);
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
             return;
-
         }
 
         else if (currentTurn == WHITE){
-
             if(!Objects.equals(initialGameData.whiteUsername(), username)){
                 String wrongTurnBlack = "Error: Tried to make a move for your opponent. Please wait your turn. You are the BLACK team.";
                 ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnBlack);
@@ -271,52 +266,39 @@ public class WebsocketHandler {
                 return;
 
             }
-
         }
 
         else{
-
             if(!Objects.equals(initialGameData.blackUsername(), username)){
-
                 String wrongTurnWhite = "Error: Tried to make a move for your opponent. Please wait your turn. You are the WHITE team.";
                 ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnWhite);
                 connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
                 return;
-
             }
-
         }
 
         try{
-
             initialGame.makeMove(moveToMake);
-
         }
 
         catch(Exception badMove){
-
             String invalidMove = "That is not a valid move, please try again.";
             ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, invalidMove);
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
             return;
-
         }
 
         GameData updatedGame;
 
         if (initialGame.isInCheckmate(WHITE) || initialGame.isInCheckmate(BLACK) ||
                 initialGame.isInStalemate(WHITE) || initialGame.isInStalemate(BLACK)){
-
             updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(),
                     initialGameData.gameName(), initialGame, true);
-
         }
 
         else{
-
             updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(),
                     initialGameData.gameName(), initialGame, false);
-
         }
 
         dataAccess.updateGameData(gameID, updatedGame);
