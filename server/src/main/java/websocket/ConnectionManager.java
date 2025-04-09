@@ -51,33 +51,6 @@ public class ConnectionManager {
     }
 
 
-    public void addObserver(Integer gameID, String username, Session session){
-
-        if (activeConnections.containsKey(gameID)){
-
-            ConnectionArray updatedArray = activeConnections.get(gameID);
-
-            Connection newConnection = new Connection(username, session);
-
-            updatedArray.allConnections.add(newConnection);
-
-        }
-
-        else{
-
-            Connection newConnection = new Connection(username, session);
-
-            ArrayList<Connection> newArrayList = new ArrayList<>();
-
-            newArrayList.add(newConnection);
-
-            activeConnections.put(gameID, new ConnectionArray(newArrayList));
-
-        }
-
-    }
-
-
     // Do I need to throw an exception here if the user isn't already connected? Or is it okay to assume
     // that because I build and break all of the connections that won't happen?
     public void removeConnection(Integer gameID, String username){
@@ -168,17 +141,6 @@ public class ConnectionManager {
             }
 
         }
-
-    }
-
-
-    public void sillyHelperErrorBroadcast(String authToken, Session session, ServerMessage messageToSend) throws Exception{
-
-        addPlayer(-99, authToken, session, null);
-
-        broadcastMessageToSingleUser(-99, authToken, messageToSend);
-
-        removeConnection(-99, authToken);
 
     }
 

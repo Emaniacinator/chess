@@ -9,7 +9,7 @@ import java.util.Arrays;
 import static ui.ClientState.INGAME;
 import static ui.ClientState.OBSERVINGGAME;
 import static ui.EscapeSequences.*;
-import static websocket.messages.ServerMessage.ServerMessageType.LOAD_GAME;
+import static websocket.messages.ServerMessage.ServerMessageType.*;
 
 public class Repl {
 
@@ -46,45 +46,34 @@ public class Repl {
 
                 String[] inputTokens = inputLine.trim().split(" ");
 
-                ClientState currentState = client.returnState();
+                // if inputTokens.length is 0, print that no command was received and then print the help section.
 
-                if (currentState == INGAME || currentState == OBSERVINGGAME){
+                String toPrint;
 
-                    // if inputTokens.length is 0, print that no command was received and then print the help section.
+                if (inputTokens.length == 1){
 
-                    String passedStateValue;
+                    toPrint = client.determineTakenAction(inputTokens[0]);
 
-                    if (currentState == INGAME){
+                }
 
-                        passedStateValue = "in game";
+                else if (inputTokens.length > 1) {
 
-                    }
-
-                    else{
-
-                        passedStateValue = "observing game";
-
-                    }
+                    toPrint = client.determineTakenAction(inputTokens[0], Arrays.copyOfRange(inputTokens, 1, inputTokens.length));
 
                 }
 
                 else{
 
-                    // if inputTokens.length is 0, print that no command was received and then print the help section.
-
-                    if (inputTokens.length == 1){
-
-                        System.out.println(client.determineTakenAction(inputTokens[0]));
-
-                    }
-
-                    else if (inputTokens.length > 1) {
-
-                        System.out.println(client.determineTakenAction(inputTokens[0], Arrays.copyOfRange(inputTokens, 1, inputTokens.length)));
-
-                    }
+                    toPrint = CommandHelper.getHelpMenu(client.returnState());
 
                 }
+
+                if (toPrint != null){
+
+                    System.out.println(SET_TEXT_COLOR_GREEN + toPrint);
+
+                }
+
 
                 previousInput = inputTokens[0];
 
@@ -92,7 +81,7 @@ public class Repl {
 
             catch(Exception exception){
 
-                System.out.println(exception.getMessage());
+                System.out.println(SET_TEXT_COLOR_GREEN + exception.getMessage());
 
             }
 
@@ -111,13 +100,19 @@ public class Repl {
 
         if (message.getServerMessageType() == LOAD_GAME){
 
-            System.out.println(client.displayBoard(message.getGame().getBoard(), client.returnUserColor()));
+            System.out.println(CommandHelper.displayBoard(message.getGame().getBoard(), client.returnUserColor()));
+
+        }
+
+        else if (message.getServerMessageType() == ERROR){
+
+            System.out.println(SET_TEXT_COLOR_BLUE + "[" + message.getServerMessageType() + "] >>> " + message.getErrorMessage());
 
         }
 
         else{
 
-            System.out.println(message);
+            System.out.println(SET_TEXT_COLOR_BLUE + "[" + message.getServerMessageType() + "] >>> " + message.getMessage());
 
         }
 

@@ -89,6 +89,20 @@ public class ServerMessage {
     }
 
 
+    public String getMessage(){
+
+        return this.message;
+
+    }
+
+
+    public String getErrorMessage(){
+
+        return this.errorMessage;
+
+    }
+
+
     public ServerMessageType getServerMessageType() {
 
         return this.serverMessageType;

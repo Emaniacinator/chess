@@ -45,7 +45,8 @@ public class UserGameCommand {
 
 
     // This one is used to help produce the right information to display adding a user to a specific side of a game
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessGame.TeamColor commandForWhichSide, String commandFromWhatUser) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID,
+                           ChessGame.TeamColor commandForWhichSide, String commandFromWhatUser) {
 
         this.commandType = commandType;
         this.authToken = authToken;

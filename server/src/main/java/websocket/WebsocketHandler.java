@@ -195,7 +195,21 @@ public class WebsocketHandler {
 
         connectionManager.addPlayer(gameID, username, session, userColor);
 
-        String messageStringToGame = String.format("%s has just joined the game on the %s team", username, userColor);
+        String messageStringToGame;
+
+        if (userColor != null){
+
+            messageStringToGame = String.format("%s has just joined the game on the %s team", username, userColor);
+
+        }
+
+        else {
+
+            messageStringToGame = String.format("%s has just joined the game as an observer", username);
+
+        }
+
+
 
         ServerMessage outputMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
 
@@ -266,7 +280,7 @@ public class WebsocketHandler {
 
             if(!Objects.equals(initialGameData.whiteUsername(), username)){
 
-                String wrongTurnBlack = "Error: Tried to make a move for your opponenet. Please wait your turn. You are the BLACK team.";
+                String wrongTurnBlack = "Error: Tried to make a move for your opponent. Please wait your turn. You are the BLACK team.";
 
                 ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnBlack);
 
@@ -282,7 +296,7 @@ public class WebsocketHandler {
 
             if(!Objects.equals(initialGameData.blackUsername(), username)){
 
-                String wrongTurnWhite = "Error: Tried to make a move for your opponenet. Please wait your turn. You are the WHITE team.";
+                String wrongTurnWhite = "Error: Tried to make a move for your opponent. Please wait your turn. You are the WHITE team.";
 
                 ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnWhite);
 
@@ -302,7 +316,9 @@ public class WebsocketHandler {
 
         catch(Exception badMove){
 
-            ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, badMove.getMessage());
+            String invalidMove = "That is not a valid move, please try again.";
+
+            ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, invalidMove);
 
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
 
@@ -312,22 +328,26 @@ public class WebsocketHandler {
 
         GameData updatedGame;
 
-        if (initialGame.isInCheckmate(WHITE) || initialGame.isInCheckmate(BLACK) || initialGame.isInStalemate(WHITE) || initialGame.isInStalemate(BLACK)){
+        if (initialGame.isInCheckmate(WHITE) || initialGame.isInCheckmate(BLACK) ||
+                initialGame.isInStalemate(WHITE) || initialGame.isInStalemate(BLACK)){
 
-            updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(), initialGameData.gameName(), initialGame, true);
+            updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(),
+                    initialGameData.gameName(), initialGame, true);
             // Broadcast a winner at the end of this entire method. Maybe create a variable to determine if something came of this?
 
         }
 
         else{
 
-            updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(), initialGameData.gameName(), initialGame, false);
+            updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(),
+                    initialGameData.gameName(), initialGame, false);
 
         }
 
         dataAccess.updateGameData(gameID, updatedGame);
 
-        String messageStringToGame = String.format("%s moved a piece from %s to %s", username, moveToMake.getStartPosition().toString(), moveToMake.getEndPosition().toString());
+        String messageStringToGame = String.format("%s moved a piece from %s to %s",
+                username, moveToMake.getStartPosition().toString(), moveToMake.getEndPosition().toString());
 
         ServerMessage outputBoardMessageToGame = new ServerMessage(LOAD_GAME, updatedGame.game());
         // You're probably going to have to redesign your Client Side stuff so that when the user calls draw board it reads
@@ -366,13 +386,15 @@ public class WebsocketHandler {
 
             if (Objects.equals(disconnectFrom.whiteUsername(), username)){
 
-                updatedWithDisconnect = new GameData(gameID, null, disconnectFrom.blackUsername(), disconnectFrom.gameName(), disconnectFrom.game(), disconnectFrom.isOver());
+                updatedWithDisconnect = new GameData(gameID, null, disconnectFrom.blackUsername(),
+                        disconnectFrom.gameName(), disconnectFrom.game(), disconnectFrom.isOver());
 
             }
 
             else{
 
-                updatedWithDisconnect = new GameData(gameID, disconnectFrom.whiteUsername(), null, disconnectFrom.gameName(), disconnectFrom.game(), disconnectFrom.isOver());
+                updatedWithDisconnect = new GameData(gameID, disconnectFrom.whiteUsername(), null,
+                        disconnectFrom.gameName(), disconnectFrom.game(), disconnectFrom.isOver());
 
             }
 
@@ -438,7 +460,8 @@ public class WebsocketHandler {
 
         GameData gameDataToUpdate = dataAccess.getGameData(gameID);
 
-        if (!Objects.equals(gameDataToUpdate.whiteUsername(), resignerUsername) && !Objects.equals(gameDataToUpdate.blackUsername(), resignerUsername)){
+        if (!Objects.equals(gameDataToUpdate.whiteUsername(), resignerUsername) &&
+                !Objects.equals(gameDataToUpdate.blackUsername(), resignerUsername)){
 
             String cantResignObserver = "Error: You are an observer and cannot resign";
 
