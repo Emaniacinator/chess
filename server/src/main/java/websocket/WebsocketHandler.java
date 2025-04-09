@@ -229,49 +229,35 @@ public class WebsocketHandler {
         AuthData userAuthData;
 
         try{
-
             userAuthData = dataAccess.getAuthData(authToken);
-
         }
 
         catch (Exception invalidAuth){
-
             connectForMissingFieldOutput(authToken, session);
-
             return;
-
         }
 
         String username = userAuthData.username();
-
         GameData initialGameData = dataAccess.getGameData(gameID);
 
         if (initialGameData.isOver() == true){
 
             System.out.println(username);
-
             String messageStringToUser = "Error: Tried to make a move in a game that is over. Type 'help' for a list of commands";
-
             ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, messageStringToUser);
-
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
-
             return;
 
         }
 
         ChessGame initialGame = initialGameData.game();
-
         ChessGame.TeamColor currentTurn = initialGame.getTeamTurn();
 
         if (!Objects.equals(initialGameData.whiteUsername(), username) && !Objects.equals(initialGameData.blackUsername(), username)){
 
             String wrongTurnObserver = "Error: You are an observer and cannot make a move";
-
             ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnObserver);
-
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
-
             return;
 
         }
@@ -279,13 +265,9 @@ public class WebsocketHandler {
         else if (currentTurn == WHITE){
 
             if(!Objects.equals(initialGameData.whiteUsername(), username)){
-
                 String wrongTurnBlack = "Error: Tried to make a move for your opponent. Please wait your turn. You are the BLACK team.";
-
                 ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnBlack);
-
                 connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
-
                 return;
 
             }
@@ -297,11 +279,8 @@ public class WebsocketHandler {
             if(!Objects.equals(initialGameData.blackUsername(), username)){
 
                 String wrongTurnWhite = "Error: Tried to make a move for your opponent. Please wait your turn. You are the WHITE team.";
-
                 ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, wrongTurnWhite);
-
                 connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
-
                 return;
 
             }
@@ -317,11 +296,8 @@ public class WebsocketHandler {
         catch(Exception badMove){
 
             String invalidMove = "That is not a valid move, please try again.";
-
             ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, invalidMove);
-
             connectionManager.broadcastMessageToSingleUser(gameID, username, outputMessageToUser);
-
             return;
 
         }
@@ -333,7 +309,6 @@ public class WebsocketHandler {
 
             updatedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(),
                     initialGameData.gameName(), initialGame, true);
-            // Broadcast a winner at the end of this entire method. Maybe create a variable to determine if something came of this?
 
         }
 
@@ -350,15 +325,10 @@ public class WebsocketHandler {
                 username, moveToMake.getStartPosition().toString(), moveToMake.getEndPosition().toString());
 
         ServerMessage outputBoardMessageToGame = new ServerMessage(LOAD_GAME, updatedGame.game());
-        // You're probably going to have to redesign your Client Side stuff so that when the user calls draw board it reads
-        // from the server. But we'll see how things actually go.
-
         ServerMessage outputMoveUpdateMessageToGame = new ServerMessage(NOTIFICATION, messageStringToGame);
 
         connectionManager.broadcastMessageToGame(gameID, username, outputMoveUpdateMessageToGame);
-
         connectionManager.broadcastMessageToGame(gameID, username, outputBoardMessageToGame);
-
         connectionManager.broadcastMessageToSingleUser(gameID, username, outputBoardMessageToGame);
 
     }

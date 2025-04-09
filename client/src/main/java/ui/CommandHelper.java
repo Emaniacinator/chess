@@ -250,15 +250,11 @@ public class CommandHelper {
                 }
 
                 if (colorSwitcher == true){
-
                     colorSwitcher = false;
-
                 }
 
                 else{
-
                     colorSwitcher = true;
-
                 }
 
             }
@@ -266,21 +262,16 @@ public class CommandHelper {
             entireBoard = entireBoard + getCharacterSpacing((char)('0' + i)) + RESET_BG_COLOR + "\n";
 
             if (colorSwitcher == true){
-
                 colorSwitcher = false;
-
             }
 
             else{
-
                 colorSwitcher = true;
-
             }
 
         }
 
         entireBoard = entireBoard + topAndBottom;
-
         return entireBoard;
 
     }
@@ -297,7 +288,7 @@ public class CommandHelper {
 
         }
 
-        returnRow = returnRow + getCharacterSpacing(' ');
+        returnRow = returnRow + EMPTY;
 
         return returnRow + RESET_BG_COLOR + RESET_TEXT_COLOR;
 
@@ -312,55 +303,37 @@ public class CommandHelper {
         if (colorSwitcher == true){
 
             if (isHighlighted == false){
-
                 backgroundColor = SET_BG_COLOR_WHITE;
-
             }
-
             else{
-
                 backgroundColor = SET_BG_COLOR_LIGHT_RED;
-
             }
-
 
         }
 
         else{
 
             if (isHighlighted == false){
-
                 backgroundColor = SET_BG_COLOR_DARK_GREEN;
-
             }
-
             else{
-
                 backgroundColor = SET_BG_COLOR_DARK_RED;
-
             }
 
         }
 
         if (currentPiece == null){
-
             // This is where it's returning the space that's too big, I suspect
             return backgroundColor + EMPTY;
-
         }
 
         String pieceColor;
 
         if (currentTeam == WHITE){
-
             pieceColor = SET_TEXT_COLOR_BLUE;
-
         }
-
         else{
-
             pieceColor = SET_TEXT_COLOR_BLACK;
-
         }
 
         switch(currentPiece.getPieceType()) {
@@ -368,91 +341,59 @@ public class CommandHelper {
             case KING:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_KING;
-
                 }
-
                 else{
-
                     return backgroundColor + pieceColor + BLACK_KING;
-
                 }
 
             case QUEEN:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_QUEEN;
-
                 }
-
                 else{
-
                     return backgroundColor + pieceColor + BLACK_QUEEN;
-
                 }
 
             case BISHOP:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_BISHOP;
-
                 }
-
                 else{
-
                     return backgroundColor + pieceColor + BLACK_BISHOP;
-
                 }
 
             case KNIGHT:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_KNIGHT;
-
                 }
-
                 else{
-
                     return backgroundColor + pieceColor + BLACK_KNIGHT;
-
                 }
 
             case ROOK:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_ROOK;
-
                 }
-
                 else{
-
                     return backgroundColor + pieceColor + BLACK_ROOK;
-
                 }
 
             case PAWN:
 
                 if (currentTeam == WHITE){
-
                     return backgroundColor + pieceColor + WHITE_PAWN;
-
                 }
-
                 else{
-
                     return backgroundColor + pieceColor + BLACK_PAWN;
-
                 }
 
         }
-
         return null;
-
     }
 
 
