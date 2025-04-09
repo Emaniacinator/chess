@@ -59,14 +59,14 @@ public class UserGameCommand {
 
 
     // This one lets the game be passed into the server for an update and tracks what move is being made.
-    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, GameData gameDataFromUser, ChessMove move) {
+    public UserGameCommand(CommandType commandType, String authToken, Integer gameID, ChessMove move) {
 
         this.commandType = commandType;
         this.authToken = authToken;
         this.gameID = gameID;
         this.commandForWhichSide = null;
         this.commandFromWhatUser = null;
-        this.gameDataFromUser = gameDataFromUser;
+        this.gameDataFromUser = null;
         this.move = move;
 
     }

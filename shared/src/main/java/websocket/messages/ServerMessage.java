@@ -96,6 +96,13 @@ public class ServerMessage {
     }
 
 
+    public ChessGame getGame(){
+
+        return this.game;
+
+    }
+
+
     // We'll see how this looks. I might not like it and as a result might have to change it.
     public String toString(){
 

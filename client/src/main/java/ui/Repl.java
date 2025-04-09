@@ -1,6 +1,7 @@
 package ui;
 
 import websocket.commands.UserGameCommand;
+import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
 import java.util.Arrays;
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import static ui.ClientState.INGAME;
 import static ui.ClientState.OBSERVINGGAME;
 import static ui.EscapeSequences.*;
+import static websocket.messages.ServerMessage.ServerMessageType.LOAD_GAME;
 
 public class Repl {
 
@@ -15,15 +17,13 @@ public class Repl {
     private final ChessClient client;
 
 
-    public void makeErrorLineAppearOnPurposeSoYouRememberThisComment(){};
-    // OH! The repl should feed the info to the ChessClient, which is then supposed to determine the command and the state.
-    // That will then send a request to the ServerFacade? This will then make an instance of UserGameCommand to run game
-    // commands through the websocket? While a separate instance of the websocket stays open to return and siplay updates?
+    public void makeErrorLineAppearOnPurposeSoYouRememberThisComment();
+    // Make sure that this one calls the display board function from the chess client when it gets a display board call.
 
 
-    public Repl(String serverURL){
+    public Repl(String serverURL) throws Exception{
 
-        client = new ChessClient(serverURL);
+        client = new ChessClient(serverURL, this);
 
     }
 
@@ -99,6 +99,31 @@ public class Repl {
                 System.out.println(exception.getMessage());
 
             }
+
+        }
+
+    }
+
+
+    // This one might cause some quirks since it could do a weird thing when printing the board
+    // Also print the pretty side thing first or not?
+
+    // Probably have it do this differently depending on what *type* of message is received.
+    // Create another switch statement for it here?
+
+    create an error so you look at the comments above me
+
+    public void printNotification(ServerMessage message){
+
+        if (message.getServerMessageType() == LOAD_GAME){
+
+            System.out.println(client.displayBoard(message.getGame().getBoard(), client.returnUserColor()));
+
+        }
+
+        else{
+
+            System.out.println(message.toString());
 
         }
 

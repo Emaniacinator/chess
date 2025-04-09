@@ -21,6 +21,8 @@ public class ChessClient {
     private AuthData clientAuthData = null;
     private GameData userSideGameData;
     private ChessGame.TeamColor userSideTeamColor;
+    private WebsocketFacade websocketFacade;
+    private String[] arrayWithGameID;
 
     // Throw an error if make move is called when this IS NOT null. True = user resigned. False = opponent
     // resigned. When the error is thrown, say if the user won or not. If it is null, allow the move to
@@ -32,10 +34,11 @@ public class ChessClient {
     // You need to make sure that the userSideGameData gets updated EVERY time new data is received or sent
     // You haven't yet implemented this part into everything you already wrote yet
 
-    public ChessClient(String serverURL){
+    public ChessClient(String serverURL, Repl userRepl) throws Exception{
 
         this.serverURL = serverURL;
-        serverFacade = new ServerFacade(serverURL);
+        this.serverFacade = new ServerFacade(serverURL);
+        this.websocketFacade = new WebsocketFacade(serverURL, userRepl);
 
     }
 
@@ -53,6 +56,12 @@ public class ChessClient {
 
     }
 
+
+    public ChessGame.TeamColor returnUserColor(){
+
+        return this.userSideTeamColor;
+
+    }
 
 
     public String determineTakenAction(String inputCommand, String[] otherTokens) throws Exception{
@@ -83,21 +92,22 @@ public class ChessClient {
 
                 return createCommand(otherTokens);
 
-            case "join": // Implement launching the Websocket connection
+            case "join":
 
-                return joinCommand(otherTokens);
+                joinCommand(otherTokens);
 
-            case "observe": // Implement launching the Websocket connection
+                break;
 
-                return observeCommand(otherTokens);
+            case "observe":
+
+                observeCommand(otherTokens);
+
+                break;
 
             case "list":
 
                 return listCommand(otherTokens);
 
-            // You may want to make this actually read from the server later in case the local board
-            // is not being effectively updated by the Websocket, actually.
-            // Or just have the ChessClient update the board every time a new websocket board state is received lol
             case "redraw":
 
                 if (currentState == INGAME){
@@ -119,7 +129,8 @@ public class ChessClient {
             // Not yet implemented fully
             case "make_move":
 
-                return null; //makeMoveCommand();
+                makeMoveCommand(otherTokens);
+
 
             // In theory, this is fully implemented. But there's a lot going on so something DEFINITELY could have broken
             case "highlight_moves":
@@ -127,9 +138,13 @@ public class ChessClient {
                 return highlightMovesCommand(otherTokens);
 
             // Not yet implemented fully
+
+            // Make sure to set the current GameID to -99 AND to disconnect the user from the game AND to set the cloentSideTeamColor to null
             case "leave":
 
                 return null; //leaveCommand();
+
+                break;
 
             // Not yet implemented fully
             case "resign":
@@ -281,8 +296,10 @@ public class ChessClient {
     }
 
 
-    // Implement launching the Websocket connection
-    public String joinCommand(String[] otherTokens) throws Exception{
+    // You made this not return a string anymore since the Server message should really do that instead.
+    public void joinCommand(String[] otherTokens) throws Exception{
+
+        int gameIDCheck;
 
         if (currentState == LOGGEDOUT){
 
@@ -304,7 +321,8 @@ public class ChessClient {
 
         try{
 
-            Integer.parseInt(otherTokens[0]);
+            gameIDCheck = Integer.parseInt(otherTokens[0]);
+            arrayWithGameID = otherTokens;
 
         }
 
@@ -320,19 +338,21 @@ public class ChessClient {
 
         }
 
+        websocketFacade.joinGame(clientAuthData.authToken(), gameIDCheck, userSideTeamColor, clientAuthData.username());
+
         userSideGameData = serverFacade.joinGame(otherTokens, clientAuthData);
 
         userSideTeamColor = ChessGame.TeamColor.valueOf(otherTokens[1].toUpperCase());
 
         currentState = INGAME;
 
-        return displayBoard(userSideGameData.game().getBoard(), userSideTeamColor);
-
     }
 
 
-    // Implement launching the Websocket connection
-    public String observeCommand(String[] otherTokens) throws Exception{
+    // You made this not return a string anymore since the Server message should really do that instead.
+    public void observeCommand(String[] otherTokens) throws Exception{
+
+        int observeGameIDCheck;
 
         if (currentState == LOGGEDOUT){
 
@@ -354,7 +374,7 @@ public class ChessClient {
 
         try{
 
-            Integer.parseInt(otherTokens[0]);
+            observeGameIDCheck = Integer.parseInt(otherTokens[0]);
 
         }
 
@@ -364,11 +384,11 @@ public class ChessClient {
 
         }
 
+        websocketFacade.joinGame(clientAuthData.authToken(), observeGameIDCheck, userSideTeamColor, clientAuthData.username());
+
         userSideGameData = serverFacade.observeGame(otherTokens, clientAuthData);
 
         currentState = OBSERVINGGAME;
-
-        return displayBoard(userSideGameData.game().getBoard(), ChessGame.TeamColor.WHITE);
 
     }
 
@@ -414,7 +434,7 @@ public class ChessClient {
 
         }
 
-        if (currentState != OBSERVINGGAME){
+        if (currentState != OBSERVINGGAME && currentState != INGAME){
 
             return "Error: You must be in a game to redraw the board. Type 'help' for a list of commands.";
 
@@ -427,18 +447,94 @@ public class ChessClient {
 
     public String redrawCommand(String[] otherTokens, ChessGame.TeamColor teamColor) throws Exception{
 
-        // Create an error for the wrong number of inputs
+        if (otherTokens.length != 0){
 
-        return displayBoard(userSideGameData.game().getBoard(), teamColor);
+            return "Error: 'redraw' doesn't accept any additional inputs. Please try again.";
+
+        }
+
+        ChessBoard currentBoard = serverFacade.observeGame(arrayWithGameID, clientAuthData).game().getBoard();
+
+        return displayBoard(currentBoard, teamColor);
 
     }
 
 
-    // Put the makeMovesCommand here later instead of at the bottom so that you don't go crazy and your
-    // organization keeps working as expected.
+    // This should be finished, but might have some errors.
+    public void makeMoveCommand(String[] otherTokens) throws Exception{
+
+        // Put all the error cases here
+
+        // One for not being logged in
+
+        if (currentState == LOGGEDOUT){
+
+            throw new Exception ("Error: Please log in and join a game before attempting to highlight a piece's moves");
+
+        }
+
+        // One for not in game / observing
+
+        if (currentState != INGAME && currentState != OBSERVINGGAME){
+
+            throw new Exception ("You must be playing or observing a game to highlight a piece's moves. Type 'help' for a list of commands.");
+
+        }
+
+        // One for wrong number of tokens
+
+        if (otherTokens.length != 4 || otherTokens.length != 5){
+
+            throw new Exception ("Error: 'make_move' only accepts exactly 4 or 5 inputs. Please try again.");
+
+        }
+
+        ChessBoard currentBoard = serverFacade.observeGame(arrayWithGameID, clientAuthData).game().getBoard();
+
+        int startColumnPosition = makeColumnLetterANumber(otherTokens[0]);
+
+        int startRowPosition = makeRowPositionANumber(otherTokens[1]);
+
+        int endColumnPosition = makeColumnLetterANumber(otherTokens[2]);
+
+        int endRowPosition = makeColumnLetterANumber(otherTokens[3]);
+
+        ChessPiece.PieceType promotes = null;
+
+        if (otherTokens.length == 5){
+
+            promotes = getPromotionInput(otherTokens[4]);
+
+        }
+
+        ChessPosition startPiecePosition = new ChessPosition(startRowPosition, startColumnPosition);
+
+        ChessPosition endPiecePosition = new ChessPosition(endRowPosition, endColumnPosition);
+
+        ChessPiece pieceToMove = currentBoard.getPiece(startPiecePosition);
+
+        // If there is no piece there, return an error saying that there is no piece there.
+
+        if (pieceToMove == null){
+
+            throw new Exception("Error: No piece at the designated location. Please try again.");
+
+        }
+
+        ChessMove moveToMake = new ChessMove(startPiecePosition, endPiecePosition, promotes);
+
+        websocketFacade.makeMove(clientAuthData.authToken(), Integer.parseInt(arrayWithGameID[0]), moveToMake);
+
+    }
 
     // Okay, there's a lot here so it totally could have broken something :(
     public String highlightMovesCommand(String[] otherTokens) throws Exception{
+
+        put an error bar here as a reminder that you havent made exception cases
+
+        // Create an error for being logged out
+
+        // Create an error for not being in game / observing a game
 
         // Create an error for the wrong number of inputs
 
@@ -458,7 +554,10 @@ public class ChessClient {
 
         // See if there is a piece there by making a ChessPiece item.
 
-        ChessBoard currentBoard = userSideGameData.game().getBoard();
+
+        // This might be a super flawed approach, but I also want to say that I *think* it should work so wer're trying it.
+        // Also, update JUST the game ID when a user joins a new game. Remove the local copy of the game.
+        ChessBoard currentBoard = serverFacade.observeGame(arrayWithGameID, clientAuthData).game().getBoard();
 
         if (currentBoard == null){
 
@@ -575,6 +674,35 @@ public class ChessClient {
             default:
 
                 throw new Exception("Error: Did not input a valid letter for the desired piece's column");
+
+        }
+
+    }
+
+
+    private ChessPiece.PieceType getPromotionInput(String inputToken) throws Exception{
+
+        switch (inputToken.toLowerCase()){
+
+            case "rook":
+
+                return ChessPiece.PieceType.ROOK;
+
+            case "bishop":
+
+                return ChessPiece.PieceType.BISHOP;
+
+            case "knight":
+
+                return ChessPiece.PieceType.KNIGHT;
+
+            case "queen":
+
+                return ChessPiece.PieceType.QUEEN;
+
+            default:
+
+                throw new Exception("Error: Input an invalid promotion piece type. Please try again.");
 
         }
 
