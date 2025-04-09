@@ -8,6 +8,7 @@ import server.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Scanner;
 
 import static chess.ChessGame.TeamColor.*;
 import static ui.ClientState.*;
@@ -126,10 +127,11 @@ public class ChessClient {
             // Similarly, make sure that the user can't call this function unless they are actually in the game and NOT AN OBSERVER
             // After both of those, check to make sure that the right number of inputs are being read.
 
-            // Not yet implemented fully
             case "make_move":
 
                 makeMoveCommand(otherTokens);
+
+                break;
 
 
             // In theory, this is fully implemented. But there's a lot going on so something DEFINITELY could have broken
@@ -139,17 +141,19 @@ public class ChessClient {
 
             // Not yet implemented fully
 
-            // Make sure to set the current GameID to -99 AND to disconnect the user from the game AND to set the cloentSideTeamColor to null
+            // Make sure to set the current GameID to -99 AND to disconnect the user from the game AND to set the clientSideTeamColor to null
             case "leave":
 
-                return null; //leaveCommand();
+                leaveCommand(otherTokens);
 
                 break;
 
             // Not yet implemented fully
             case "resign":
 
-                return null; //resignCommand();
+                resignCommand(otherTokens);
+
+                break;
 
         }
 
@@ -469,7 +473,7 @@ public class ChessClient {
 
         if (currentState == LOGGEDOUT){
 
-            throw new Exception ("Error: Please log in and join a game before attempting to highlight a piece's moves");
+            throw new Exception ("Error: Please log in and join a game before attempting to highlight a piece's moves.");
 
         }
 
@@ -477,7 +481,7 @@ public class ChessClient {
 
         if (currentState != INGAME && currentState != OBSERVINGGAME){
 
-            throw new Exception ("You must be playing or observing a game to highlight a piece's moves. Type 'help' for a list of commands.");
+            throw new Exception ("Error: You must be playing or observing a game to highlight a piece's moves. Type 'help' for a list of commands.");
 
         }
 
@@ -530,11 +534,21 @@ public class ChessClient {
     // Okay, there's a lot here so it totally could have broken something :(
     public String highlightMovesCommand(String[] otherTokens) throws Exception{
 
-        put an error bar here as a reminder that you havent made exception cases
-
         // Create an error for being logged out
 
+        if (currentState == LOGGEDOUT){
+
+            throw new Exception("Error: Please log in and join a game before attempting to highlight a piece's moves.");
+
+        }
+
         // Create an error for not being in game / observing a game
+
+        if (currentState != INGAME && currentState != OBSERVINGGAME){
+
+            throw new Exception("Error: You must be playing or observing a game to highlight a piece's moves. Type 'help' for a list of commands.");
+
+        }
 
         // Create an error for the wrong number of inputs
 
@@ -554,8 +568,7 @@ public class ChessClient {
 
         // See if there is a piece there by making a ChessPiece item.
 
-
-        // This might be a super flawed approach, but I also want to say that I *think* it should work so wer're trying it.
+        // This might be a super flawed approach, but I also want to say that I *think* it should work so we're trying it.
         // Also, update JUST the game ID when a user joins a new game. Remove the local copy of the game.
         ChessBoard currentBoard = serverFacade.observeGame(arrayWithGameID, clientAuthData).game().getBoard();
 
@@ -606,6 +619,108 @@ public class ChessClient {
         // instead of the usual color if it matches one of the spaces in the list of possible moves for the ChessPiece.
 
         return displayBoard(currentBoard, userSideTeamColor, highlightedPositions);
+
+    }
+
+
+    public void leaveCommand(String[] otherTokens) throws Exception{
+
+        // Put exception cases here
+
+        // Is logged out
+
+        if (currentState == LOGGEDOUT){
+
+            throw new Exception("Error: You aren't logged in. Type 'help' for a list of commands.");
+
+        }
+
+        // Is not in a game or observing
+
+        if (currentState != INGAME && currentState != OBSERVINGGAME){
+
+            throw new Exception("Error: You are not in a game, so there is no game to leave. Type 'help' for a list of commands.");
+
+        }
+
+        // Has any inputs
+
+        if (otherTokens.length != 0){
+
+            throw new Exception("Error: 'leave' does not accept any additional inputs. Please try again.");
+
+        }
+
+        websocketFacade.leaveGame(clientAuthData.authToken(), Integer.parseInt(arrayWithGameID[0]));
+
+        arrayWithGameID = new String[]{"-99"};
+
+        userSideTeamColor = null;
+
+        currentState = LOGGEDIN;
+
+    }
+
+
+    public void resignCommand(String[] otherTokens) throws Exception{
+
+        // Put exception cases here
+
+        // Is logged out
+
+        if (currentState == LOGGEDOUT){
+
+            throw new Exception("Error: You are currently logged out and cannot resign. Type 'help' for a list of commands.");
+
+        }
+
+        // Is not the player in a game
+
+        if (currentState != INGAME){
+
+            throw new Exception("Error: You cannot resign unless you are a player in a game. Type 'help' for a list of commands.");
+
+        }
+
+        // has any inputs
+
+        if (otherTokens.length != 0){
+
+            throw new Exception("Error: 'resign' does not accept any additional inputs. Please try again.");
+
+        }
+
+        // Remember the verification since we need to ask twice
+
+        System.out.println("Verify: You would like to resign the game. Please type 'true' or 'false'.");
+
+        Scanner readInput = new Scanner(System.in);
+
+        String inputLine = readInput.nextLine();
+
+        // if resign, send command to websocket
+
+        if(inputLine.toLowerCase().equals("true")){
+
+            websocketFacade.resignFromGame(clientAuthData.authToken(), Integer.parseInt(arrayWithGameID[0]));
+
+        }
+
+        // if not resign, output message "chose not to resign"
+
+        else if(inputLine.toLowerCase().equals("false")){
+
+            System.out.println("You chose not to resign");
+
+        }
+
+        // if other input, display that they input an invalid response and the game has not been resigned
+
+        else{
+
+            System.out.println("This was an invalid response. You have not been resigned from the game.");
+
+        }
 
     }
 
@@ -730,7 +845,7 @@ public class ChessClient {
             case INGAME:
 
                 return  "redraw - redraws the chess board\n" + // This function will make the LOAD_GAME websocket (html? SQL?) call, then display the board
-                        "make_move <START POSITION> <END POSITION> - move a piece from the starting position to the ending position if the move is valid\n" +
+                        "make_move <START POSITION> <END POSITION> <PROMOTION PIECE?> - move a piece from the starting position to the ending position if the move is valid\n" +
                         "highlight_moves <PIECE POSITION> - Highlights all the legal spaces that a specific piece can move to\n" +
                         "leave - leaves the current chess game\n" +
                         "resign - forfeits the game, but does not leave the game\n" +
@@ -800,7 +915,7 @@ public class ChessClient {
 
                 if (currentPiece != null){
 
-                    if (Arrays.asList(locationsToHighlight).isEmpty() == false && Arrays.asList(locationsToHighlight).contains(specificPiece)){
+                    if (locationsToHighlight != null && Arrays.asList(locationsToHighlight).isEmpty() == false && Arrays.asList(locationsToHighlight).contains(specificPiece)){
 
                         entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor(), true);
 
@@ -817,7 +932,7 @@ public class ChessClient {
                 // This might be where the weird board spacing is coming in
                 else{
 
-                    if (Arrays.asList(locationsToHighlight).isEmpty() == false && Arrays.asList(locationsToHighlight).contains(specificPiece)){
+                    if (locationsToHighlight != null && Arrays.asList(locationsToHighlight).isEmpty() == false && Arrays.asList(locationsToHighlight).contains(specificPiece)){
 
                         entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide, true);
 

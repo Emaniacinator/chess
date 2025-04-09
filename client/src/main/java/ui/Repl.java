@@ -17,10 +17,6 @@ public class Repl {
     private final ChessClient client;
 
 
-    public void makeErrorLineAppearOnPurposeSoYouRememberThisComment();
-    // Make sure that this one calls the display board function from the chess client when it gets a display board call.
-
-
     public Repl(String serverURL) throws Exception{
 
         client = new ChessClient(serverURL, this);
@@ -111,8 +107,6 @@ public class Repl {
     // Probably have it do this differently depending on what *type* of message is received.
     // Create another switch statement for it here?
 
-    create an error so you look at the comments above me
-
     public void printNotification(ServerMessage message){
 
         if (message.getServerMessageType() == LOAD_GAME){
@@ -123,7 +117,7 @@ public class Repl {
 
         else{
 
-            System.out.println(message.toString());
+            System.out.println(message);
 
         }
 
