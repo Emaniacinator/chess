@@ -399,8 +399,6 @@ public class WebsocketHandler {
 
             connectionManager.removeConnection(gameID, username);
 
-            System.out.println("Player disconnected");
-
 
         }
 
@@ -410,8 +408,6 @@ public class WebsocketHandler {
             ServerMessage outputMessageToObserver = new ServerMessage(NOTIFICATION, messageStringToObserver);
             connectionManager.broadcastMessageToGame(gameID, username, outputMessageToObserver);
             connectionManager.removeConnection(gameID, username);
-            System.out.println("Observer disconnected");
-
 
         }
 

@@ -184,8 +184,6 @@ public class CommandHelper {
         int initialRow;
         int initialColumn;
 
-        System.out.println("You are now in the displayBoard method");
-
         if (displaySide == WHITE){
 
             // In this case, you start with black at the top, resulting in incrementing numerically downwards for the row.
@@ -219,12 +217,9 @@ public class CommandHelper {
 
                 if (currentPiece != null){
 
-                    System.out.println("You are checking for an empty space");
 
                     if (locationsToHighlight != null && locationsToHighlight.isEmpty() == false
                             && locationsToHighlight.contains(specificPiece)){
-
-                        System.out.println("Made it to adding a highlighted piece icon");
 
                         entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor(), true);
 
@@ -232,19 +227,13 @@ public class CommandHelper {
 
                     else{
 
-                        System.out.println("Made it to adding a piece icon");
-
                         entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor(), false);
 
                     }
 
-                    System.out.println("Empty space formatted correctly.");
-
                 }
 
                 else{
-
-                    System.out.println("You are checking for a piece space.");
 
                     if (locationsToHighlight != null && locationsToHighlight.isEmpty() == false
                             && locationsToHighlight.contains(specificPiece)){
@@ -259,8 +248,6 @@ public class CommandHelper {
 
                     }
 
-                    System.out.println("Piece space formatted correctly.");
-
                 }
 
                 if (colorSwitcher == true){
@@ -272,8 +259,6 @@ public class CommandHelper {
                 }
 
             }
-
-            System.out.println("Made it past creating highlighted spaces");
 
             entireBoard = entireBoard + getCharacterSpacing((char)('0' + i)) + RESET_BG_COLOR + "\n";
 
