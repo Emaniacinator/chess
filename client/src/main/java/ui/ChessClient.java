@@ -234,11 +234,9 @@ public class ChessClient {
         if (currentState == LOGGEDOUT){
             throw new Exception("Error: Not logged in, can't join game. Type 'help' for a list of commands.");
         }
-
         if (currentState != LOGGEDIN){
             throw new Exception("Error: Can't join more than 1 game. Please leave current game before continuing.");
         }
-
         if (otherTokens == null || otherTokens.length != 2){
             throw new Exception("Error: 'join' only accepts exactly 2 inputs. Please try again.");
         }
@@ -247,7 +245,6 @@ public class ChessClient {
             gameIDCheck = Integer.parseInt(otherTokens[0]);
             arrayWithGameID = otherTokens;
         }
-
         catch(Exception exception){
             throw new Exception("Error: input gameID value is not a valid number. Please try again.");
         }
@@ -262,16 +259,13 @@ public class ChessClient {
             userSideGameData = serverFacade.joinGame(otherTokens, clientAuthData);
             websocketFacade.joinGame(clientAuthData.authToken(), gameIDCheck, userSideTeamColor, clientAuthData.username());
         }
-
         catch (Exception exception){
             userSideTeamColor = null;
             throw exception;
         }
 
         currentState = INGAME;
-
     }
-
 
     public void observeCommand(String[] otherTokens) throws Exception{
 
@@ -301,9 +295,7 @@ public class ChessClient {
         websocketFacade.joinGame(clientAuthData.authToken(), observeGameIDCheck, userSideTeamColor, clientAuthData.username());
         userSideGameData = serverFacade.observeGame(otherTokens, clientAuthData);
         currentState = OBSERVINGGAME;
-
     }
-
 
     public String listCommand(String[] otherTokens) throws Exception{
 
@@ -332,7 +324,6 @@ public class ChessClient {
 
     }
 
-
     public String redrawCommand(String[] otherTokens) throws Exception{
 
         if (currentState == LOGGEDOUT){
@@ -344,7 +335,6 @@ public class ChessClient {
         }
 
         return redrawCommand(otherTokens, ChessGame.TeamColor.BLACK);
-
     }
 
 
@@ -356,9 +346,7 @@ public class ChessClient {
 
         ChessBoard currentBoard = serverFacade.observeGame(arrayWithGameID, clientAuthData).game().getBoard();
         return CommandHelper.displayBoard(currentBoard, teamColor);
-
     }
-
 
     public void makeMoveCommand(String[] otherTokens) throws Exception{
 
@@ -395,9 +383,7 @@ public class ChessClient {
 
         ChessMove moveToMake = new ChessMove(startPiecePosition, endPiecePosition, promotes);
         websocketFacade.makeMove(clientAuthData.authToken(), Integer.parseInt(arrayWithGameID[0]), moveToMake);
-
     }
-
 
     public String highlightMovesCommand(String[] otherTokens) throws Exception{
 
@@ -456,9 +442,7 @@ public class ChessClient {
         }
 
         return CommandHelper.displayBoard(currentBoard, userSideTeamColor, highlightedPositions);
-
     }
-
 
     public void leaveCommand(String[] otherTokens) throws Exception{
 
@@ -476,9 +460,7 @@ public class ChessClient {
         arrayWithGameID = new String[]{"-99"};
         userSideTeamColor = null;
         currentState = LOGGEDIN;
-
     }
-
 
     public void resignCommand(String[] otherTokens) throws Exception{
 
@@ -499,15 +481,11 @@ public class ChessClient {
         if(inputLine.toLowerCase().equals("true")){
             websocketFacade.resignFromGame(clientAuthData.authToken(), Integer.parseInt(arrayWithGameID[0]));
         }
-
         else if(inputLine.toLowerCase().equals("false")){
             System.out.println("You chose not to resign");
         }
-
         else{
             System.out.println("This was an invalid response. You have not been resigned from the game.");
         }
-
     }
-
 }
