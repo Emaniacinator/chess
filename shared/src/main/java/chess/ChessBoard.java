@@ -26,8 +26,16 @@ public class ChessBoard {
 
                 ChessPosition locationToCopy = new ChessPosition(i + 1, j + 1);
                 ChessPiece pieceToCopy = copiedBoard.getPiece(locationToCopy);
+                ChessPiece actualCopy = null;
 
-                addPiece(locationToCopy, pieceToCopy);
+                if (pieceToCopy != null){
+
+                    actualCopy = new ChessPiece(pieceToCopy.getTeamColor(), pieceToCopy.getPieceType(), pieceToCopy.checkHasMoved());
+
+                }
+
+
+                addPiece(locationToCopy, actualCopy);
 
             }
 

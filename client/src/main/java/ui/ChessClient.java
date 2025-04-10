@@ -6,6 +6,7 @@ import chess.model.GameData;
 import server.GameList;
 import server.ServerFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Scanner;
@@ -342,7 +343,7 @@ public class ChessClient {
             return "Error: You must be in a game to redraw the board. Type 'help' for a list of commands.";
         }
 
-        return redrawCommand(otherTokens, ChessGame.TeamColor.WHITE);
+        return redrawCommand(otherTokens, ChessGame.TeamColor.BLACK);
 
     }
 
@@ -413,7 +414,8 @@ public class ChessClient {
         int columnPosition = CommandHelper.makeColumnLetterANumber(otherTokens[0]);
         int rowPosition = CommandHelper.makeRowPositionANumber(otherTokens[1]);
         ChessPosition highlightedPiecePosition = new ChessPosition(rowPosition, columnPosition);
-        ChessBoard currentBoard = serverFacade.observeGame(arrayWithGameID, clientAuthData).game().getBoard();
+        ChessGame currentGame = serverFacade.observeGame(arrayWithGameID, clientAuthData).game();
+        ChessBoard currentBoard = currentGame.getBoard();
 
         if (currentBoard == null){
             throw new Exception("Error: How the heck did you get here? Anyways, there is no chess board *shrug emoji*");
@@ -431,13 +433,37 @@ public class ChessClient {
             return "There are no possible moves for that piece.";
         }
 
-        ChessPosition[] highlightedPositions = new ChessPosition[possiblePieceMoves.size() + 1];
-        highlightedPositions[0] = highlightedPiecePosition;
+        ArrayList<ChessPosition> highlightedPositions = new ArrayList<>();
+        highlightedPositions.add(highlightedPiecePosition);
         int positionHelper = 1;
+        ChessGame.TeamColor checkColor = highlightedPiece.getTeamColor();
+
+        System.out.println("You made it to the possible move finder.");
+
+        System.out.println("Intital highlight list:\n" + highlightedPositions);
 
         for (ChessMove convertToPosition : possiblePieceMoves){
-            highlightedPositions[positionHelper] = convertToPosition.getEndPosition();
-            positionHelper++;
+            try{
+                ChessGame testGame = new ChessGame(checkColor, currentBoard);
+                testGame.makeMove(convertToPosition);
+                System.out.println("You made it past the make move check.");
+                if (!testGame.isInCheck(checkColor)){
+                    highlightedPositions.add(convertToPosition.getEndPosition());
+                    positionHelper++;
+                }
+                System.out.println("You made it past the list adder.");
+            }
+            catch(Exception ignored){System.out.println("You made it to the move exception case.");}
+
+            System.out.println("Highlight list:\n" + highlightedPositions);
+        }
+
+        System.out.println("Probably the issue is in the displayBoard command then.");
+
+        if (highlightedPositions.size() == 1){
+
+            return "None of that piece's possible moves will remove the king from check";
+
         }
 
         return CommandHelper.displayBoard(currentBoard, userSideTeamColor, highlightedPositions);

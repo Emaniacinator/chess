@@ -39,16 +39,6 @@ public class WebsocketHandler {
     }
 
 
-    public Boolean didYouReadTheNoteRightBelowThis = false;
-    // You may not need to broadcast the user's own actions back to them since you *can*
-    // just return a string to their REPL as an output (UNLESS IT'S A LOAD GAME NOTIFICATION,
-    // SINCE THAT AFFECTS MORE VARIABLES SUCH AS THE USER SIDE GAME DATA). Alternatively, the
-    // client side stuff can return null or "" when the server sends out a notification from
-    // the methods that are used.
-
-    // Note that the ServerMessage is just about the types of data that will be returned to the user.
-    // Similarly, the UserGameCommand is just about the types of actions that the user can take.
-
     private final ConnectionManager connectionManager = new ConnectionManager();
 
 
@@ -120,11 +110,6 @@ public class WebsocketHandler {
                 break;
 
             case MAKE_MOVE:
-
-                // Because of how they set up the tests, you'll probably need to run a check to see if the user matches
-                // the color of piece that's trying to be moved here. Which is frustrating because I had a different
-                // design in mind (and already being built) but they didn't explain this (or the tests) clearly so it's
-                // not going to work anymore.
 
                 GameData inputGameData = userCommand.getGameData();
 
@@ -312,6 +297,60 @@ public class WebsocketHandler {
         connectionManager.broadcastMessageToGame(gameID, username, outputMoveUpdateMessageToGame);
         connectionManager.broadcastMessageToGame(gameID, username, outputBoardMessageToGame);
         connectionManager.broadcastMessageToSingleUser(gameID, username, outputBoardMessageToGame);
+        displayCheck(gameID);
+
+    }
+
+
+    private void displayCheck(int gameID) throws Exception{
+
+        GameData initialGameData = dataAccess.getGameData(gameID);
+
+        if (initialGameData.game().isInCheck(WHITE) || initialGameData.game().isInCheck(BLACK)) {
+
+            if (initialGameData.game().isInCheck(WHITE)){
+
+                String username = initialGameData.whiteUsername();
+
+                displayCheckmate(gameID, WHITE, username);
+
+            }
+
+            else{
+
+                String username = initialGameData.blackUsername();
+
+                displayCheckmate(gameID, BLACK, username);
+
+            }
+
+        }
+
+        // if true, run checkmate. Checkmate will decide whether to send check or checkmate notification
+
+    }
+
+
+    private void displayCheckmate(int gameID, ChessGame.TeamColor whichSide, String username) throws Exception{
+
+        GameData initialGameData = dataAccess.getGameData(gameID);
+
+        if (initialGameData.game().isInCheckmate(whichSide)){
+            String checkmateString = String.format("%s is in checkmate. The game has ended. %s team lost.", username, whichSide);
+            ServerMessage checkmateMessage = new ServerMessage(NOTIFICATION, checkmateString);
+            GameData completedGame = new GameData(gameID, initialGameData.whiteUsername(), initialGameData.blackUsername(),
+                    initialGameData.gameName(), initialGameData.game(), true);
+            dataAccess.updateGameData(gameID, completedGame);
+            connectionManager.broadcastMessageToGame(gameID, username, checkmateMessage);
+            connectionManager.broadcastMessageToSingleUser(gameID, username, checkmateMessage);
+        }
+
+        else{
+            String checkString = String.format("%s is in check.", username);
+            ServerMessage checkMessage = new ServerMessage(NOTIFICATION, checkString);
+            connectionManager.broadcastMessageToGame(gameID, username, checkMessage);
+            connectionManager.broadcastMessageToSingleUser(gameID, username, checkMessage);
+        }
 
     }
 
@@ -368,13 +407,9 @@ public class WebsocketHandler {
         else{
 
             String messageStringToObserver = String.format("%s has stopped observing the game", username);
-
             ServerMessage outputMessageToObserver = new ServerMessage(NOTIFICATION, messageStringToObserver);
-
             connectionManager.broadcastMessageToGame(gameID, username, outputMessageToObserver);
-
             connectionManager.removeConnection(gameID, username);
-
             System.out.println("Observer disconnected");
 
 
@@ -416,13 +451,9 @@ public class WebsocketHandler {
                 !Objects.equals(gameDataToUpdate.blackUsername(), resignerUsername)){
 
             String cantResignObserver = "Error: You are an observer and cannot resign";
-
             ServerMessage outputMessageToUser = new ServerMessage(ERROR, true, cantResignObserver);
-
             connectionManager.broadcastMessageToSingleUser(gameID, resignerUsername, outputMessageToUser);
-
             System.out.println("This should have blocked the observer from making the game end through resignation");
-
             return;
 
         }
@@ -430,11 +461,8 @@ public class WebsocketHandler {
         if (gameDataToUpdate.isOver() == true){
 
             String gameAlreadyResigned = "Error: Your opponent has already resigned. Cannot resign.";
-
             ServerMessage duplicateResign = new ServerMessage(ERROR, true, gameAlreadyResigned);
-
             connectionManager.broadcastMessageToSingleUser(gameID, resignerUsername, duplicateResign);
-
             System.out.println("This should only print to the user trying to resign");
 
         }
@@ -442,17 +470,11 @@ public class WebsocketHandler {
         else{
 
             GameData finalGamestate = gameDataToUpdate.updateToGameOver();
-
             dataAccess.updateGameData(gameID, finalGamestate);
-
             String resignMessageToGame = String.format("%s has resigned", resignerUsername);
-
             ServerMessage resign = new ServerMessage(NOTIFICATION, resignMessageToGame);
-
             connectionManager.broadcastMessageToSingleUser(gameID, resignerUsername, resign);
-
             connectionManager.broadcastMessageToGame(gameID, resignerUsername, resign);
-
             System.out.println("This should have broadcasted to everyone");
 
         }

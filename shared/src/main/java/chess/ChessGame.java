@@ -36,7 +36,7 @@ public class ChessGame {
     public ChessGame(TeamColor teamTurn, ChessBoard currentBoard){
 
         this.teamTurn = teamTurn;
-        this.currentBoard = currentBoard;
+        this.currentBoard = new ChessBoard(currentBoard);
 
     }
 

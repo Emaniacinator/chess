@@ -61,7 +61,7 @@ public class EscapeSequences {
     public static final String BLACK_KNIGHT = " ♞ ";
     public static final String BLACK_ROOK = " ♜ ";
     public static final String BLACK_PAWN = " ♟ ";
-    public static final String EMPTY = "\u2008\u2008\u2008\u2003\u2008\u2008\u2008";
+    public static final String EMPTY = " \u2003 ";
 
 
     public static final String WEIRD_SPACE = "\u2001";

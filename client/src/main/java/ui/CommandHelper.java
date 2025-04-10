@@ -8,6 +8,7 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import static chess.ChessGame.TeamColor.*;
@@ -176,12 +177,14 @@ public class CommandHelper {
     }
 
 
-    public static String displayBoard(ChessBoard displayedBoard, ChessGame.TeamColor displaySide, ChessPosition[] locationsToHighlight){
+    public static String displayBoard(ChessBoard displayedBoard, ChessGame.TeamColor displaySide, ArrayList<ChessPosition> locationsToHighlight){
 
         boolean colorSwitcher = true;
         int incrementer;
         int initialRow;
         int initialColumn;
+
+        System.out.println("You are now in the displayBoard method");
 
         if (displaySide == WHITE){
 
@@ -216,8 +219,12 @@ public class CommandHelper {
 
                 if (currentPiece != null){
 
-                    if (locationsToHighlight != null && Arrays.asList(locationsToHighlight).isEmpty() == false
-                            && Arrays.asList(locationsToHighlight).contains(specificPiece)){
+                    System.out.println("You are checking for an empty space");
+
+                    if (locationsToHighlight != null && locationsToHighlight.isEmpty() == false
+                            && locationsToHighlight.contains(specificPiece)){
+
+                        System.out.println("Made it to adding a highlighted piece icon");
 
                         entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor(), true);
 
@@ -225,27 +232,34 @@ public class CommandHelper {
 
                     else{
 
+                        System.out.println("Made it to adding a piece icon");
+
                         entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, currentPiece.getTeamColor(), false);
 
                     }
 
+                    System.out.println("Empty space formatted correctly.");
+
                 }
 
-                // This might be where the weird board spacing is coming in
                 else{
 
-                    if (locationsToHighlight != null && Arrays.asList(locationsToHighlight).isEmpty() ==
-                            false && Arrays.asList(locationsToHighlight).contains(specificPiece)){
+                    System.out.println("You are checking for a piece space.");
 
-                        entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide, true);
+                    if (locationsToHighlight != null && locationsToHighlight.isEmpty() == false
+                            && locationsToHighlight.contains(specificPiece)){
+
+                        entireBoard = entireBoard + getPieceIcon(null, colorSwitcher, displaySide, true);
 
                     }
 
                     else{
 
-                        entireBoard = entireBoard + getPieceIcon(currentPiece, colorSwitcher, displaySide, false);
+                        entireBoard = entireBoard + getPieceIcon(null, colorSwitcher, displaySide, false);
 
                     }
+
+                    System.out.println("Piece space formatted correctly.");
 
                 }
 
@@ -258,6 +272,8 @@ public class CommandHelper {
                 }
 
             }
+
+            System.out.println("Made it past creating highlighted spaces");
 
             entireBoard = entireBoard + getCharacterSpacing((char)('0' + i)) + RESET_BG_COLOR + "\n";
 
